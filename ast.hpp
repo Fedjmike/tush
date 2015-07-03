@@ -21,7 +21,7 @@ namespace AST {
 
         FnApp (Node* fn, std::vector<Node*> params)
             : fn(std::unique_ptr<Node>(fn)),
-              params{} {
+              params {} {
             for (Node* param: params)
                 this->params.push_back(std::unique_ptr<Node>(param));
         }

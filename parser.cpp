@@ -17,7 +17,7 @@ Ast* Parser::pipe () {
 
     while (match_if("|")) {
         auto fn = fn_app();
-        node = new AST::FnApp(fn, vector<Ast*>{node});
+        node = new AST::FnApp(fn, vector<Ast*> {node});
     }
 
     return node;
@@ -35,7 +35,7 @@ Ast* Parser::fn_app () {
     else {
         auto fn = nodes.back();
         nodes.pop_back();
-        return new AST::FnApp{fn, nodes};
+        return new AST::FnApp(fn, nodes);
     }
 }
 
