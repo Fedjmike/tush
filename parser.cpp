@@ -24,17 +24,32 @@ Ast* Parser::pipe () {
 }
 
 Ast* Parser::fn_app () {
-    vector<Ast*> nodes {atom()};
+    vector<Ast*> nodes;
+    /*Filled iff there is a backtick function*/
+    Ast* fn = 0;
 
-    while (waiting_for(")") && waiting_for("|"))
-        nodes.push_back(atom());
+    while (waiting_for(")") && waiting_for("|")) {
+        if (try_match("`")) {
+            if (fn)
+                ; //TODO: error
+
+            fn = atom();
+            match("`");
+
+        } else
+            nodes.push_back(atom());
+    }
 
     if (nodes.size() == 1)
         return nodes[0];
 
     else {
-        auto fn = nodes.back();
-        nodes.pop_back();
+        /*If not explicitly marked in backticks, the last expr was the fn*/
+        if (!fn) {
+            fn = nodes.back();
+            nodes.pop_back();
+        }
+
         return new AST::FnApp(fn, nodes);
     }
 }
