@@ -19,8 +19,8 @@ public:
     ParserBase (Lexer* nlexer) : lexer(nlexer), current(nlexer->next()) {}
 
 protected:
-    void error () {
-        printf("ERROR\n");
+    void error (string msg) {
+        printf("error: %s\n", msg.c_str());
         errors++;
     }
 
@@ -39,7 +39,7 @@ protected:
 
     void match (string look) {
         if (!see(look))
-            error();
+            error("Expected '" + look + "' found '" + current.buffer + "'");
 
         accept();
     }

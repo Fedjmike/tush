@@ -31,7 +31,7 @@ Ast* Parser::fn_app () {
     while (waiting_for(")") && waiting_for("|")) {
         if (try_match("`")) {
             if (fn)
-                ; //TODO: error
+                error("Multiple explicit functions in backticks: '" + current.buffer + "'");
 
             fn = atom();
             match("`");
