@@ -4,6 +4,8 @@
 #include "lexer.hpp"
 #include "parser.hpp"
 
+#include "ast-printer.hpp"
+
 int main (int argc, char** argv) {
     (void) argc, (void) argv;
 
@@ -12,5 +14,10 @@ int main (int argc, char** argv) {
 
     Lexer lexer(input);
     Parser parser(&lexer);
-    delete parser.s();
+    
+    auto tree = parser.s();
+
+    AST::print(tree);
+
+    delete tree;
 }

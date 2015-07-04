@@ -7,7 +7,7 @@
 
 namespace AST {
     struct Node {
-
+        virtual ~Node () {};
     };
 
     struct Expr: public Node {
