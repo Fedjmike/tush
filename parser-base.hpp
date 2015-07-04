@@ -28,6 +28,10 @@ protected:
         return look == current.buffer;
     }
 
+    bool see_kind (Token::Kind look) {
+        return look == current.kind;
+    }
+
     bool waiting_for (string look) {
         return !see(look) && current.kind != Token::eof;
     }
@@ -37,11 +41,17 @@ protected:
         current = lexer->next();
     }
 
+    void expected (string expected) {
+        error("Expected " + expected + ", found '" + current.buffer + "'");
+        accept();
+    }
+
     void match (string look) {
         if (!see(look))
-            error("Expected '" + look + "' found '" + current.buffer + "'");
+            expected(look);
 
-        accept();
+        else
+            accept();
     }
 
     bool try_match (string look) {

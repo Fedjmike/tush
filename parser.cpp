@@ -56,7 +56,12 @@ Ast* Parser::fn_app () {
 
 Ast* Parser::atom () {
     auto node = new AST::Literal(current);
-    accept();
+
+    if (see_kind(Token::normal))
+        accept();
+
+    else
+        expected("expression");
 
     return node;
 }
