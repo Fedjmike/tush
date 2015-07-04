@@ -46,9 +46,13 @@ inline Token Lexer::next () {
     if (input.eof())
         return Token::make_eof();
 
+    auto kind = Token::normal;
+
     switch (current) {
     /*String or character literal*/
     case '"': case '\'': {
+        kind = current == '"' ? Token::lit_str : Token::lit_char;
+
         char_t quote = current;
         eat();
 
@@ -68,6 +72,7 @@ inline Token Lexer::next () {
     case '[': case ']':
     case '{': case '}':
     case ',': case '`':
+        kind = Token::op;
         eat();
 
     break;
@@ -91,5 +96,5 @@ inline Token Lexer::next () {
         } while (!exit && !input.eof());
     }
 
-    return Token(Token::normal, buffer);
+    return Token(kind, buffer);
 };
