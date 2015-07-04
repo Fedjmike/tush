@@ -37,14 +37,14 @@ protected:
         current = lexer->next();
     }
 
-    void expect (string look) {
+    void match (string look) {
         if (!see(look))
             error();
 
         accept();
     }
 
-    bool match_if (string look) {
+    bool try_match (string look) {
         if (see(look)) {
             accept();
             return true;

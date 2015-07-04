@@ -15,7 +15,7 @@ Ast* Parser::s () {
 Ast* Parser::pipe () {
     auto node = fn_app();
 
-    while (match_if("|")) {
+    while (try_match("|")) {
         auto fn = fn_app();
         node = new AST::FnApp(fn, vector<Ast*> {node});
     }
