@@ -25,6 +25,7 @@ Ast* Parser::pipe () {
 
 Ast* Parser::fn_app () {
     vector<Ast*> nodes;
+    int exprs = 0;
     /*Filled iff there is a backtick function*/
     Ast* fn = 0;
 
@@ -38,9 +39,11 @@ Ast* Parser::fn_app () {
 
         } else
             nodes.push_back(atom());
+
+        exprs++;
     }
 
-    if (nodes.size() == 1)
+    if (exprs == 1)
         return nodes[0];
 
     else {
