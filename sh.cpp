@@ -17,7 +17,7 @@ int main (int argc, char** argv) {
     
     auto tree = parser.s();
 
-    AST::print(tree);
+    print_ast(tree);
 
     delete tree;
 }

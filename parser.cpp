@@ -17,7 +17,7 @@ Ast* Parser::pipe () {
 
     while (try_match("|")) {
         auto fn = fn_app();
-        node = new AST::FnApp(fn, vector<Ast*> {node});
+        node = new Ast::FnApp(fn, vector<Ast*> {node});
     }
 
     return node;
@@ -53,12 +53,12 @@ Ast* Parser::fn_app () {
             nodes.pop_back();
         }
 
-        return new AST::FnApp(fn, nodes);
+        return new Ast::FnApp(fn, nodes);
     }
 }
 
 Ast* Parser::atom () {
-    auto node = new AST::Literal(current);
+    auto node = new Ast::Literal(current);
 
     if (see_kind(Token::normal))
         accept();

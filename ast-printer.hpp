@@ -2,6 +2,4 @@
 
 #include "ast.hpp"
 
-namespace AST {
-    void print (const Ast* node);
-}
+void print_ast (const Ast* node);

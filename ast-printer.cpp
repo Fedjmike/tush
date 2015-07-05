@@ -4,20 +4,20 @@
 
 #include "fn-map.hpp"
 
-static void print_literal (const AST::Literal* node) {
+static void print_literal (const Ast::Literal* node) {
     printf("literal: %s\n", node->token.buffer.c_str());
 }
 
-static void print_fn_app (const AST::FnApp* node) {
+static void print_fn_app (const Ast::FnApp* node) {
     puts("fn app");
 
     for (auto& param: node->params)
-        AST::print(param.get());
+        print_ast(param.get());
 
     printf("fn: ");
-    AST::print(node->fn.get());
+    print_ast(node->fn.get());
 }
 
-void AST::print (const Ast* node) {
+void print_ast (const Ast* node) {
     fn_map(node, print_literal, print_fn_app);
 }
