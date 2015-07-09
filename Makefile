@@ -1,13 +1,13 @@
-CXX = g++
-CXXFLAGS = -std=c++14 -Werror -Wall -Wextra
+CC = gcc
+CFLAGS = -std=c11 -Werror -Wall -Wextra -Ilibfc
 
-HEADERS = $(wildcard *.hpp)
-OBJECTS = $(patsubst %.cpp, %.o, $(wildcard *.cpp))
+HEADERS = $(wildcard *.h)
+OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 
 *.o: $(HEADERS)
 
 sh: $(OBJECTS)
-	$(CXX) $(OBJECTS) -o $@
+	$(CC) $(OBJECTS) -o $@
 
 clean:
 	rm *.o sh{,.exe}
