@@ -7,16 +7,23 @@
 
 #include "ast-printer.h"
 
+#include "value.h"
+#include "runner.h"
+
 int main (int argc, char** argv) {
     (void) argc, (void) argv;
 
-    char* str = "*.cpp wc | sort";
+    char* str = "sh.c size";
+    //char* str = "*.cpp wc | sort";
 
     lexerCtx lexer = lexerInit(str);
     ast* tree = parse(&lexer);
     lexerDestroy(&lexer);
 
-    printAST(tree);
+    envCtx env = {};
+    value* result = run(&env, tree);
+
+    valuePrint(result);
 
     astDestroy(tree);
 }
