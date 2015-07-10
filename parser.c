@@ -31,7 +31,7 @@ static ast* parserPipe (parserCtx* ctx) {
 
         vector nodes = vectorInit(1, malloc);
         vectorPush(&nodes, node);
-        node = astFnAppCreate(fn, nodes);
+        node = astCreateFnApp(fn, nodes);
     }
 
     return node;
@@ -67,12 +67,12 @@ static ast* parserFnApp (parserCtx* ctx) {
         if (!fn)
             fn = vectorPop(&nodes);
 
-        return astFnAppCreate(fn, nodes);
+        return astCreateFnApp(fn, nodes);
     }
 }
 
 static ast* parserAtom (parserCtx* ctx) {
-    ast* node = astLiteralCreate(strdup(ctx->current.buffer));
+    ast* node = astCreateLiteral(strdup(ctx->current.buffer));
 
     if (see_kind(ctx, tokenNormal))
         accept(ctx);

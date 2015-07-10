@@ -22,14 +22,14 @@ void astDestroy (ast* node) {
     free(node);
 }
 
-ast* astFnAppCreate (ast* fn, vector(ast*) args) {
+ast* astCreateFnApp (ast* fn, vector(ast*) args) {
     return astCreate(astFnApp, (ast) {
         .l = fn,
         .children = args
     });
 }
 
-ast* astLiteralCreate (char* literal) {
+ast* astCreateLiteral (char* literal) {
     return astCreate(astLiteral, (ast) {
         .kind = astLiteral,
         .literal = literal,

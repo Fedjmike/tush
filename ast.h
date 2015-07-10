@@ -19,7 +19,7 @@ typedef struct ast {
     char* literal;
 } ast;
 
-ast* astFnAppCreate (ast* fn, vector(ast*) args);
-ast* astLiteralCreate (char* literal);
+ast* astCreateFnApp (ast* fn, vector(ast*) args);
+ast* astCreateLiteral (char* literal);
 
 void astDestroy (ast* node);
