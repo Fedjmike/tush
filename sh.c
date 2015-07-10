@@ -12,11 +12,11 @@ int main (int argc, char** argv) {
 
     char* str = "*.cpp wc | sort";
 
-    lexerCtx* lexer = lexerCreate(str);
-    ast* tree = parse(lexer);
+    lexerCtx lexer = lexerInit(str);
+    ast* tree = parse(&lexer);
+    lexerDestroy(&lexer);
 
     printAST(tree);
 
     astDestroy(tree);
-    lexerDestroy(lexer);
 }

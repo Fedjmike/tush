@@ -22,30 +22,28 @@ typedef struct lexerCtx {
     int length;
 } lexerCtx;
 
-static lexerCtx* lexerCreate (const char* str);
-static void lexerDestroy (lexerCtx* ctx);
+static lexerCtx lexerInit (const char* str);
+static lexerCtx* lexerDestroy (lexerCtx* ctx);
 
 static bool lexerEOF (lexerCtx* ctx);
 static token lexerNext (lexerCtx* ctx);
 
 /*==== Inline implementations ====*/
 
-inline static lexerCtx* lexerCreate (const char* str) {
-    lexerCtx* ctx = calloc(1, sizeof(*ctx));
+inline static lexerCtx lexerInit (const char* str) {
+    return (lexerCtx) {
+        .input = str,
+        .pos = 0,
 
-    ctx->input = str;
-    ctx->pos = 0;
-
-    ctx->buffer = calloc(lexerDefaultBufSize, 1);
-    ctx->bufsize = lexerDefaultBufSize;
-    ctx->length = 0;
-
-    return ctx;
+        .buffer = calloc(lexerDefaultBufSize, 1),
+        .bufsize = lexerDefaultBufSize,
+        .length = 0
+    };
 }
 
-inline static void lexerDestroy (lexerCtx* ctx) {
+inline static lexerCtx* lexerDestroy (lexerCtx* ctx) {
     free(ctx->buffer);
-    free(ctx);
+    return ctx;
 }
 
 inline static char lexerCurrent (lexerCtx* ctx) {
