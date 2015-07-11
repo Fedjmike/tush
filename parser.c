@@ -38,23 +38,24 @@ static ast* parserPipe (parserCtx* ctx) {
 }
 
 static ast* parserFnApp (parserCtx* ctx) {
-    vector(ast*) nodes = vectorInit(3, malloc);
-    int exprs = 0;
     /*Filled iff there is a backtick function*/
     ast* fn = 0;
 
-    while (waiting_for(ctx, ")") && waiting_for(ctx, "|")) {
+    vector(ast*) nodes = vectorInit(3, malloc);
+    int exprs = 0;
+
+    for (; waiting_for(ctx, ")") && waiting_for(ctx, "|"); exprs++) {
         if (try_match(ctx, "`")) {
-            if (fn)
+            if (fn) {
                 error(ctx, "Multiple explicit functions in backticks");
+                vectorPush(&nodes, fn);
+            }
 
             fn = parserAtom(ctx);
             match(ctx, "`");
 
         } else
             vectorPush(&nodes, parserAtom(ctx));
-
-        exprs++;
     }
 
     if (exprs == 1) {
