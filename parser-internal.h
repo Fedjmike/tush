@@ -1,6 +1,8 @@
-#include "parser.h"
-
 #include <stdio.h>
+
+#include "forward.h"
+#include "token.h"
+#include "lexer.h"
 
 enum {
     parserNoisy = false

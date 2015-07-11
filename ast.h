@@ -3,7 +3,6 @@
 #include <vector.h>
 
 #include "forward.h"
-#include "token.h"
 
 typedef enum astKind {
     astFnApp, astLiteral

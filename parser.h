@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ast.h"
-#include "lexer.h"
+#include "forward.h"
 
 ast* parse (lexerCtx* lexer);
