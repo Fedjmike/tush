@@ -2,13 +2,12 @@
 
 #include <vector.h>
 
+#include "forward.h"
 #include "token.h"
 
 typedef enum astKind {
     astFnApp, astLiteral
 } astKind;
-
-typedef struct ast ast;
 
 typedef struct ast {
     astKind kind;

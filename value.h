@@ -1,12 +1,11 @@
 #pragma once
 
 #include "common.h"
+#include "forward.h"
 
 typedef enum valueKind {
     valueFn, valueFile, valueInt
 } valueKind;
-
-typedef struct value value;
 
 typedef struct value {
     valueKind kind;
