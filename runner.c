@@ -9,9 +9,7 @@ static value* impl_size__ (value* file) {
     struct stat st;
     stat(file->filename, &st);
 
-    return malloci(sizeof(value), &(value) {
-        .kind = valueInt, .integer = st.st_size
-    });
+    return valueCreateInt(st.st_size);
 }
 
 value* runFnApp (envCtx* env, const ast* node) {
@@ -31,14 +29,10 @@ value* runLiteral (envCtx* env, const ast* node) {
     //lol
     
     if (!strcmp(node->literal, "size")) {
-        return malloci(sizeof(value), &(value) {
-            .kind = valueFn, .fnptr = impl_size__
-        });
+        return valueCreateFn(impl_size__);
 
     } else {
-        return malloci(sizeof(value), &(value) {
-            .kind = valueFile, .filename = strdup(node->literal)
-        });
+        return valueCreateFile(node->literal);
     }
 }
 

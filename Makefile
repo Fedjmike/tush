@@ -1,5 +1,6 @@
 CC = gcc
 CFLAGS = -std=c11 -Werror -Wall -Wextra -I../libkiss -g
+LDFLAGS = -lgc
 
 HEADERS = $(wildcard *.h)
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
@@ -7,10 +8,10 @@ OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 *.o: $(HEADERS)
 
 sh: $(OBJECTS)
-	$(CC) $(OBJECTS) -o $@
+	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 
 test: sh
-	valgrind -q --leak-check=full ./sh
+	valgrind -q --leak-check=full --suppressions=boehm-gc.supp ./sh
 
 clean:
 	rm -f *.o sh{,.exe}
