@@ -60,7 +60,10 @@ inline static void lexerSkip (lexerCtx* ctx) {
 }
 
 inline static void lexerEat (lexerCtx* ctx) {
-    //todo resize
+    /*Double the token buffer if its full*/
+    if (ctx->length == ctx->bufsize)
+        ctx->buffer = realloc(ctx->buffer, ctx->bufsize *= 2);
+
     ctx->buffer[ctx->length++] = lexerCurrent(ctx);
     lexerSkip(ctx);
 }
