@@ -8,7 +8,7 @@
 typedef enum astKind {
     astBOP, astFnApp, astStrLit, astSymbolLit,
     astInvalid,
-    astMAX
+    astKindNo
 } astKind;
 
 typedef enum opKind {

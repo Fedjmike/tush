@@ -4,14 +4,14 @@
 
 typedef enum typeKind {
     type_Integer, type_Number, type_File, type_Fn,
-    type_MAX
+    type_KindNo
 } typeKind;
 
 typedef struct type type;
 
 typedef struct typeSys {
     /*Store all the types ever allocated, free them at the end*/
-    type* basics[type_MAX];
+    type* basics[type_KindNo];
     vector(type*) fns;
 } typeSys;
 
