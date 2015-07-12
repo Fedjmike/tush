@@ -23,6 +23,7 @@ typedef struct ast {
     vector(ast*) children;
     ast *l, *r;
     opKind op;
+    type* dt;
 
     union {
         sym* symbol;

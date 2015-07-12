@@ -5,8 +5,10 @@
 #include "type.h"
 #include "sym.h"
 #include "ast.h"
+
 #include "lexer.h"
 #include "parser.h"
+#include "analyzer.h"
 
 #include "ast-printer.h"
 
@@ -37,6 +39,8 @@ int main (int argc, char** argv) {
     lexerCtx lexer = lexerInit(str);
     ast* tree = parse(global, &lexer);
     lexerDestroy(&lexer);
+
+    analyze(&ts, tree);
 
     envCtx env = {};
     value* result = run(&env, tree);

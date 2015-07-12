@@ -4,6 +4,7 @@
 
 typedef enum typeKind {
     type_Integer, type_Number, type_File, type_Fn,
+    type_Invalid,
     type_KindNo
 } typeKind;
 
@@ -18,9 +19,17 @@ typedef struct typeSys {
 typeSys typesInit (void);
 typeSys* typesFree (typeSys* ts);
 
+/*==== Ctors ====*/
+
 type* typeInteger (typeSys* ts);
 type* typeFile (typeSys* ts);
 type* typeFn (typeSys* ts, type* from, type* to);
 
+type* typeInvalid (typeSys* ts);
+
 //todo
 type* typeFnChain (typeSys ts, int n, ...);
+
+/*==== Tests and operations ====*/
+
+bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result_out);

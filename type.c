@@ -54,6 +54,10 @@ type* typeFn (typeSys* ts, type* from, type* to) {
     return dt;
 }
 
+type* typeInvalid (typeSys* ts) {
+    return typeBasic(ts, type_Invalid);
+}
+
 /*==== Type system ====*/
 
 typeSys typesInit (void) {
@@ -70,4 +74,17 @@ typeSys* typesFree (typeSys* ts) {
     vectorFreeObjs(&ts->fns, (vectorDtor) typeDestroy);
 
     return ts;
+}
+
+/*==== Tests and operations ====*/
+
+bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result) {
+    if (fn->from == arg) {
+        *result = fn->to;
+        return true;
+
+    } else {
+        *result = typeInvalid(ts);
+        return false;
+    }
 }
