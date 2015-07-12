@@ -13,7 +13,7 @@ static value* impl_size__ (value* file) {
     return valueCreateInt(st.st_size);
 }
 
-value* runFnApp (envCtx* env, const ast* node) {
+static value* runFnApp (envCtx* env, const ast* node) {
     value* result = run(env, node->l);
 
     for (int i = 0; i < node->children.length; i++) {
@@ -24,13 +24,13 @@ value* runFnApp (envCtx* env, const ast* node) {
     return result;
 }
 
-value* runStrLit (envCtx* env, const ast* node) {
+static value* runStrLit (envCtx* env, const ast* node) {
     (void) env;
 
     return valueCreateFile(node->literal.str);
 }
 
-value* runSymbolLit (envCtx* env, const ast* node) {
+static value* runSymbolLit (envCtx* env, const ast* node) {
     (void) env;
 
     if (!strcmp(node->literal.symbol->name, "size"))
