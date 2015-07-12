@@ -39,3 +39,14 @@ sym* symAdd (sym* parent, const char* name) {
     symAddChild(parent, symbol);
     return symbol;
 }
+
+sym* symLookup (sym* scope, const char* name) {
+    for (int i = 0; i < scope->children.length; i++) {
+        sym* symbol = vectorGet(scope->children, i);
+
+        if (!strcmp(name, symbol->name))
+            return symbol;
+    }
+
+    return 0;
+}

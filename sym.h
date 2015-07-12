@@ -18,3 +18,6 @@ sym* symInit (void);
 void symEnd (sym* global);
 
 sym* symAdd (sym* parent, const char* name);
+
+/*Returns null on failure*/
+sym* symLookup (sym* scope, const char* name);

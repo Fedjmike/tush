@@ -2,6 +2,7 @@
 
 #include <sys/stat.h>
 
+#include "sym.h"
 #include "ast.h"
 #include "value.h"
 
@@ -26,14 +27,17 @@ value* runFnApp (envCtx* env, const ast* node) {
 value* runLitStr (envCtx* env, const ast* node) {
     (void) env;
 
-    //lol
-    
-    if (!strcmp(node->literal.str, "size")) {
+    return valueCreateFile(node->literal.str);
+}
+
+value* runLitSymbol (envCtx* env, const ast* node) {
+    (void) env;
+
+    if (!strcmp(node->literal.symbol->name, "size"))
         return valueCreateFn(impl_size__);
 
-    } else {
-        return valueCreateFile(node->literal.str);
-    }
+    else
+        return 0;
 }
 
 value* run (envCtx* env, const ast* node) {
@@ -41,7 +45,8 @@ value* run (envCtx* env, const ast* node) {
 
     handler_t handler = (handler_t[]) {
         [astFnApp] = runFnApp,
-        [astLitStr] = runLitStr
+        [astLitStr] = runLitStr,
+        [astLitSymbol] = runLitSymbol
     }[node->kind];
 
     if (handler)

@@ -9,7 +9,10 @@ enum {
 };
 
 typedef struct parserCtx {
+    /*The global symbol table*/
     sym* global;
+    /*The current scope*/
+    sym* scope;
 
     lexerCtx* lexer;
     token current;
@@ -34,16 +37,19 @@ static bool try_match (parserCtx* ctx, const char* look);
 
 /*==== Inline implementations ====*/
 
-inline static parserCtx* parserCreate (lexerCtx* lexer) {
-    parserCtx* ctx = calloc(1, sizeof(*ctx));
-    ctx->lexer = lexer;
-    ctx->current = lexerNext(ctx->lexer);
-    ctx->errors = 0;
-    return ctx;
+inline static parserCtx parserInit (sym* global, lexerCtx* lexer) {
+    return (parserCtx) {
+        .global = global,
+        .scope = global,
+        .lexer = lexer,
+        .current = lexerNext(lexer),
+        .errors = 0
+    };
 }
 
-inline static void parserDestroy (parserCtx* ctx) {
-    free(ctx);
+inline static parserCtx* parserFree (parserCtx* ctx) {
+    /*Nothing to clean up*/
+    return ctx;
 }
 
 inline static void error (parserCtx* ctx, const char* msg) {

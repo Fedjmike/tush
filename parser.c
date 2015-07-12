@@ -3,6 +3,7 @@
 
 #include <string.h>
 
+#include "sym.h"
 #include "ast.h"
 
 static ast* parserS (parserCtx* ctx);
@@ -73,13 +74,24 @@ static ast* parserFnApp (parserCtx* ctx) {
 }
 
 static ast* parserAtom (parserCtx* ctx) {
-    ast* node = astCreateLitStr(ctx->current.buffer);
+    ast* node = 0;
 
-    if (see_kind(ctx, tokenNormal))
+    if (see_kind(ctx, tokenNormal)) {
+        sym* symbol = symLookup(ctx->scope, ctx->current.buffer);
+
+        if (symbol)
+            node = astCreateLitSymbol(symbol);
+
+        else
+            node = astCreateLitStr(ctx->current.buffer);
+
         accept(ctx);
 
-    else
+    } else {
+        //todo astError
         expected(ctx, "expression");
+        accept(ctx);
+    }
 
     return node;
 }
