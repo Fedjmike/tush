@@ -1,5 +1,6 @@
 #include "type.h"
 
+#include <assert.h>
 #include <vector.h>
 
 #include "common.h"
@@ -28,6 +29,8 @@ static void typeDestroy (type* dt) {
 }
 
 static type* typeBasic (typeSys* ts, typeKind kind) {
+    assert(kind != type_Fn);
+
     /*Only allocate one struct per basic type*/
     if (!ts->basics[kind])
         ts->basics[kind] = typeCreate(kind, (type) {});
