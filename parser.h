@@ -2,4 +2,4 @@
 
 #include "forward.h"
 
-ast* parse (lexerCtx* lexer);
+ast* parse (sym* global, lexerCtx* lexer);

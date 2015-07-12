@@ -9,14 +9,16 @@ enum {
 };
 
 typedef struct parserCtx {
+    sym* global;
+
     lexerCtx* lexer;
     token current;
 
     int errors;
 } parserCtx;
 
-static parserCtx* parserCreate (lexerCtx* lexer);
-static void parserDestroy (parserCtx* ctx);
+static parserCtx parserInit (sym* global, lexerCtx* lexer);
+static parserCtx* parserFree (parserCtx* ctx);
 
 static void error (parserCtx* ctx, const char* msg);
 

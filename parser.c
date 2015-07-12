@@ -11,10 +11,10 @@ static ast* parserPipe (parserCtx* ctx);
 static ast* parserFnApp (parserCtx* ctx);
 static ast* parserAtom ();
 
-ast* parse (lexerCtx* lexer) {
-    parserCtx* ctx = parserCreate(lexer);
-    ast* tree = parserS(ctx);
-    parserDestroy(ctx);
+ast* parse (sym* global, lexerCtx* lexer) {
+    parserCtx ctx = parserInit(global, lexer);
+    ast* tree = parserS(&ctx);
+    parserFree(&ctx);
 
     return tree;
 }

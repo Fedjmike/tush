@@ -25,7 +25,7 @@ int main (int argc, char** argv) {
     //char* str = "*.cpp wc | sort";
 
     lexerCtx lexer = lexerInit(str);
-    ast* tree = parse(&lexer);
+    ast* tree = parse(global, &lexer);
     lexerDestroy(&lexer);
 
     envCtx env = {};
