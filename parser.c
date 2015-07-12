@@ -73,7 +73,7 @@ static ast* parserFnApp (parserCtx* ctx) {
 }
 
 static ast* parserAtom (parserCtx* ctx) {
-    ast* node = astCreateLiteral(strdup(ctx->current.buffer));
+    ast* node = astCreateLitStr(strdup(ctx->current.buffer));
 
     if (see_kind(ctx, tokenNormal))
         accept(ctx);

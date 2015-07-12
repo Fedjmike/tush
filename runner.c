@@ -23,16 +23,16 @@ value* runFnApp (envCtx* env, const ast* node) {
     return result;
 }
 
-value* runLiteral (envCtx* env, const ast* node) {
+value* runLitStr (envCtx* env, const ast* node) {
     (void) env;
 
     //lol
     
-    if (!strcmp(node->literal, "size")) {
+    if (!strcmp(node->literal.str, "size")) {
         return valueCreateFn(impl_size__);
 
     } else {
-        return valueCreateFile(node->literal);
+        return valueCreateFile(node->literal.str);
     }
 }
 
@@ -41,7 +41,7 @@ value* run (envCtx* env, const ast* node) {
 
     handler_t handler = (handler_t[]) {
         [astFnApp] = runFnApp,
-        [astLiteral] = runLiteral
+        [astLitStr] = runLitStr
     }[node->kind];
 
     if (handler)

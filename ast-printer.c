@@ -11,13 +11,13 @@ static void printFnApp (const ast* node) {
     printAST(node->l);
 }
 
-static void printLiteral (const ast* node) {
-    printf("literal: %s\n", node->literal);
+static void printLitStr (const ast* node) {
+    printf("string literal: %s\n", node->literal.str);
 }
 
 void printAST (const ast* node) {
     (void (*[])(const ast* node)) {
         [astFnApp] = printFnApp,
-        [astLiteral] = printLiteral
+        [astLitStr] = printLitStr
     }[node->kind](node);
 }

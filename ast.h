@@ -5,7 +5,7 @@
 #include "forward.h"
 
 typedef enum astKind {
-    astFnApp, astLiteral
+    astFnApp, astLitStr, astLitSymbol
 } astKind;
 
 typedef struct ast {
@@ -14,10 +14,14 @@ typedef struct ast {
     vector(ast*) children;
     ast *l, *r;
 
-    char* literal;
+    union {
+        sym* symbol;
+        char* str;
+    } literal;
 } ast;
 
 ast* astCreateFnApp (ast* fn, vector(ast*) args);
-ast* astCreateLiteral (char* literal);
+ast* astCreateLitStr (char* str);
+ast* astCreateLitSymbol (sym* symbol);
 
 void astDestroy (ast* node);

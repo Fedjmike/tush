@@ -18,7 +18,10 @@ void astDestroy (ast* node) {
         astDestroy(node->r);
 
     vectorFreeObjs(&node->children, (vectorDtor) astDestroy);
-    free(node->literal);
+
+    if (node->kind == astLitStr)
+        free(node->literal.str);
+
     free(node);
 }
 
@@ -29,9 +32,14 @@ ast* astCreateFnApp (ast* fn, vector(ast*) args) {
     });
 }
 
-ast* astCreateLiteral (char* literal) {
-    return astCreate(astLiteral, (ast) {
-        .kind = astLiteral,
-        .literal = literal,
+ast* astCreateLitStr (char* str) {
+    return astCreate(astLitStr, (ast) {
+        .literal.str = str,
+    });
+}
+
+ast* astCreateLitSymbol (sym* symbol) {
+    return astCreate(astLitSymbol, (ast) {
+        .literal.symbol = symbol,
     });
 }
