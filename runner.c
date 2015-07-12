@@ -8,7 +8,7 @@
 
 static value* impl_size__ (value* file) {
     struct stat st;
-    stat(file->filename, &st);
+    stat(valueGetFilename(file), &st);
 
     return valueCreateInt(st.st_size);
 }
