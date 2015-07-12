@@ -3,7 +3,7 @@
 #include "common.h"
 
 typedef enum tokenKind {
-    tokenNormal, tokenOp, tokenLitStr, tokenLitChar, tokenEOF
+    tokenNormal, tokenOp, tokenStrLit, tokenCharLit, tokenEOF
 } tokenKind;
 
 typedef struct token {

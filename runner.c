@@ -24,13 +24,13 @@ value* runFnApp (envCtx* env, const ast* node) {
     return result;
 }
 
-value* runLitStr (envCtx* env, const ast* node) {
+value* runStrLit (envCtx* env, const ast* node) {
     (void) env;
 
     return valueCreateFile(node->literal.str);
 }
 
-value* runLitSymbol (envCtx* env, const ast* node) {
+value* runSymbolLit (envCtx* env, const ast* node) {
     (void) env;
 
     if (!strcmp(node->literal.symbol->name, "size"))
@@ -45,8 +45,8 @@ value* run (envCtx* env, const ast* node) {
 
     handler_t handler = (handler_t[]) {
         [astFnApp] = runFnApp,
-        [astLitStr] = runLitStr,
-        [astLitSymbol] = runLitSymbol
+        [astStrLit] = runStrLit,
+        [astSymbolLit] = runSymbolLit
     }[node->kind];
 
     if (handler)

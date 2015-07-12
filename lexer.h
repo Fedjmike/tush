@@ -86,7 +86,7 @@ inline static token lexerNext (lexerCtx* ctx) {
     switch (lexerCurrent(ctx)) {
     /*String or character literal*/
     case '"': case '\'': {
-        tok.kind = lexerCurrent(ctx) == '"' ? tokenLitStr : tokenLitChar;
+        tok.kind = lexerCurrent(ctx) == '"' ? tokenStrLit : tokenCharLit;
 
         char quote = lexerCurrent(ctx);
         lexerEat(ctx);
