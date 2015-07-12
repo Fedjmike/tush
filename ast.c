@@ -32,9 +32,9 @@ ast* astCreateFnApp (ast* fn, vector(ast*) args) {
     });
 }
 
-ast* astCreateLitStr (char* str) {
+ast* astCreateLitStr (const char* str) {
     return astCreate(astLitStr, (ast) {
-        .literal.str = str,
+        .literal.str = strdup(str),
     });
 }
 

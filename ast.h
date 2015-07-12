@@ -21,7 +21,7 @@ typedef struct ast {
 } ast;
 
 ast* astCreateFnApp (ast* fn, vector(ast*) args);
-ast* astCreateLitStr (char* str);
+ast* astCreateLitStr (const char* str);
 ast* astCreateLitSymbol (sym* symbol);
 
 void astDestroy (ast* node);
