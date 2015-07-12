@@ -90,7 +90,6 @@ static ast* parserAtom (parserCtx* ctx) {
     } else {
         //todo astError
         expected(ctx, "expression");
-        accept(ctx);
     }
 
     return node;
