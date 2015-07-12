@@ -21,6 +21,8 @@ typedef struct value {
     };
 } value;
 
+static const char* valueKindGetStr (valueKind kind);
+
 /*==== Value creators ====*/
 
 static value* valueCreate (value init) {
@@ -62,7 +64,8 @@ value* valueCall (const value* fn, value* arg) {
         return fn->fnptr(arg);
 
     else {
-        errprintf("Unhandled value kind, %d\n", fn->kind);
+        errprintf("Unhandled value kind, %s\n", valueKindGetStr(fn->kind));
+        //todo valueError
         return 0;
     }
 }
@@ -70,4 +73,13 @@ value* valueCall (const value* fn, value* arg) {
 const char* valueGetFilename (const value* value) {
     assert(value->kind == valueFile);
     return value->filename;
+}
+
+const char* valueKindGetStr (valueKind kind) {
+    switch (kind) {
+    case valueFn: return "Fn";
+    case valueFile: return "File";
+    case valueInt: return "Int";
+    default: return "<unhandled value kind>";
+    }
 }
