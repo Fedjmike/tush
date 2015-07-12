@@ -43,3 +43,7 @@ ast* astCreateSymbolLit (sym* symbol) {
         .literal.symbol = symbol,
     });
 }
+
+ast* astCreateInvalid (void) {
+    return astCreate(astInvalid, (ast) {});
+}

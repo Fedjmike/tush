@@ -74,7 +74,7 @@ static ast* parserFnApp (parserCtx* ctx) {
 }
 
 static ast* parserAtom (parserCtx* ctx) {
-    ast* node = 0;
+    ast* node;
 
     if (see_kind(ctx, tokenNormal)) {
         sym* symbol = symLookup(ctx->scope, ctx->current.buffer);
@@ -90,6 +90,7 @@ static ast* parserAtom (parserCtx* ctx) {
     } else {
         //todo astError
         expected(ctx, "expression");
+        node = astCreateInvalid();
     }
 
     return node;
