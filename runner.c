@@ -53,7 +53,7 @@ value* run (envCtx* env, const ast* node) {
         return handler(env, node);
 
     else {
-        errprintf("Unhandled AST kind, %d\n", node->kind);
+        errprintf("Unhandled AST kind, %d\n", astKindGetStr(node->kind));
         return 0;
     }
 }

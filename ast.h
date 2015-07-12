@@ -38,3 +38,5 @@ ast* astCreateSymbolLit (sym* symbol);
 ast* astCreateInvalid (void);
 
 void astDestroy (ast* node);
+
+const char* astKindGetStr (astKind kind);
