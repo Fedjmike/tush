@@ -2,6 +2,7 @@
 #include <gc/gc.h>
 
 #include "common.h"
+#include "type.h"
 #include "sym.h"
 #include "ast.h"
 #include "lexer.h"
@@ -12,8 +13,12 @@
 #include "value.h"
 #include "runner.h"
 
-void addBuiltins (sym* global) {
-    symAdd(global, "size");
+void addBuiltin (sym* global, const char* name, type* dt) {
+    symAdd(global, name)->dt = dt;
+}
+
+void addBuiltins (typeSys* ts, sym* global) {
+    addBuiltin(global, "size", typeFn(ts, typeFile(ts), typeInteger(ts)));
 }
 
 int main (int argc, char** argv) {
@@ -21,8 +26,10 @@ int main (int argc, char** argv) {
 
     GC_INIT();
 
+    typeSys ts = typesInit();
+
     sym* global = symInit();
-    addBuiltins(global);
+    addBuiltins(&ts, global);
 
     char* str = "sh.c size";
     //char* str = "*.cpp wc | sort";
@@ -39,4 +46,6 @@ int main (int argc, char** argv) {
     astDestroy(tree);
 
     symEnd(global);
+
+    typesFree(&ts);
 }

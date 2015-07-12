@@ -10,6 +10,8 @@
  */
 typedef struct sym {
     char* name;
+    type* dt;
+
     sym* parent;
     vector(sym*) children;
 } sym;
