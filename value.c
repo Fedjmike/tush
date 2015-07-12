@@ -45,7 +45,7 @@ value* valueCreateFn (value* (*fnptr)(value*)) {
 
 value* valueCreateFile (const char* filename) {
     return valueCreate((value) {
-        .kind = valueFile, .filename = strdup(filename)
+        .kind = valueFile, .filename = GC_STRDUP(filename)
     });
 }
 

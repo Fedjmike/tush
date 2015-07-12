@@ -43,7 +43,7 @@ value* runSymbolLit (envCtx* env, const ast* node) {
 value* run (envCtx* env, const ast* node) {
     typedef value* (*handler_t)(envCtx*, const ast*);
 
-    handler_t handler = (handler_t[]) {
+    handler_t handler = (handler_t[astMAX]) {
         [astFnApp] = runFnApp,
         [astStrLit] = runStrLit,
         [astSymbolLit] = runSymbolLit

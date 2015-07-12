@@ -1,5 +1,5 @@
 #pragma once
 
-#include "ast.h"
+#include "forward.h"
 
 void printAST (const ast* node);

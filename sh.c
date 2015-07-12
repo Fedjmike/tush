@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <gc/gc.h>
 
 #include "common.h"
 #include "sym.h"
@@ -17,6 +18,8 @@ void addBuiltins (sym* global) {
 
 int main (int argc, char** argv) {
     (void) argc, (void) argv;
+
+    GC_INIT();
 
     sym* global = symInit();
     addBuiltins(global);

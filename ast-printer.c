@@ -16,7 +16,7 @@ static void printStrLit (const ast* node) {
 }
 
 void printAST (const ast* node) {
-    (void (*[])(const ast* node)) {
+    (void (*[astMAX])(const ast* node)) {
         [astFnApp] = printFnApp,
         [astStrLit] = printStrLit
     }[node->kind](node);
