@@ -37,7 +37,7 @@ static value* runSymbolLit (envCtx* env, const ast* node) {
         return valueCreateFn(impl_size__);
 
     else
-        return 0;
+        return valueCreateInvalid();
 }
 
 value* run (envCtx* env, const ast* node) {
@@ -54,6 +54,6 @@ value* run (envCtx* env, const ast* node) {
 
     else {
         errprintf("Unhandled AST kind, %d\n", astKindGetStr(node->kind));
-        return 0;
+        return valueCreateInvalid();
     }
 }

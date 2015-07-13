@@ -5,7 +5,7 @@
 #include <gc/gc.h>
 
 typedef enum valueKind {
-    valueInt, valueFn, valueFile
+    valueInvalid, valueInt, valueFn, valueFile
 } valueKind;
 
 typedef struct value {
@@ -25,38 +25,55 @@ static const char* valueKindGetStr (valueKind kind);
 
 /*==== Value creators ====*/
 
-static value* valueCreate (value init) {
+static value* valueCreate (valueKind kind, value init) {
     value* v = GC_MALLOC(sizeof(value));
     *v = init;
+    v->kind = kind;
     return v;
 }
 
 value* valueCreateInt (int integer) {
-    return valueCreate((value) {
-        .kind = valueInt, .integer = integer
+    return valueCreate(valueInt, (value) {
+        .integer = integer
     });
 }
 
 value* valueCreateFn (value* (*fnptr)(value*)) {
-    return valueCreate((value) {
-        .kind = valueFn, .fnptr = fnptr
+    return valueCreate(valueFn, (value) {
+        .fnptr = fnptr
     });
 }
 
 value* valueCreateFile (const char* filename) {
-    return valueCreate((value) {
-        .kind = valueFile, .filename = GC_STRDUP(filename)
+    return valueCreate(valueFile, (value) {
+        .filename = GC_STRDUP(filename)
     });
+}
+
+value* valueCreateInvalid (void) {
+    static value* invalid;
+
+    if (!invalid)
+        invalid = valueCreate(valueInvalid, (value) {});
+
+    return invalid;
 }
 
 /*==== Operations on values ====*/
 
 void valuePrint (const value* v) {
-    if (v->kind == valueInt)
+    switch (v->kind) {
+    case valueInt:
         printf("%ld", v->integer);
+        break;
 
-    else
+    case valueInvalid:
+        printf("<invalid>");
+        break;
+
+    default:
         ;//todo
+    }
 }
 
 value* valueCall (const value* fn, value* arg) {
@@ -65,8 +82,7 @@ value* valueCall (const value* fn, value* arg) {
 
     else {
         errprintf("Unhandled value kind, %s\n", valueKindGetStr(fn->kind));
-        //todo valueError
-        return 0;
+        return valueCreateInvalid();
     }
 }
 
