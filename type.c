@@ -19,6 +19,8 @@ typedef struct type {
 /*==== Type ctors and dtors ====*/
 
 static type* typeCreate (typeKind kind, type init) {
+    assert(kind != type_KindNo);
+
     type* dt = malloci(sizeof(type), &init);
     dt->kind = kind;
     return dt;
