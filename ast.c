@@ -47,6 +47,12 @@ ast* astCreateSymbolLit (sym* symbol) {
     });
 }
 
+ast* astCreateListLit (vector(ast*) elements) {
+    return astCreate(astListLit, (ast) {
+        .children = elements,
+    });
+}
+
 ast* astCreateInvalid (void) {
     return astCreate(astInvalid, (ast) {});
 }
@@ -57,6 +63,7 @@ const char* astKindGetStr (astKind kind) {
     case astFnApp: return "FnApp";
     case astStrLit: return "StrLit";
     case astSymbolLit: return "SymbolLit";
+    case astListLit: return "ListLit";
     case astInvalid: return "Invalid";
     case astKindNo: return "<KindNo; not real>";
     default: return "<unhandled AST kind>";

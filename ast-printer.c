@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include "common.h"
 #include "type.h"
 #include "ast.h"
 #include "sym.h"
@@ -21,37 +22,44 @@ static printf_t* printer_outf (printerCtx* ctx) {
 
 static void printer (printerCtx* ctx, const ast* node);
 
-static void printFnApp (printerCtx* ctx, const ast* node) {
-    printer_outf(ctx)("arg(s):\n");
+/*==== ====*/
 
+static void printChildren (printerCtx* ctx, const ast* node) {
     for (int i = 0; i < node->children.length; i++) {
-        ast* arg = vectorGet(node->children, i);
-        printer(ctx, arg);
+        ast* child = vectorGet(node->children, i);
+        printer(ctx, child);
     }
-
-    printer_outf(ctx)("fn:\n");
-    printer(ctx, node->l);
 }
 
-static void printStrLit (printerCtx* ctx, const ast* node) {
-    printer_outf(ctx)("\"%s\"\n", node->literal.str);
-}
+static void printLR (printerCtx* ctx, const ast* node) {
+    if (node->l)
+        printer(ctx, node->l);
 
-static void printSymbolLit (printerCtx* ctx, const ast* node) {
-    printer_outf(ctx)("\"%s\"\n",   !node->literal.symbol ? "<no symbol attached>"
-                                  : !node->literal.symbol->name ? "<unnamed symbol>"
-                                  : node->literal.symbol->name);
+    if (node->r)
+        printer(ctx, node->r);
 }
 
 static void printer (printerCtx* ctx, const ast* node) {
     printer_outf(ctx)("+ %s\n", astKindGetStr(node->kind));
     ctx->depth++;
 
-    (void (*[astKindNo])(printerCtx*, const ast*)) {
-        [astFnApp] = printFnApp,
-        [astStrLit] = printStrLit,
-        [astSymbolLit] = printSymbolLit
-    }[node->kind](ctx, node);
+    switch (node->kind) {
+    case astStrLit:
+        printer_outf(ctx)("\"%s\"\n", node->literal.str);
+        break;
+
+    case astSymbolLit:
+        printer_outf(ctx)("\"%s\"\n",   !node->literal.symbol ? "<no symbol attached>"
+                                      : !node->literal.symbol->name ? "<unnamed symbol>"
+                                      : node->literal.symbol->name);
+        break;
+
+    default:
+        break;
+    }
+
+    printChildren(ctx, node);
+    printLR(ctx, node);
 
     if (node->dt)
         printer_outf(ctx)("type: %s\n", typeGetStr(node->dt));

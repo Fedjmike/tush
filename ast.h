@@ -6,7 +6,7 @@
 //#include "type.h"
 
 typedef enum astKind {
-    astBOP, astFnApp, astStrLit, astSymbolLit,
+    astBOP, astFnApp, astStrLit, astSymbolLit, astListLit,
     astInvalid,
     astKindNo
 } astKind;
@@ -35,6 +35,7 @@ ast* astCreateBOP (ast* l, ast* r, opKind op);
 ast* astCreateFnApp (ast* fn, vector(ast*) args);
 ast* astCreateStrLit (const char* str);
 ast* astCreateSymbolLit (sym* symbol);
+ast* astCreateListLit (vector(ast*) elements);
 
 ast* astCreateInvalid (void);
 
