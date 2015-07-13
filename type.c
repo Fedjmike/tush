@@ -108,8 +108,17 @@ const char* typeGetStr (type* dt) {
 
 /*==== Tests and operations ====*/
 
+static bool typeEquals (type* l, type* r) {
+    if (l == r || l->kind == type_Invalid || r->kind == type_Invalid)
+        return true;
+
+    else
+        //todo
+        return false;
+}
+
 bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result) {
-    if (fn->from == arg) {
+    if (typeEquals(fn->from, arg)) {
         *result = fn->to;
         return true;
 

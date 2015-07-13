@@ -87,7 +87,9 @@ value* valueCall (const value* fn, value* arg) {
 }
 
 const char* valueGetFilename (const value* value) {
-    assert(value->kind == valueFile);
+    if (value->kind != valueFile)
+        return 0;
+
     return value->filename;
 }
 

@@ -7,8 +7,16 @@
 #include "value.h"
 
 static value* impl_size__ (value* file) {
+    const char* filename = valueGetFilename(file);
+
+    if (!filename)
+        return valueCreateInvalid();
+
     struct stat st;
-    stat(valueGetFilename(file), &st);
+    bool fail = stat(filename, &st);
+
+    if (fail)
+        return valueCreateInvalid();
 
     return valueCreateInt(st.st_size);
 }
