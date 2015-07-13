@@ -5,7 +5,7 @@
 #include <gc/gc.h>
 
 typedef enum valueKind {
-    valueInvalid, valueInt, valueFn, valueFile
+    valueInvalid, valueInt, valueFn, valueFile, valueVector
 } valueKind;
 
 typedef struct value {
@@ -18,6 +18,8 @@ typedef struct value {
         char* filename;
         /*Int*/
         int64_t integer;
+        /*Vector*/
+        vector(value*) vec;
     };
 } value;
 
@@ -50,6 +52,12 @@ value* valueCreateFile (const char* filename) {
     });
 }
 
+value* valueCreateVector (vector(value*) elements) {
+    return valueCreate(valueVector, (value) {
+        .vec = elements
+    });
+}
+
 value* valueCreateInvalid (void) {
     static value* invalid;
 
@@ -66,6 +74,25 @@ void valuePrint (const value* v) {
     case valueInt:
         printf("%ld", v->integer);
         break;
+
+    case valueFile:
+        printf("%s", v->filename);
+        break;
+
+    case valueVector: {
+        printf("[");
+
+        for (int i = 0; i < v->vec.length; i++) {
+            if (i != 0)
+                printf(", ");
+
+            value* element = vectorGet(v->vec, i);
+            valuePrint(element);
+        }
+
+        printf("]");
+        break;
+    }
 
     case valueInvalid:
         printf("<invalid>");

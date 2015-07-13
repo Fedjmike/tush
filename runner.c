@@ -38,6 +38,17 @@ static value* runStrLit (envCtx* env, const ast* node) {
     return valueCreateFile(node->literal.str);
 }
 
+static value* runListLit (envCtx* env, const ast* node) {
+    vector(value*) result = vectorInit(node->children.length, GC_malloc);
+
+    for (int i = 0; i < node->children.length; i++) {
+        ast* element = vectorGet(node->children, i);
+        vectorPush(&result, run(env, element));
+    }
+
+    return valueCreateVector(result);
+}
+
 static value* runSymbolLit (envCtx* env, const ast* node) {
     (void) env;
 
@@ -54,6 +65,7 @@ value* run (envCtx* env, const ast* node) {
     static handler_t table[astKindNo] = {
         [astFnApp] = runFnApp,
         [astStrLit] = runStrLit,
+        [astListLit] = runListLit,
         [astSymbolLit] = runSymbolLit
     };
 

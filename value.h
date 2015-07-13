@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector.h>
+
 #include "common.h"
 #include "forward.h"
 
@@ -20,6 +22,7 @@ typedef struct value value;
 value* valueCreateInt (int integer);
 value* valueCreateFn (value* (*fnptr)(value*));
 value* valueCreateFile (const char* filename);
+value* valueCreateVector (vector(value*) elements);
 value* valueCreateInvalid (void);
 
 void valuePrint (const value* v);
