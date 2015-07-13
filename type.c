@@ -71,7 +71,8 @@ typeSys typesInit (void) {
 
 typeSys* typesFree (typeSys* ts) {
     for (unsigned int i = 0; i < sizeof(ts->basics)/sizeof(*ts->basics); i++)
-        typeDestroy(ts->basics[i]);
+        if (ts->basics[i])
+            typeDestroy(ts->basics[i]);
 
     vectorFreeObjs(&ts->fns, (vectorDtor) typeDestroy);
 
