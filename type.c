@@ -20,6 +20,11 @@ typedef struct type {
     char* str;
 } type;
 
+
+static bool typeKindIsntUnitary (typeKind kind) {
+    return kind != type_Fn;
+}
+
 /*==== Type ctors and dtors ====*/
 
 static type* typeCreate (typeKind kind, type init) {
@@ -35,22 +40,22 @@ static void typeDestroy (type* dt) {
     free(dt);
 }
 
-static type* typeBasic (typeSys* ts, typeKind kind) {
-    assert(kind != type_Fn);
+static type* typeUnitary (typeSys* ts, typeKind kind) {
+    assert(typeKindIsntUnitary(kind));
 
-    /*Only allocate one struct per basic type*/
-    if (!ts->basics[kind])
-        ts->basics[kind] = typeCreate(kind, (type) {});
+    /*Only allocate one struct per unitary type*/
+    if (!ts->unitaries[kind])
+        ts->unitaries[kind] = typeCreate(kind, (type) {});
 
-    return ts->basics[kind];
+    return ts->unitaries[kind];
 }
 
 type* typeInteger (typeSys* ts) {
-    return typeBasic(ts, type_Integer);
+    return typeUnitary(ts, type_Integer);
 }
 
 type* typeFile (typeSys* ts) {
-    return typeBasic(ts, type_File);
+    return typeUnitary(ts, type_File);
 }
 
 type* typeFn (typeSys* ts, type* from, type* to) {
@@ -62,22 +67,22 @@ type* typeFn (typeSys* ts, type* from, type* to) {
 }
 
 type* typeInvalid (typeSys* ts) {
-    return typeBasic(ts, type_Invalid);
+    return typeUnitary(ts, type_Invalid);
 }
 
 /*==== Type system ====*/
 
 typeSys typesInit (void) {
     return (typeSys) {
-        .basics = {},
+        .unitaries = {},
         .fns = vectorInit(100, malloc)
     };
 }
 
 typeSys* typesFree (typeSys* ts) {
-    for (unsigned int i = 0; i < sizeof(ts->basics)/sizeof(*ts->basics); i++)
-        if (ts->basics[i])
-            typeDestroy(ts->basics[i]);
+    for (unsigned int i = 0; i < sizeof(ts->unitaries)/sizeof(*ts->unitaries); i++)
+        if (ts->unitaries[i])
+            typeDestroy(ts->unitaries[i]);
 
     vectorFreeObjs(&ts->fns, (vectorDtor) typeDestroy);
 

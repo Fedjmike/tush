@@ -12,7 +12,7 @@ typedef struct type type;
 
 typedef struct typeSys {
     /*Store all the types ever allocated, free them at the end*/
-    type* basics[type_KindNo];
+    type* unitaries[type_KindNo];
     vector(type*) fns;
 } typeSys;
 
