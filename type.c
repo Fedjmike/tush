@@ -13,6 +13,8 @@ typedef struct type {
         struct {
             type *from, *to;
         };
+        /*List*/
+        type* elements;
     };
 
     /*Not used by all types
@@ -22,7 +24,7 @@ typedef struct type {
 
 
 static bool typeKindIsntUnitary (typeKind kind) {
-    return kind != type_Fn;
+    return kind != type_Fn && kind != type_List;
 }
 
 /*==== Type ctors and dtors ====*/
@@ -62,7 +64,15 @@ type* typeFn (typeSys* ts, type* from, type* to) {
     type* dt = typeCreate(type_Fn, (type) {
         .from = from, .to = to
     });
-    vectorPush(&ts->fns, dt);
+    vectorPush(&ts->others, dt);
+    return dt;
+}
+
+type* typeList (typeSys* ts, type* elements) {
+    type* dt = typeCreate(type_List, (type) {
+        .elements = elements
+    });
+    vectorPush(&ts->others, dt);
     return dt;
 }
 
@@ -75,7 +85,7 @@ type* typeInvalid (typeSys* ts) {
 typeSys typesInit (void) {
     return (typeSys) {
         .unitaries = {},
-        .fns = vectorInit(100, malloc)
+        .others = vectorInit(100, malloc)
     };
 }
 
@@ -84,7 +94,7 @@ typeSys* typesFree (typeSys* ts) {
         if (ts->unitaries[i])
             typeDestroy(ts->unitaries[i]);
 
-    vectorFreeObjs(&ts->fns, (vectorDtor) typeDestroy);
+    vectorFreeObjs(&ts->others, (vectorDtor) typeDestroy);
 
     return ts;
 }
@@ -106,6 +116,13 @@ const char* typeGetStr (type* dt) {
 
         dt->str = malloc(strlen(from) + 4 + strlen(to) + 1);
         sprintf(dt->str, "%s -> %s", from, to);
+        return dt->str;
+    }
+
+    case type_List: {
+        const char* elements = typeGetStr(dt->elements);
+        dt->str = malloc(strlen(elements) + 2 + 1);
+        sprintf(dt->str, "[%s]", elements);
         return dt->str;
     }
     }
