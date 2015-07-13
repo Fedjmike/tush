@@ -19,7 +19,9 @@ typedef struct typeSys {
 typeSys typesInit (void);
 typeSys* typesFree (typeSys* ts);
 
-/*==== Ctors ====*/
+/*==== Type getters ====
+  Types are immutable and their allocation is handled by the type
+  system. These functions give you a reference to them.*/
 
 type* typeInteger (typeSys* ts);
 type* typeFile (typeSys* ts);
