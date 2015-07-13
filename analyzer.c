@@ -50,11 +50,13 @@ static void analyzeSymbolLit (analyzerCtx* ctx, ast* node) {
 static type* analyzer (analyzerCtx* ctx, ast* node) {
     typedef void (*handler_t)(analyzerCtx*, ast*);
 
-    handler_t handler = (handler_t[astKindNo]) {
+    static handler_t table[astKindNo] = {
         [astFnApp] = analyzeFnApp,
         [astStrLit] = analyzeStrLit,
         [astSymbolLit] = analyzeSymbolLit
-    }[node->kind];
+    };
+
+    handler_t handler = table[node->kind];
 
     if (handler)
         handler(ctx, node);

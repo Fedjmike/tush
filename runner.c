@@ -51,11 +51,13 @@ static value* runSymbolLit (envCtx* env, const ast* node) {
 value* run (envCtx* env, const ast* node) {
     typedef value* (*handler_t)(envCtx*, const ast*);
 
-    handler_t handler = (handler_t[astKindNo]) {
+    static handler_t table[astKindNo] = {
         [astFnApp] = runFnApp,
         [astStrLit] = runStrLit,
         [astSymbolLit] = runSymbolLit
-    }[node->kind];
+    };
+
+    handler_t handler = table[node->kind];
 
     if (handler)
         return handler(env, node);
