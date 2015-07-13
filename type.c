@@ -143,12 +143,7 @@ static bool typeEquals (type* l, type* r) {
 }
 
 bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result) {
-    if (typeEquals(fn->from, arg)) {
-        *result = fn->to;
-        return true;
-
-    } else {
-        *result = typeInvalid(ts);
-        return false;
-    }
+    bool yup = typeEquals(fn->from, arg);
+    *result = yup ? fn->to : typeInvalid(ts);
+    return yup;
 }
