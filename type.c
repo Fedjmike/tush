@@ -102,6 +102,9 @@ typeSys* typesFree (typeSys* ts) {
 /*==== ====*/
 
 const char* typeGetStr (type* dt) {
+    if (dt->str)
+        return dt->str;
+
     switch (dt->kind) {
     case type_Integer: return "Integer";
     case type_Number: return "Number";
