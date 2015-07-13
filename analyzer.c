@@ -60,7 +60,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
         handler(ctx, node);
 
     else {
-        errprintf("Unhandled AST kind, %d\n", astKindGetStr(node->kind));
+        errprintf("Unhandled AST kind, %s\n", astKindGetStr(node->kind));
         node->dt = typeInvalid(ctx->ts);
     }
 
