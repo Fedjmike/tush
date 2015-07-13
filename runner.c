@@ -1,5 +1,7 @@
 #include "runner.h"
 
+#include <assert.h>
+#include <gc/gc.h>
 #include <sys/stat.h>
 
 #include "sym.h"
@@ -25,8 +27,27 @@ static value* runFnApp (envCtx* env, const ast* node) {
     value* result = run(env, node->l);
 
     for (int i = 0; i < node->children.length; i++) {
-        ast* arg = vectorGet(node->children, i);
-        result = valueCall(result, run(env, arg));
+        ast* argNode = vectorGet(node->children, i);
+        value* arg = run(env, argNode);
+
+        if (!node->listApp)
+            result = valueCall(result, arg);
+
+        else {
+            valueIter iter;
+            /*Fails if the arg isn't an iterable value*/
+            assert(valueGetIterator(arg, &iter));
+
+            //todo async, blocking io
+
+            //todo list size, if poss.
+            vector(value*) results = vectorInit(4, GC_malloc);
+
+            for (value* element; (element = valueIterRead(&iter));)
+                vectorPush(&results, valueCall(result, element));
+
+            result = valueCreateVector(results);
+        }
     }
 
     return result;

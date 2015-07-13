@@ -16,20 +16,36 @@ static type* analyzer (analyzerCtx* ctx, ast* node);
 
 static void analyzeFnApp (analyzerCtx* ctx, ast* node) {
     type* fn = analyzer(ctx, node->l);
+    type* result = fn;
 
+    //todo fix, this is backwards
+    //or is it? still broken tho
     for (int i = 0; i < node->children.length; i++) {
         ast* argNode = vectorGet(node->children, i);
         type* arg = analyzer(ctx, argNode);
 
-        //todo analyzer errors
         //todo type equality
 
-        type* result;
-        assert(typeAppliesToFn(ctx->ts, arg, fn, &result));
-        fn = result;
+        type *elements;
+
+        if (typeAppliesToFn(ctx->ts, arg, fn, &result))
+            ;
+
+        /*If the parameter is a list, attempt to apply the function instead to
+          all of th elements individually.*/
+        else if (   typeIsList(ctx->ts, arg, &elements)
+                 && typeAppliesToFn(ctx->ts, elements, fn, &result)) {
+            /*The result of this node is a list of the results of all the calls*/
+            result = typeList(ctx->ts, result);
+            //todo which arg is the list? lol
+            node->listApp = true;
+
+        } else
+            assert(false);
+            //todo analyzer errors
     }
 
-    node->dt = fn;
+    node->dt = result;
 }
 
 static void analyzeStrLit (analyzerCtx* ctx, ast* node) {

@@ -41,3 +41,5 @@ const char* typeGetStr (type* dt);
 /*==== Tests and operations ====*/
 
 bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result_out);
+
+bool typeIsList (typeSys* ts, type* dt, type** elements_out);

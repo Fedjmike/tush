@@ -8,6 +8,16 @@
 /*Opaque, use interface below*/
 typedef struct value value;
 
+typedef struct valueIter {
+    value* iterable;
+
+    /*Information depends on the iterable implementations kind*/
+    union {
+        /*Vector*/
+        int n;
+    };
+} valueIter;
+
 /*The value creators allocate objects with a garbage collector!
 
   These objects are only kept alive by references stored in:
@@ -25,8 +35,13 @@ value* valueCreateFile (const char* filename);
 value* valueCreateVector (vector(value*) elements);
 value* valueCreateInvalid (void);
 
+/*==== (Kind generic) Operations ====*/
+
 void valuePrint (const value* v);
 
 value* valueCall (const value* fn, value* arg);
 
 const char* valueGetFilename (const value* file);
+
+bool valueGetIterator (value* iterable, valueIter* iter_out);
+value* valueIterRead (valueIter* iterator);

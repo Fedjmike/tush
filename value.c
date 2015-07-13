@@ -120,6 +120,23 @@ const char* valueGetFilename (const value* value) {
     return value->filename;
 }
 
+bool valueGetIterator (value* iterable, valueIter* iter) {
+    if (iterable->kind != valueVector)
+        return false;
+
+    else {
+        *iter = (valueIter) {
+            .iterable = iterable, .n = 0
+        };
+        return true;
+    }
+}
+
+value* valueIterRead (valueIter* iterator) {
+    assert(iterator->iterable->kind == valueVector);
+    return vectorGet(iterator->iterable->vec, iterator->n++);
+}
+
 const char* valueKindGetStr (valueKind kind) {
     switch (kind) {
     case valueFn: return "Fn";

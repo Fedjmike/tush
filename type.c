@@ -147,3 +147,9 @@ bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result) {
     *result = yup ? fn->to : typeInvalid(ts);
     return yup;
 }
+
+bool typeIsList (typeSys* ts, type* dt, type** elements) {
+    bool yup = dt->kind == type_List;
+    *elements = yup ? dt->elements : typeInvalid(ts);
+    return yup;
+}

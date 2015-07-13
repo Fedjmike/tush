@@ -27,11 +27,17 @@ typedef struct ast {
     type* dt;
 
     union {
-        /*StrLit*/
-        char* str;
-        /*SymbolLit*/
-        sym* symbol;
-    } literal;
+        union {
+            /*StrLit*/
+            char* str;
+            /*SymbolLit*/
+            sym* symbol;
+        } literal;
+
+        /*FnApp*/
+        bool listApp;
+    };
+    //todo combine bools into a flags field
 } ast;
 
 ast* astCreateBOP (ast* l, ast* r, opKind op);
