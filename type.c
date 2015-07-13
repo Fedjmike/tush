@@ -14,6 +14,10 @@ typedef struct type {
             type *from, *to;
         };
     };
+
+    /*Not used by all types
+      Allocated in typeGetStr, if at all*/
+    char* str;
 } type;
 
 /*==== Type ctors and dtors ====*/
@@ -27,6 +31,7 @@ static type* typeCreate (typeKind kind, type init) {
 }
 
 static void typeDestroy (type* dt) {
+    free(dt->str);
     free(dt);
 }
 
@@ -86,10 +91,18 @@ const char* typeGetStr (type* dt) {
     case type_Integer: return "Integer";
     case type_Number: return "Number";
     case type_File: return "File";
-    case type_Fn: return "Fn";
     case type_Invalid: return "<invalid>";
     case type_KindNo: return "<KindNo, not real>";
     default: return "<unhandled type kind>";
+
+    case type_Fn: {
+        const char *from = typeGetStr(dt->from),
+                   *to = typeGetStr(dt->to);
+
+        dt->str = malloc(strlen(from) + 4 + strlen(to) + 1);
+        sprintf(dt->str, "%s -> %s", from, to);
+        return dt->str;
+    }
     }
 }
 
