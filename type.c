@@ -76,6 +76,20 @@ typeSys* typesFree (typeSys* ts) {
     return ts;
 }
 
+/*==== ====*/
+
+const char* typeGetStr (type* dt) {
+    switch (dt->kind) {
+    case type_Integer: return "Integer";
+    case type_Number: return "Number";
+    case type_File: return "File";
+    case type_Fn: return "Fn";
+    case type_Invalid: return "<invalid>";
+    case type_KindNo: return "<KindNo, not real>";
+    default: return "<unhandled type kind>";
+    }
+}
+
 /*==== Tests and operations ====*/
 
 bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result) {

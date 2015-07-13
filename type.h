@@ -30,6 +30,10 @@ type* typeInvalid (typeSys* ts);
 //todo
 type* typeFnChain (typeSys ts, int n, ...);
 
+/*==== ====*/
+
+const char* typeGetStr (type* dt);
+
 /*==== Tests and operations ====*/
 
 bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result_out);

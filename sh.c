@@ -41,6 +41,7 @@ int main (int argc, char** argv) {
     lexerDestroy(&lexer);
 
     analyze(&ts, tree);
+    printAST(tree);
 
     envCtx env = {};
     value* result = run(&env, tree);
