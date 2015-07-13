@@ -54,7 +54,7 @@ static void printer (printerCtx* ctx, const ast* node) {
     }[node->kind](ctx, node);
 
     if (node->dt)
-        printer_outf(ctx)("dt: %s\n", typeGetStr(node->dt));
+        printer_outf(ctx)("type: %s\n", typeGetStr(node->dt));
 
     ctx->depth--;
 }

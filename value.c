@@ -53,7 +53,7 @@ value* valueCreateFile (const char* filename) {
 
 void valuePrint (const value* v) {
     if (v->kind == valueInt)
-        printf("%ld: Int\n", v->integer);
+        printf("%ld", v->integer);
 
     else
         ;//todo

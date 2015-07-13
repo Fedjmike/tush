@@ -47,6 +47,7 @@ int main (int argc, char** argv) {
     value* result = run(&env, tree);
 
     valuePrint(result);
+    printf(": %s\n", typeGetStr(tree->dt));
 
     astDestroy(tree);
 
