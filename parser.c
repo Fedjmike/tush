@@ -8,6 +8,7 @@
 
 static ast* parserS (parserCtx* ctx);
 
+static ast* parserExpr (parserCtx* ctx);
 static ast* parserPipe (parserCtx* ctx);
 static ast* parserFnApp (parserCtx* ctx);
 static ast* parserAtom ();
@@ -21,6 +22,10 @@ ast* parse (sym* global, lexerCtx* lexer) {
 }
 
 static ast* parserS (parserCtx* ctx) {
+    return parserExpr(ctx);
+}
+
+static ast* parserExpr (parserCtx* ctx) {
     return parserPipe(ctx);
 }
 
@@ -38,6 +43,10 @@ static ast* parserPipe (parserCtx* ctx) {
     return node;
 }
 
+static bool waiting_for_delim (parserCtx* ctx) {
+    return waiting(ctx) && !see(ctx, "|") && !see(ctx, ",") && !see(ctx, ")") && !see(ctx, "]");
+}
+
 static ast* parserFnApp (parserCtx* ctx) {
     /*Filled iff there is a backtick function*/
     ast* fn = 0;
@@ -45,7 +54,7 @@ static ast* parserFnApp (parserCtx* ctx) {
     vector(ast*) nodes = vectorInit(3, malloc);
     int exprs = 0;
 
-    for (; waiting_for(ctx, ")") && waiting_for(ctx, "|"); exprs++) {
+    for (; waiting_for_delim(ctx); exprs++) {
         if (try_match(ctx, "`")) {
             if (fn) {
                 error(ctx, "Multiple explicit functions in backticks");
@@ -76,7 +85,19 @@ static ast* parserFnApp (parserCtx* ctx) {
 static ast* parserAtom (parserCtx* ctx) {
     ast* node;
 
-    if (see_kind(ctx, tokenNormal)) {
+    /*List literal*/
+    if (try_match(ctx, "[")) {
+        vector(ast*) nodes = vectorInit(4, malloc);
+
+        if (waiting_for(ctx, "]")) do {
+            vectorPush(&nodes, parserExpr(ctx));
+        } while (try_match(ctx, ","));
+
+        node = astCreateListLit(nodes);
+
+        match(ctx, "]");
+
+    } else if (see_kind(ctx, tokenNormal)) {
         sym* symbol = symLookup(ctx->scope, ctx->current.buffer);
 
         if (symbol)

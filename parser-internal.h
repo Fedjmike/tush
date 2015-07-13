@@ -27,6 +27,7 @@ static void error (parserCtx* ctx, const char* msg);
 
 static bool see (parserCtx* ctx, const char* look);
 static bool see_kind (parserCtx* ctx, tokenKind look);
+static bool waiting (parserCtx* ctx);
 static bool waiting_for (parserCtx* ctx, const char* look);
 
 static void accept (parserCtx* ctx);
@@ -65,8 +66,12 @@ inline static bool see_kind (parserCtx* ctx, tokenKind look) {
     return ctx->current.kind == look;
 }
 
+inline static bool waiting (parserCtx* ctx) {
+    return ctx->current.kind != tokenEOF;
+}
+
 inline static bool waiting_for (parserCtx* ctx, const char* look) {
-    return !see(ctx, look) && ctx->current.kind != tokenEOF;
+    return waiting(ctx) && !see(ctx, look);
 }
 
 inline static void accept (parserCtx* ctx) {

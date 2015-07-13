@@ -36,6 +36,24 @@ static void analyzeStrLit (analyzerCtx* ctx, ast* node) {
     node->dt = typeFile(ctx->ts);
 }
 
+static void analyzeListLit (analyzerCtx* ctx, ast* node) {
+    //todo 'a List
+    assert(node->children.length != 0);
+
+    type* elements;
+
+    for (int i = 0; i < node->children.length; i++) {
+        ast* element = vectorGet(node->children, i);
+        elements = analyzer(ctx, element);
+
+        //todo check equality
+        //mode average if they differ
+        //todo lowest common interface ?
+    }
+
+    node->dt = typeList(ctx->ts, elements);
+}
+
 static void analyzeSymbolLit (analyzerCtx* ctx, ast* node) {
     if (node->literal.symbol && node->literal.symbol->dt)
         node->dt = node->literal.symbol->dt;
@@ -53,6 +71,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
     static handler_t table[astKindNo] = {
         [astFnApp] = analyzeFnApp,
         [astStrLit] = analyzeStrLit,
+        [astListLit] = analyzeListLit,
         [astSymbolLit] = analyzeSymbolLit
     };
 
