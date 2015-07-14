@@ -24,7 +24,7 @@ typedef struct type {
 
 
 static bool typeKindIsntUnitary (typeKind kind) {
-    return kind != type_Fn && kind != type_List;
+    return kind == type_Fn || kind == type_List;
 }
 
 /*==== Type ctors and dtors ====*/
@@ -43,7 +43,7 @@ static void typeDestroy (type* dt) {
 }
 
 static type* typeUnitary (typeSys* ts, typeKind kind) {
-    assert(typeKindIsntUnitary(kind));
+    assert(!typeKindIsntUnitary(kind));
 
     /*Only allocate one struct per unitary type*/
     if (!ts->unitaries[kind])

@@ -64,6 +64,8 @@ ast* astCreateInvalid (void) {
     return astCreate(astInvalid, (ast) {});
 }
 
+/*==== ====*/
+
 const char* astKindGetStr (astKind kind) {
     switch (kind) {
     case astBOP: return "BOP";

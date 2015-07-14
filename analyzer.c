@@ -10,9 +10,9 @@ typedef struct analyzerCtx {
     typeSys* ts;
 } analyzerCtx;
 
-/*==== ====*/
-
 static type* analyzer (analyzerCtx* ctx, ast* node);
+
+/*==== ====*/
 
 static void analyzePipeApp (analyzerCtx* ctx, ast* node) {
     type *fn = analyzer(ctx, node->l),

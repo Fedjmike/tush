@@ -11,9 +11,13 @@ typedef enum typeKind {
 
 typedef struct type type;
 
+/*This store all the types ever allocated, and frees them at the end*/
 typedef struct typeSys {
-    /*Store all the types ever allocated, free them at the end*/
+    /*Unitary types are those that all instances are conceptually the
+      same. That is, the type has no parameters. Therefore only one ever
+      need be allocated, and we can easily index them by kind.*/
     type* unitaries[type_KindNo];
+
     vector(type*) others;
 } typeSys;
 
@@ -38,7 +42,10 @@ type* typeFnChain (typeSys ts, int n, ...);
 
 const char* typeGetStr (type* dt);
 
-/*==== Tests and operations ====*/
+/*==== Tests and operations ====
+  Many of these simultaneously:
+    1. Check a semantic condition
+    2. Produce a type as an out-parameter*/
 
 bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result_out);
 

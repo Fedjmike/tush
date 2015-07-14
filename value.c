@@ -67,6 +67,17 @@ value* valueCreateInvalid (void) {
     return invalid;
 }
 
+/*==== ====*/
+
+const char* valueKindGetStr (valueKind kind) {
+    switch (kind) {
+    case valueFn: return "Fn";
+    case valueFile: return "File";
+    case valueInt: return "Int";
+    default: return "<unhandled value kind>";
+    }
+}
+
 /*==== Operations on values ====*/
 
 void valuePrint (const value* v) {
@@ -140,13 +151,4 @@ int valueGuessIterSize (valueIter iterator) {
 value* valueIterRead (valueIter* iterator) {
     assert(iterator->iterable->kind == valueVector);
     return vectorGet(iterator->iterable->vec, iterator->n++);
-}
-
-const char* valueKindGetStr (valueKind kind) {
-    switch (kind) {
-    case valueFn: return "Fn";
-    case valueFile: return "File";
-    case valueInt: return "Int";
-    default: return "<unhandled value kind>";
-    }
 }

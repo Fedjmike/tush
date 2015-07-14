@@ -66,7 +66,7 @@ static ast* parserFnApp (parserCtx* ctx) {
     }
 
     if (exprs == 1) {
-        ast* node = vectorGet(nodes, 0);
+        ast* node = vectorPop(&nodes);
         vectorFree(&nodes);
         return node;
 
