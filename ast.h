@@ -6,7 +6,7 @@
 //#include "type.h"
 
 typedef enum astKind {
-    astBOP, astFnApp, astStrLit, astSymbolLit, astListLit,
+    astBOP, astPipeApp, astFnApp, astStrLit, astSymbolLit, astListLit,
     astInvalid,
     astKindNo
 } astKind;
@@ -34,13 +34,14 @@ typedef struct ast {
             sym* symbol;
         } literal;
 
-        /*FnApp*/
+        /*PipeApp*/
         bool listApp;
     };
     //todo combine bools into a flags field
 } ast;
 
 ast* astCreateBOP (ast* l, ast* r, opKind op);
+ast* astCreatePipeApp (ast* fn, ast* arg);
 ast* astCreateFnApp (ast* fn, vector(ast*) args);
 ast* astCreateStrLit (const char* str);
 ast* astCreateSymbolLit (sym* symbol);

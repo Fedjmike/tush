@@ -28,6 +28,13 @@ void astDestroy (ast* node) {
     free(node);
 }
 
+ast* astCreatePipeApp (ast* fn, ast* arg) {
+    return astCreate(astPipeApp, (ast) {
+        .l = fn,
+        .r = arg,
+    });
+}
+
 ast* astCreateFnApp (ast* fn, vector(ast*) args) {
     return astCreate(astFnApp, (ast) {
         .l = fn,
@@ -60,6 +67,7 @@ ast* astCreateInvalid (void) {
 const char* astKindGetStr (astKind kind) {
     switch (kind) {
     case astBOP: return "BOP";
+    case astPipeApp: return "PipeApp";
     case astFnApp: return "FnApp";
     case astStrLit: return "StrLit";
     case astSymbolLit: return "SymbolLit";

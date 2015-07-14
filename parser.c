@@ -34,10 +34,7 @@ static ast* parserPipe (parserCtx* ctx) {
 
     while (try_match(ctx, "|")) {
         ast* fn = parserFnApp(ctx);
-
-        vector nodes = vectorInit(1, malloc);
-        vectorPush(&nodes, node);
-        node = astCreateFnApp(fn, nodes);
+        node = astCreatePipeApp(fn, node);
     }
 
     return node;

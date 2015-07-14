@@ -14,35 +14,39 @@ typedef struct analyzerCtx {
 
 static type* analyzer (analyzerCtx* ctx, ast* node);
 
-static void analyzeFnApp (analyzerCtx* ctx, ast* node) {
-    type* fn = analyzer(ctx, node->l);
-    type* result = fn;
+static void analyzePipeApp (analyzerCtx* ctx, ast* node) {
+    type *fn = analyzer(ctx, node->l),
+         *arg = analyzer(ctx, node->r);
 
-    //todo fix, this is backwards
-    //or is it? still broken tho
+    type *result, *elements;
+
+    if (typeAppliesToFn(ctx->ts, arg, fn, &result))
+        ;
+
+    /*If the parameter is a list, attempt to apply the function instead to
+      all of the elements individually.*/
+    else if (   typeIsList(ctx->ts, arg, &elements)
+             && typeAppliesToFn(ctx->ts, elements, fn, &result)) {
+        /*The result is a list of the results of all the calls*/
+        result = typeList(ctx->ts, result);
+        node->listApp = true;
+
+    } else
+        assert(false);
+        //todo analyzer errors
+
+    node->dt = result;
+}
+
+static void analyzeFnApp (analyzerCtx* ctx, ast* node) {
+    type* result = analyzer(ctx, node->l);
+
     for (int i = 0; i < node->children.length; i++) {
         ast* argNode = vectorGet(node->children, i);
         type* arg = analyzer(ctx, argNode);
 
-        //todo type equality
-
-        type *elements;
-
-        if (typeAppliesToFn(ctx->ts, arg, fn, &result))
-            ;
-
-        /*If the parameter is a list, attempt to apply the function instead to
-          all of th elements individually.*/
-        else if (   typeIsList(ctx->ts, arg, &elements)
-                 && typeAppliesToFn(ctx->ts, elements, fn, &result)) {
-            /*The result of this node is a list of the results of all the calls*/
-            result = typeList(ctx->ts, result);
-            //todo which arg is the list? lol
-            node->listApp = true;
-
-        } else
-            assert(false);
-            //todo analyzer errors
+        
+        assert(typeAppliesToFn(ctx->ts, arg, result, &result));
     }
 
     node->dt = result;
@@ -85,6 +89,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
     typedef void (*handler_t)(analyzerCtx*, ast*);
 
     static handler_t table[astKindNo] = {
+        [astPipeApp] = analyzePipeApp,
         [astFnApp] = analyzeFnApp,
         [astStrLit] = analyzeStrLit,
         [astListLit] = analyzeListLit,

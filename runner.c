@@ -23,6 +23,28 @@ static value* impl_size__ (value* file) {
     return valueCreateInt(st.st_size);
 }
 
+static value* runPipeApp (envCtx* env, const ast* node) {
+    value *fn = run(env, node->l),
+          *arg = run(env, node->r);
+
+    /*Implicit map*/
+    if (node->listApp) {
+        valueIter iter;
+        /*Fails if the arg isn't an iterable value*/
+        assert(valueGetIterator(arg, &iter));
+
+        vector(value*) results = vectorInit(valueGuessIterSize(iter), GC_malloc);
+
+        /*Apply it to each element*/
+        for (value* element; (element = valueIterRead(&iter));)
+            vectorPush(&results, valueCall(fn, element));
+
+        return valueCreateVector(results);
+
+    } else
+        return valueCall(fn, arg);
+}
+
 static value* runFnApp (envCtx* env, const ast* node) {
     value* result = run(env, node->l);
 
@@ -30,24 +52,7 @@ static value* runFnApp (envCtx* env, const ast* node) {
         ast* argNode = vectorGet(node->children, i);
         value* arg = run(env, argNode);
 
-        if (!node->listApp)
-            result = valueCall(result, arg);
-
-        else {
-            valueIter iter;
-            /*Fails if the arg isn't an iterable value*/
-            assert(valueGetIterator(arg, &iter));
-
-            //todo async, blocking io
-
-            //todo list size, if poss.
-            vector(value*) results = vectorInit(4, GC_malloc);
-
-            for (value* element; (element = valueIterRead(&iter));)
-                vectorPush(&results, valueCall(result, element));
-
-            result = valueCreateVector(results);
-        }
+        result = valueCall(result, arg);
     }
 
     return result;
@@ -84,6 +89,7 @@ value* run (envCtx* env, const ast* node) {
     typedef value* (*handler_t)(envCtx*, const ast*);
 
     static handler_t table[astKindNo] = {
+        [astPipeApp] = runPipeApp,
         [astFnApp] = runFnApp,
         [astStrLit] = runStrLit,
         [astListLit] = runListLit,
