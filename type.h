@@ -35,8 +35,9 @@ type* typeList (typeSys* ts, type* elements);
 
 type* typeInvalid (typeSys* ts);
 
-//todo
-type* typeFnChain (typeSys ts, int n, ...);
+/*A helper function for construction fn types.
+  Accepts a list of typeKinds, which must be unitary types.*/
+type* typeFnChain (int kindNo, typeSys* ts, ...);
 
 /*==== ====*/
 

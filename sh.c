@@ -22,7 +22,7 @@ void addBuiltin (sym* global, const char* name, type* dt) {
 }
 
 void addBuiltins (typeSys* ts, sym* global) {
-    addBuiltin(global, "size", typeFn(ts, typeFile(ts), typeInteger(ts)));
+    addBuiltin(global, "size", typeFnChain(2, ts, type_File, type_Integer));
 }
 
 /*==== Compiler ====*/

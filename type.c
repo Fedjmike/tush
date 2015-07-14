@@ -101,6 +101,32 @@ typeSys* typesFree (typeSys* ts) {
 
 /*==== ====*/
 
+type* typeFnChain (int kindNo, typeSys* ts, ...) {
+    type* result;
+
+    va_list args;
+    va_start(args, ts);
+
+    for (int i = 0; i < kindNo; i++) {
+        typeKind kind = va_arg(args, int);
+        assert(!typeKindIsntUnitary(kind));
+
+        type* dt = typeUnitary(ts, kind);
+
+        /*On the first iteration the result is just the unitary type
+          (using the induction variable to make it easy for the compiler to optimize)*/
+        if (i == 0)
+            result = dt;
+
+        else
+            result = typeFn(ts, result, dt);
+    }
+
+    va_end(args);
+
+    return result;
+}
+
 const char* typeGetStr (type* dt) {
     if (dt->str)
         return dt->str;
