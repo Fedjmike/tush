@@ -34,7 +34,7 @@ static ast* parserPipe (parserCtx* ctx) {
 
     while (try_match(ctx, "|")) {
         ast* fn = parserFnApp(ctx);
-        node = astCreatePipeApp(fn, node);
+        node = astCreatePipeApp(node, fn);
     }
 
     return node;
@@ -75,7 +75,7 @@ static ast* parserFnApp (parserCtx* ctx) {
         if (!fn)
             fn = vectorPop(&nodes);
 
-        return astCreateFnApp(fn, nodes);
+        return astCreateFnApp(nodes, fn);
     }
 }
 

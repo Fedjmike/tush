@@ -15,8 +15,8 @@ static type* analyzer (analyzerCtx* ctx, ast* node);
 /*==== ====*/
 
 static void analyzePipeApp (analyzerCtx* ctx, ast* node) {
-    type *fn = analyzer(ctx, node->l),
-         *arg = analyzer(ctx, node->r);
+    type *arg = analyzer(ctx, node->l),
+         *fn = analyzer(ctx, node->r);
 
     type *result, *elements;
 
@@ -39,7 +39,7 @@ static void analyzePipeApp (analyzerCtx* ctx, ast* node) {
 }
 
 static void analyzeFnApp (analyzerCtx* ctx, ast* node) {
-    type* result = analyzer(ctx, node->l);
+    type* result = analyzer(ctx, node->r);
 
     for (int i = 0; i < node->children.length; i++) {
         ast* argNode = vectorGet(node->children, i);

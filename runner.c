@@ -24,8 +24,8 @@ static value* impl_size__ (value* file) {
 }
 
 static value* runPipeApp (envCtx* env, const ast* node) {
-    value *fn = run(env, node->l),
-          *arg = run(env, node->r);
+    value *arg = run(env, node->l),
+          *fn = run(env, node->r);
 
     /*Implicit map*/
     if (node->listApp) {
@@ -46,7 +46,7 @@ static value* runPipeApp (envCtx* env, const ast* node) {
 }
 
 static value* runFnApp (envCtx* env, const ast* node) {
-    value* result = run(env, node->l);
+    value* result = run(env, node->r);
 
     for (int i = 0; i < node->children.length; i++) {
         ast* argNode = vectorGet(node->children, i);

@@ -28,16 +28,16 @@ void astDestroy (ast* node) {
     free(node);
 }
 
-ast* astCreatePipeApp (ast* fn, ast* arg) {
+ast* astCreatePipeApp (ast* arg, ast* fn) {
     return astCreate(astPipeApp, (ast) {
-        .l = fn,
-        .r = arg,
+        .l = arg,
+        .r = fn,
     });
 }
 
-ast* astCreateFnApp (ast* fn, vector(ast*) args) {
+ast* astCreateFnApp (vector(ast*) args, ast* fn) {
     return astCreate(astFnApp, (ast) {
-        .l = fn,
+        .r = fn,
         .children = args
     });
 }

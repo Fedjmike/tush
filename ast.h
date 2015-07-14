@@ -41,8 +41,8 @@ typedef struct ast {
 } ast;
 
 ast* astCreateBOP (ast* l, ast* r, opKind op);
-ast* astCreatePipeApp (ast* fn, ast* arg);
-ast* astCreateFnApp (ast* fn, vector(ast*) args);
+ast* astCreatePipeApp (ast* arg, ast* fn);
+ast* astCreateFnApp (vector(ast*) args, ast* fn);
 ast* astCreateStrLit (const char* str);
 ast* astCreateSymbolLit (sym* symbol);
 ast* astCreateListLit (vector(ast*) elements);
