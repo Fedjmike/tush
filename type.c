@@ -169,9 +169,9 @@ static bool typeEquals (type* l, type* r) {
 }
 
 bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result) {
-    bool yup = typeEquals(fn->from, arg);
-    *result = yup ? fn->to : typeInvalid(ts);
-    return yup;
+    bool applies = fn->kind == type_Fn && typeEquals(fn->from, arg);
+    *result = applies ? fn->to : typeInvalid(ts);
+    return applies;
 }
 
 bool typeIsList (typeSys* ts, type* dt, type** elements) {
