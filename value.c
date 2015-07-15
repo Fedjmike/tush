@@ -86,6 +86,10 @@ void valuePrint (const value* v) {
         printf("%ld", v->integer);
         break;
 
+    case valueFn:
+        printf("[fn at %p]", v->fnptr);
+        break;
+
     case valueFile:
         printf("%s", v->filename);
         break;
@@ -110,7 +114,7 @@ void valuePrint (const value* v) {
         break;
 
     default:
-        ;//todo
+        errprintf("Unhandled value kind, %s\n", valueKindGetStr(v->kind));
     }
 }
 
