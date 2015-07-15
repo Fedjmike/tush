@@ -11,6 +11,7 @@
 typedef struct sym {
     char* name;
     type* dt;
+    value* val;
 
     sym* parent;
     vector(sym*) children;

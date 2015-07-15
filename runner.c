@@ -2,26 +2,10 @@
 
 #include <assert.h>
 #include <gc/gc.h>
-#include <sys/stat.h>
 
 #include "sym.h"
 #include "ast.h"
 #include "value.h"
-
-static value* impl_size__ (value* file) {
-    const char* filename = valueGetFilename(file);
-
-    if (!filename)
-        return valueCreateInvalid();
-
-    struct stat st;
-    bool fail = stat(filename, &st);
-
-    if (fail)
-        return valueCreateInvalid();
-
-    return valueCreateInt(st.st_size);
-}
 
 static value* runPipeApp (envCtx* env, const ast* node) {
     value *arg = run(env, node->l),
@@ -77,12 +61,8 @@ static value* runListLit (envCtx* env, const ast* node) {
 
 static value* runSymbolLit (envCtx* env, const ast* node) {
     (void) env;
-
-    if (!strcmp(node->literal.symbol->name, "size"))
-        return valueCreateFn(impl_size__);
-
-    else
-        return valueCreateInvalid();
+    value* val = node->literal.symbol->val;
+    return val ? val : valueCreateInvalid();
 }
 
 value* run (envCtx* env, const ast* node) {

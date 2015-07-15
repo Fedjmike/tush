@@ -6,6 +6,8 @@
 #include "sym.h"
 #include "ast.h"
 
+#include "builtins.h"
+
 #include "lexer.h"
 #include "parser.h"
 #include "analyzer.h"
@@ -14,16 +16,6 @@
 
 #include "value.h"
 #include "runner.h"
-
-/*==== Builtins ====*/
-
-void addBuiltin (sym* global, const char* name, type* dt) {
-    symAdd(global, name)->dt = dt;
-}
-
-void addBuiltins (typeSys* ts, sym* global) {
-    addBuiltin(global, "size", typeFnChain(2, ts, type_File, type_Integer));
-}
 
 /*==== Compiler ====*/
 
