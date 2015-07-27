@@ -24,14 +24,23 @@ typedef struct compilerCtx {
     sym* global;
 } compilerCtx;
 
-ast* compile (compilerCtx* ctx, const char* str) {
+ast* compile (compilerCtx* ctx, const char* str, int* errors) {
     /*Turn the string into an AST*/
-    lexerCtx lexer = lexerInit(str);
-    ast* tree = parse(ctx->global, &lexer);
-    lexerDestroy(&lexer);
+    ast* tree; {
+        lexerCtx lexer = lexerInit(str);
+        parserResult result = parse(ctx->global, &lexer);
+        lexerDestroy(&lexer);
+
+        tree = result.tree;
+        *errors += result.errors;
+    }
 
     /*Add types and other semantic information*/
-    analyze(&ctx->ts, tree);
+    {
+        analyzerResult result = analyze(&ctx->ts, tree);
+        *errors += result.errors;
+    }
+
     printAST(tree);
 
     return tree;
@@ -53,15 +62,18 @@ compilerCtx* compilerFree (compilerCtx* ctx) {
 /*==== Gosh ====*/
 
 void gosh (compilerCtx* ctx, const char* str) {
-    ast* tree = compile(ctx, str);
+    int errors = 0;
+    ast* tree = compile(ctx, str, &errors);
 
-    /*Run the AST*/
-    envCtx env = {};
-    value* result = run(&env, tree);
+    if (errors == 0) {
+        /*Run the AST*/
+        envCtx env = {};
+        value* result = run(&env, tree);
 
-    /*Print the value and type*/
-    valuePrint(result);
-    printf(" :: %s\n", typeGetStr(tree->dt));
+        /*Print the value and type*/
+        valuePrint(result);
+        printf(" :: %s\n", typeGetStr(tree->dt));
+    }
 
     astDestroy(tree);
 }

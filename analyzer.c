@@ -2,17 +2,31 @@
 
 #include <assert.h>
 
+#include "common.h"
 #include "type.h"
 #include "sym.h"
 #include "ast.h"
 
 typedef struct analyzerCtx {
     typeSys* ts;
+    int errors;
 } analyzerCtx;
 
 static type* analyzer (analyzerCtx* ctx, ast* node);
 
+/*==== Internals ====*/
+
+inline static printf_t* error (analyzerCtx* ctx) {
+    ctx->errors++;
+    printf("error: ");
+    return printf;
+}
+
 /*==== ====*/
+
+static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
+    error(ctx)("type %s does not apply to function %s\n", typeGetStr(arg), typeGetStr(fn));
+}
 
 static void analyzePipeApp (analyzerCtx* ctx, ast* node) {
     type *arg = analyzer(ctx, node->l),
@@ -31,9 +45,10 @@ static void analyzePipeApp (analyzerCtx* ctx, ast* node) {
         result = typeList(ctx->ts, result);
         node->listApp = true;
 
-    } else
-        assert(false);
-        //todo analyzer errors
+    } else {
+        errorFnApp(ctx, arg, fn);
+        result = typeInvalid(ctx->ts);
+    }
 
     node->dt = result;
 }
@@ -45,8 +60,10 @@ static void analyzeFnApp (analyzerCtx* ctx, ast* node) {
         ast* argNode = vectorGet(node->children, i);
         type* arg = analyzer(ctx, argNode);
 
-        
-        assert(typeAppliesToFn(ctx->ts, arg, result, &result));
+        if (!typeAppliesToFn(ctx->ts, arg, result, &result)) {
+            errorFnApp(ctx, arg, result);
+            result = typeInvalid(ctx->ts);
+        }
     }
 
     node->dt = result;
@@ -121,8 +138,15 @@ static analyzerCtx* analyzerFree (analyzerCtx* ctx) {
     return ctx;
 }
 
-void analyze (typeSys* ts, ast* node) {
+analyzerResult analyze (typeSys* ts, ast* node) {
     analyzerCtx ctx = analyzerInit(ts);
     analyzer(&ctx, node);
+
+    analyzerResult result = {
+        .errors = ctx.errors
+    };
+
     analyzerFree(&ctx);
+
+    return result;
 }

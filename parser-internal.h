@@ -23,7 +23,7 @@ typedef struct parserCtx {
 static parserCtx parserInit (sym* global, lexerCtx* lexer);
 static parserCtx* parserFree (parserCtx* ctx);
 
-static void error (parserCtx* ctx, const char* msg);
+static printf_t* error (parserCtx* ctx);
 
 static bool see (parserCtx* ctx, const char* look);
 static bool see_kind (parserCtx* ctx, tokenKind look);
@@ -53,9 +53,10 @@ inline static parserCtx* parserFree (parserCtx* ctx) {
     return ctx;
 }
 
-inline static void error (parserCtx* ctx, const char* msg) {
-    printf("error: %s\n", msg);
+inline static printf_t* error (parserCtx* ctx) {
     ctx->errors++;
+    printf("error: ");
+    return printf;
 }
 
 inline static bool see (parserCtx* ctx, const char* look) {
@@ -83,7 +84,7 @@ inline static void accept (parserCtx* ctx) {
 
 inline static void expected (parserCtx* ctx, const char* expected) {
     (void) expected;
-    error(ctx, "expected");
+    error(ctx)("Expected %s, found '%s'\n", expected, ctx->current.buffer);
     accept(ctx);
 }
 

@@ -2,4 +2,9 @@
 
 #include "forward.h"
 
-ast* parse (sym* global, lexerCtx* lexer);
+typedef struct parserResult {
+    ast* tree;
+    int errors;
+} parserResult;
+
+parserResult parse (sym* global, lexerCtx* lexer);

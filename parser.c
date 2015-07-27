@@ -13,12 +13,18 @@ static ast* parserPipe (parserCtx* ctx);
 static ast* parserFnApp (parserCtx* ctx);
 static ast* parserAtom ();
 
-ast* parse (sym* global, lexerCtx* lexer) {
+parserResult parse (sym* global, lexerCtx* lexer) {
     parserCtx ctx = parserInit(global, lexer);
     ast* tree = parserS(&ctx);
+
+    parserResult result = {
+        .tree = tree,
+        .errors = ctx.errors
+    };
+
     parserFree(&ctx);
 
-    return tree;
+    return result;
 }
 
 static ast* parserS (parserCtx* ctx) {
@@ -54,7 +60,7 @@ static ast* parserFnApp (parserCtx* ctx) {
     for (; waiting_for_delim(ctx); exprs++) {
         if (try_match(ctx, "`")) {
             if (fn) {
-                error(ctx, "Multiple explicit functions in backticks");
+                error(ctx)("Multiple explicit functions in backticks: '%s'\n", ctx->current.buffer);
                 vectorPush(&nodes, fn);
             }
 

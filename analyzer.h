@@ -2,4 +2,8 @@
 
 #include "forward.h"
 
-void analyze (typeSys* ts, ast* node);
+typedef struct analyzerResult {
+    int errors;
+} analyzerResult;
+
+analyzerResult analyze (typeSys* ts, ast* node);

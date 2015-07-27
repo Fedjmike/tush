@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include <string.h>
 
+typedef int printf_t(const char*, ...);
+
 typedef void* (*stdalloc)(size_t);
 
 static inline void* malloci (size_t size, void* src) {
