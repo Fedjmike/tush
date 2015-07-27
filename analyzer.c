@@ -32,21 +32,23 @@ static void analyzePipeApp (analyzerCtx* ctx, ast* node) {
     type *arg = analyzer(ctx, node->l),
          *fn = analyzer(ctx, node->r);
 
-    type *result, *elements;
+    type* result;
 
-    if (typeAppliesToFn(ctx->ts, arg, fn, &result))
-        ;
+    if (typeAppliesToFn(arg, fn))
+        result = typeGetFnResult(fn);
 
     /*If the parameter is a list, attempt to apply the function instead to
       all of the elements individually.*/
-    else if (   typeIsList(ctx->ts, arg, &elements)
-             && typeAppliesToFn(ctx->ts, elements, fn, &result)) {
+    else if (   typeIsList(arg)
+             && typeAppliesToFn(typeGetListElements(arg), fn)) {
         /*The result is a list of the results of all the calls*/
-        result = typeList(ctx->ts, result);
+        result = typeList(ctx->ts, typeGetFnResult(fn));
         node->listApp = true;
 
     } else {
-        errorFnApp(ctx, arg, fn);
+        if (!typeIsInvalid(arg) && !typeIsInvalid(fn))
+            errorFnApp(ctx, arg, fn);
+
         result = typeInvalid(ctx->ts);
     }
 
@@ -60,8 +62,13 @@ static void analyzeFnApp (analyzerCtx* ctx, ast* node) {
         ast* argNode = vectorGet(node->children, i);
         type* arg = analyzer(ctx, argNode);
 
-        if (!typeAppliesToFn(ctx->ts, arg, result, &result)) {
-            errorFnApp(ctx, arg, result);
+        if (typeAppliesToFn(arg, result))
+            result = typeGetFnResult(result);
+
+        else {
+            if (!typeIsInvalid(arg) && !typeIsInvalid(result))
+                errorFnApp(ctx, arg, result);
+
             result = typeInvalid(ctx->ts);
         }
     }

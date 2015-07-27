@@ -43,11 +43,12 @@ type* typeFnChain (int kindNo, typeSys* ts, ...);
 
 const char* typeGetStr (type* dt);
 
-/*==== Tests and operations ====
-  Many of these simultaneously:
-    1. Check a semantic condition
-    2. Produce a type as an out-parameter*/
+/*==== Tests and getters ====*/
 
-bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result_out);
+bool typeIsInvalid (type* dt);
 
-bool typeIsList (typeSys* ts, type* dt, type** elements_out);
+bool typeAppliesToFn (type* arg, type* fn);
+type* typeGetFnResult (type* fn);
+
+bool typeIsList (type* dt);
+type* typeGetListElements (type* dt);

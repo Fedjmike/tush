@@ -159,8 +159,17 @@ const char* typeGetStr (type* dt) {
 
 /*==== Tests and operations ====*/
 
+bool typeIsInvalid (type* dt) {
+    assert(dt);
+
+    return dt->kind == type_Invalid;
+}
+
 static bool typeEquals (type* l, type* r) {
-    if (l == r || l->kind == type_Invalid || r->kind == type_Invalid)
+    assert(l);
+    assert(r);
+
+    if (l == r || typeIsInvalid(l) || typeIsInvalid(r))
         return true;
 
     else
@@ -168,14 +177,29 @@ static bool typeEquals (type* l, type* r) {
         return false;
 }
 
-bool typeAppliesToFn (typeSys* ts, type* arg, type* fn, type** result) {
-    bool applies = fn->kind == type_Fn && typeEquals(fn->from, arg);
-    *result = applies ? fn->to : typeInvalid(ts);
-    return applies;
+bool typeAppliesToFn (type* arg, type* fn) {
+    assert(arg);
+    assert(fn);
+
+    return fn->kind == type_Fn && typeEquals(fn->from, arg);
 }
 
-bool typeIsList (typeSys* ts, type* dt, type** elements) {
-    bool yup = dt->kind == type_List;
-    *elements = yup ? dt->elements : typeInvalid(ts);
-    return yup;
+type* typeGetFnResult (type* fn) {
+    assert(fn);
+    assert(fn->kind == type_Fn);
+
+    return fn->to;
+}
+
+bool typeIsList (type* dt) {
+    assert(dt);
+
+    return dt->kind == type_List;
+}
+
+type* typeGetListElements (type* dt) {
+    assert(dt);
+    assert(typeIsList(dt));
+
+    return dt->elements;
 }
