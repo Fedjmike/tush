@@ -48,10 +48,10 @@ static void printer (printerCtx* ctx, const ast* node) {
         printer_outf(ctx)("\"%s\"\n", node->literal.str);
         break;
 
-    case astSymbolLit:
-        printer_outf(ctx)("\"%s\"\n",   !node->literal.symbol ? "<no symbol attached>"
-                                      : !node->literal.symbol->name ? "<unnamed symbol>"
-                                      : node->literal.symbol->name);
+    case astSymbol:
+        printer_outf(ctx)("\"%s\"\n",   !node->symbol ? "<no symbol attached>"
+                                      : !node->symbol->name ? "<unnamed symbol>"
+                                      : node->symbol->name);
         break;
 
     default:

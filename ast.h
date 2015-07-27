@@ -6,7 +6,8 @@
 //#include "type.h"
 
 typedef enum astKind {
-    astBOP, astPipeApp, astFnApp, astStrLit, astSymbolLit, astListLit,
+    astBOP, astPipeApp, astFnApp, astSymbol,
+    astStrLit, astListLit,
     astInvalid,
     astKindNo
 } astKind;
@@ -30,10 +31,10 @@ typedef struct ast {
         union {
             /*StrLit*/
             char* str;
-            /*SymbolLit*/
-            sym* symbol;
         } literal;
 
+        /*Symbol*/
+        sym* symbol;
         /*PipeApp*/
         bool listApp;
     };
@@ -43,8 +44,9 @@ typedef struct ast {
 ast* astCreateBOP (ast* l, ast* r, opKind op);
 ast* astCreatePipeApp (ast* arg, ast* fn);
 ast* astCreateFnApp (vector(ast*) args, ast* fn);
+ast* astCreateSymbol (sym* symbol);
+
 ast* astCreateStrLit (const char* str);
-ast* astCreateSymbolLit (sym* symbol);
 ast* astCreateListLit (vector(ast*) elements);
 
 ast* astCreateInvalid (void);

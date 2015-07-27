@@ -42,15 +42,15 @@ ast* astCreateFnApp (vector(ast*) args, ast* fn) {
     });
 }
 
-ast* astCreateStrLit (const char* str) {
-    return astCreate(astStrLit, (ast) {
-        .literal.str = strdup(str),
+ast* astCreateSymbol (sym* symbol) {
+    return astCreate(astSymbol, (ast) {
+        .symbol = symbol,
     });
 }
 
-ast* astCreateSymbolLit (sym* symbol) {
-    return astCreate(astSymbolLit, (ast) {
-        .literal.symbol = symbol,
+ast* astCreateStrLit (const char* str) {
+    return astCreate(astStrLit, (ast) {
+        .literal.str = strdup(str),
     });
 }
 
@@ -71,8 +71,8 @@ const char* astKindGetStr (astKind kind) {
     case astBOP: return "BOP";
     case astPipeApp: return "PipeApp";
     case astFnApp: return "FnApp";
+    case astSymbol: return "Symbol";
     case astStrLit: return "StrLit";
-    case astSymbolLit: return "SymbolLit";
     case astListLit: return "ListLit";
     case astInvalid: return "Invalid";
     case astKindNo: return "<KindNo; not real>";

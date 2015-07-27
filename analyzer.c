@@ -52,6 +52,17 @@ static void analyzeFnApp (analyzerCtx* ctx, ast* node) {
     node->dt = result;
 }
 
+static void analyzeSymbol (analyzerCtx* ctx, ast* node) {
+    if (node->symbol && node->symbol->dt)
+        node->dt = node->symbol->dt;
+
+    else {
+        errprintf("Untyped symbol, %p %s\n", node->symbol,
+                  node->symbol ? node->symbol->name : "");
+        node->dt = typeInvalid(ctx->ts);
+    }
+}
+
 static void analyzeStrLit (analyzerCtx* ctx, ast* node) {
     node->dt = typeFile(ctx->ts);
 }
@@ -74,26 +85,15 @@ static void analyzeListLit (analyzerCtx* ctx, ast* node) {
     node->dt = typeList(ctx->ts, elements);
 }
 
-static void analyzeSymbolLit (analyzerCtx* ctx, ast* node) {
-    if (node->literal.symbol && node->literal.symbol->dt)
-        node->dt = node->literal.symbol->dt;
-
-    else {
-        errprintf("Untyped symbol, %p %s\n", node->literal.symbol,
-                  node->literal.symbol ? node->literal.symbol->name : "");
-        node->dt = typeInvalid(ctx->ts);
-    }
-}
-
 static type* analyzer (analyzerCtx* ctx, ast* node) {
     typedef void (*handler_t)(analyzerCtx*, ast*);
 
     static handler_t table[astKindNo] = {
         [astPipeApp] = analyzePipeApp,
         [astFnApp] = analyzeFnApp,
+        [astSymbol] = analyzeSymbol,
         [astStrLit] = analyzeStrLit,
-        [astListLit] = analyzeListLit,
-        [astSymbolLit] = analyzeSymbolLit
+        [astListLit] = analyzeListLit
     };
 
     handler_t handler = table[node->kind];

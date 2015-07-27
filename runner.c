@@ -42,6 +42,12 @@ static value* runFnApp (envCtx* env, const ast* node) {
     return result;
 }
 
+static value* runSymbol (envCtx* env, const ast* node) {
+    (void) env;
+    value* val = node->symbol->val;
+    return val ? val : valueCreateInvalid();
+}
+
 static value* runStrLit (envCtx* env, const ast* node) {
     (void) env;
 
@@ -59,21 +65,15 @@ static value* runListLit (envCtx* env, const ast* node) {
     return valueCreateVector(result);
 }
 
-static value* runSymbolLit (envCtx* env, const ast* node) {
-    (void) env;
-    value* val = node->literal.symbol->val;
-    return val ? val : valueCreateInvalid();
-}
-
 value* run (envCtx* env, const ast* node) {
     typedef value* (*handler_t)(envCtx*, const ast*);
 
     static handler_t table[astKindNo] = {
         [astPipeApp] = runPipeApp,
         [astFnApp] = runFnApp,
+        [astSymbol] = runSymbol,
         [astStrLit] = runStrLit,
-        [astListLit] = runListLit,
-        [astSymbolLit] = runSymbolLit
+        [astListLit] = runListLit
     };
 
     handler_t handler = table[node->kind];

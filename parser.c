@@ -98,7 +98,7 @@ static ast* parserAtom (parserCtx* ctx) {
         sym* symbol = symLookup(ctx->scope, ctx->current.buffer);
 
         if (symbol)
-            node = astCreateSymbolLit(symbol);
+            node = astCreateSymbol(symbol);
 
         else
             node = astCreateStrLit(ctx->current.buffer);
