@@ -1,0 +1,95 @@
+[ ] Type system
+    [ ] forall qualifier
+    [ ] Typeclasses/traits
+    [ ] Maybe
+    [ ] 'a File
+    [ ] "See through" types that act as an instance of their parameter
+        [ ] () -> 'a
+        [ ] 'a File
+
+[ ] Language
+    [ ] Literals
+        [-] Integer
+        [ ] Number
+        [ ] Lambda
+        [ ] String
+        [ ] (String) format?
+        [ ] File, Directory, Path, Glob
+        [ ] Regex
+        [ ] Option (as in flags)
+    [ ] Operators
+        [ ] Files
+            [ ] /
+            [ ] |>
+        [ ] Functional
+            [-] Application
+            [-] Pipe op
+                - Right associative composition
+            [x] Explicit fn
+            [-] Implicit conversions
+                [ ] Path -> File
+                fmap over:
+                [ ] Lists, ['a]
+                [ ] Maybe, 'a?
+                [ ] Generalize to all?
+            [ ] Options
+        [ ] Arithmetic
+        [ ] String
+            [ ] Formatting
+        [ ] Iterables
+        [ ] Comparison
+        [ ] Boolean
+        [ ] Branching
+    [ ] Statements
+        [ ] Decl/assignment
+        [ ] Functions
+            [ ] Options
+            [ ] Dependency functions
+        [ ] if, while, for, switch
+    [ ] Modules
+
+[ ] Interfacing with legacy Unix
+
+[ ] C API
+
+[ ] Concurrent IO
+
+[ ] UI
+
+---------
+
+[-] Gather todos
+[ ] minimize asserts
+
+== Structures
+
+[ ] No {ast,sym}::children by default, allocate on need
+
+type:
+[ ] Each type T contains a hashmap of fn types T -> K where K is the key. Use this to only allocate one of each fn type.
+[ ] And for lists. Then generalize for any parametric type.
+[ ] Create type str in the ctor
+[ ] Type equality
+
+ast:
+[ ] Make AST::children a const_vector (combined length and size fields)
+[ ] Pooled allocator for AST
+[ ] Unpackers for the AST (and others?)
+
+sym:
+[ ] Change sym::children to a hashmap
+
+value:
+[ ] valueError
+
+== Passes
+
+Lexer:
+[ ] Unicode
+[ ] Make the lexer create a vector of tokens which persist, own their buffers
+[ ] Put location info in tokens
+[ ] Add a field to the AST, a reference to relevant token
+[ ] Lexer op classes
+
+Runner:
+[ ] Optimization for calling n-ary valueFns

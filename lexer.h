@@ -6,8 +6,6 @@
 #include "common.h"
 #include "token.h"
 
-/*TODO: unicode*/
-
 enum {
     lexerDefaultBufSize = 128
 };
