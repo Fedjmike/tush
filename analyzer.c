@@ -81,6 +81,10 @@ static void analyzeSymbol (analyzerCtx* ctx, ast* node) {
 }
 
 static void analyzeStrLit (analyzerCtx* ctx, ast* node) {
+    node->dt = typeInvalid(ctx->ts);
+}
+
+static void analyzeFileLit (analyzerCtx* ctx, ast* node) {
     node->dt = typeFile(ctx->ts);
 }
 
@@ -110,6 +114,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
         [astFnApp] = analyzeFnApp,
         [astSymbol] = analyzeSymbol,
         [astStrLit] = analyzeStrLit,
+        [astFileLit] = analyzeFileLit,
         [astListLit] = analyzeListLit
     };
 

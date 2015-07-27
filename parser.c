@@ -85,6 +85,10 @@ static ast* parserFnApp (parserCtx* ctx) {
     }
 }
 
+static bool isPathToken (const char* str) {
+    return strchr(str, '/') || strchr(str, '.');
+}
+
 static ast* parserAtom (parserCtx* ctx) {
     ast* node;
 
@@ -101,9 +105,12 @@ static ast* parserAtom (parserCtx* ctx) {
         match(ctx, "]");
 
     } else if (see_kind(ctx, tokenNormal)) {
-        sym* symbol = symLookup(ctx->scope, ctx->current.buffer);
+        sym* symbol;
 
-        if (symbol)
+        if (isPathToken(ctx->current.buffer))
+            node = astCreateFileLit(ctx->current.buffer);
+
+        else if ((symbol = symLookup(ctx->scope, ctx->current.buffer)))
             node = astCreateSymbol(symbol);
 
         else

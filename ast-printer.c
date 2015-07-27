@@ -48,6 +48,10 @@ static void printer (printerCtx* ctx, const ast* node) {
         printer_outf(ctx)("\"%s\"\n", node->literal.str);
         break;
 
+    case astFileLit:
+        printer_outf(ctx)("file: %s\n", node->literal.str);
+        break;
+
     case astSymbol:
         printer_outf(ctx)("\"%s\"\n",   !node->symbol ? "<no symbol attached>"
                                       : !node->symbol->name ? "<unnamed symbol>"

@@ -54,6 +54,12 @@ static value* runStrLit (envCtx* env, const ast* node) {
     return valueCreateFile(node->literal.str);
 }
 
+static value* runFileLit (envCtx* env, const ast* node) {
+    (void) env;
+
+    return valueCreateFile(node->literal.str);
+}
+
 static value* runListLit (envCtx* env, const ast* node) {
     vector(value*) result = vectorInit(node->children.length, GC_malloc);
 
@@ -73,6 +79,7 @@ value* run (envCtx* env, const ast* node) {
         [astFnApp] = runFnApp,
         [astSymbol] = runSymbol,
         [astStrLit] = runStrLit,
+        [astFileLit] = runFileLit,
         [astListLit] = runListLit
     };
 
