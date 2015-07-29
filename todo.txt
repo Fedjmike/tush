@@ -21,6 +21,7 @@
         [ ] Files
             [ ] /
             [ ] |>
+            [ ] |+> (different spelling?)
         [ ] Functional
             [-] Application
             [-] Pipe op
@@ -55,6 +56,11 @@
 [ ] Concurrent IO
 
 [ ] UI
+    [ ] Prompt
+    [ ] Completion
+    [ ] Syntax highlighting
+    [-] Value printing
+    [ ] Job control
 
 ---------
 
@@ -75,6 +81,7 @@ ast:
 [ ] Make AST::children a const_vector (combined length and size fields)
 [ ] Pooled allocator for AST
 [ ] Unpackers for the AST (and others?)
+[ ] opKind -> str
 
 sym:
 [ ] Change sym::children to a hashmap
@@ -93,3 +100,6 @@ Lexer:
 
 Runner:
 [ ] Optimization for calling n-ary valueFns
+
+Analyzer:
+[ ] Each analyzer routine returns type, handler assigns

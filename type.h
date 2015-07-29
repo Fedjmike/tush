@@ -11,7 +11,7 @@ typedef enum typeKind {
 
 typedef struct type type;
 
-/*This store all the types ever allocated, and frees them at the end*/
+/*This stores all the types ever allocated, and frees them at the end*/
 typedef struct typeSys {
     /*Unitary types are those that all instances are conceptually the
       same. That is, the type has no parameters. Therefore only one ever

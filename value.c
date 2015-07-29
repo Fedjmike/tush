@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <gc/gc.h>
+#include <common.h>
 
 typedef enum valueKind {
     valueInvalid, valueInt, valueFn, valueFile, valueVector

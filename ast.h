@@ -3,7 +3,6 @@
 #include <vector.h>
 
 #include "forward.h"
-//#include "type.h"
 
 typedef enum astKind {
     astBOP, astFnApp, astSymbol,

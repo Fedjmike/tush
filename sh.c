@@ -62,6 +62,8 @@ compilerCtx* compilerFree (compilerCtx* ctx) {
 /*==== Gosh ====*/
 
 void gosh (compilerCtx* ctx, const char* str) {
+    puts(str);
+
     int errors = 0;
     ast* tree = compile(ctx, str, &errors);
 
