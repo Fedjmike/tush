@@ -65,7 +65,7 @@ static type* analyzeBOP (analyzerCtx* ctx, ast* node) {
     case opPipe: return analyzePipe(ctx, node);
 
     default:
-        errprintf("Unhandled binary operator kind, %d", node->op);
+        errprintf("Unhandled binary operator kind, %s", opKindGetStr(node->op));
         return typeInvalid(ctx->ts);
     }
 }

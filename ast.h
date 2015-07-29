@@ -57,4 +57,5 @@ ast* astCreateInvalid (void);
 
 void astDestroy (ast* node);
 
+const char* opKindGetStr (opKind kind);
 const char* astKindGetStr (astKind kind);

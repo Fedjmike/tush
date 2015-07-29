@@ -81,7 +81,7 @@ ast:
 [ ] Make AST::children a const_vector (combined length and size fields)
 [ ] Pooled allocator for AST
 [ ] Unpackers for the AST (and others?)
-[ ] opKind -> str
+[x] opKind -> str
 
 sym:
 [ ] Change sym::children to a hashmap

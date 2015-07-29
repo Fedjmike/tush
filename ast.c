@@ -73,6 +73,28 @@ ast* astCreateInvalid (void) {
 
 /*==== ====*/
 
+const char* opKindGetStr (opKind kind) {
+    switch (kind) {
+    case opPipe: return "|";
+    case opWrite: return "|>";
+    case opLogicalAnd: return "&&";
+    case opLogicalOr: return "||";
+    case opEqual: return "==";
+    case opNotEqual: return "!=";
+    case opLess: return "<";
+    case opLessEqual: return "<=";
+    case opGreater: return ">";
+    case opGreaterEqual: return ">=";
+    case opAdd: return "+";
+    case opSubtract: return "-";
+    case opMultiply: return "*";
+    case opDivide: return "/";
+    case opModulo: return "%";
+    case opNull: return "<null op kind>";
+    default: return "<unhandled op kind>";
+    }
+}
+
 const char* astKindGetStr (astKind kind) {
     switch (kind) {
     case astBOP: return "BOP";
