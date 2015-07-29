@@ -6,14 +6,19 @@
 //#include "type.h"
 
 typedef enum astKind {
-    astBOP, astPipeApp, astFnApp, astSymbol,
+    astBOP, astFnApp, astSymbol,
     astStrLit, astFileLit, astListLit,
     astInvalid,
     astKindNo
 } astKind;
 
 typedef enum opKind {
-    opNull = 0, opWrite, opAppend
+    opNull = 0,
+    opPipe, opWrite,
+    opLogicalAnd, opLogicalOr,
+    opEqual, opNotEqual, opLess, opLessEqual, opGreater, opGreaterEqual,
+    opAdd, opSubtract,
+    opMultiply, opDivide, opModulo
 } opKind;
 
 //todo different ast malloc depending on # of children
@@ -42,7 +47,6 @@ typedef struct ast {
 } ast;
 
 ast* astCreateBOP (ast* l, ast* r, opKind op);
-ast* astCreatePipeApp (ast* arg, ast* fn);
 ast* astCreateFnApp (vector(ast*) args, ast* fn);
 ast* astCreateSymbol (sym* symbol);
 

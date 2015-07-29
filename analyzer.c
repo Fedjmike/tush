@@ -24,13 +24,15 @@ inline static printf_t* error (analyzerCtx* ctx) {
 
 /*==== ====*/
 
+/*---- Binary operators ----*/
+
 static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
     error(ctx)("type %s does not apply to function %s\n", typeGetStr(arg), typeGetStr(fn));
 }
 
-static void analyzePipeApp (analyzerCtx* ctx, ast* node) {
-    type *arg = analyzer(ctx, node->l),
-         *fn = analyzer(ctx, node->r);
+static void analyzePipe (analyzerCtx* ctx, ast* node) {
+    type *arg = node->l->dt,
+         *fn = node->r->dt;
 
     type* result;
 
@@ -54,6 +56,21 @@ static void analyzePipeApp (analyzerCtx* ctx, ast* node) {
 
     node->dt = result;
 }
+
+static void analyzeBOP (analyzerCtx* ctx, ast* node) {
+    analyzer(ctx, node->l);
+    analyzer(ctx, node->r);
+
+    switch (node->op) {
+    case opPipe: analyzePipe(ctx, node); break;
+
+    default:
+        errprintf("Unhandled binary operator kind, %d", node->op);
+        node->dt = typeInvalid(ctx->ts);
+    }
+}
+
+/*---- End of binary operators ----*/
 
 static void analyzeFnApp (analyzerCtx* ctx, ast* node) {
     type* result = analyzer(ctx, node->r);
@@ -117,7 +134,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
     typedef void (*handler_t)(analyzerCtx*, ast*);
 
     static handler_t table[astKindNo] = {
-        [astPipeApp] = analyzePipeApp,
+        [astBOP] = analyzeBOP,
         [astFnApp] = analyzeFnApp,
         [astSymbol] = analyzeSymbol,
         [astStrLit] = analyzeStrLit,

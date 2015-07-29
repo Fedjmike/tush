@@ -7,9 +7,10 @@
 #include "ast.h"
 #include "value.h"
 
-static value* runPipeApp (envCtx* env, const ast* node) {
-    value *arg = run(env, node->l),
-          *fn = run(env, node->r);
+/*---- Binary operators ----*/
+
+static value* runPipe (envCtx* env, const ast* node, value* arg, value* fn) {
+    (void) env;
 
     /*Implicit map*/
     if (node->listApp) {
@@ -28,6 +29,21 @@ static value* runPipeApp (envCtx* env, const ast* node) {
     } else
         return valueCall(fn, arg);
 }
+
+static value* runBOP (envCtx* env, const ast* node) {
+    value *left = run(env, node->l),
+          *right = run(env, node->r);
+
+    switch (node->op) {
+    case opPipe: return runPipe(env, node, left, right); break;
+
+    default:
+        errprintf("Unhandled binary operator kind, %d", node->op);
+        return 0;
+    }
+}
+
+/*---- End of binary operators ----*/
 
 static value* runFnApp (envCtx* env, const ast* node) {
     value* result = run(env, node->r);
@@ -75,7 +91,7 @@ value* run (envCtx* env, const ast* node) {
     typedef value* (*handler_t)(envCtx*, const ast*);
 
     static handler_t table[astKindNo] = {
-        [astPipeApp] = runPipeApp,
+        [astBOP] = runBOP,
         [astFnApp] = runFnApp,
         [astSymbol] = runSymbol,
         [astStrLit] = runStrLit,

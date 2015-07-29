@@ -65,6 +65,9 @@ static void printer (printerCtx* ctx, const ast* node) {
     printChildren(ctx, node);
     printLR(ctx, node);
 
+    if (node->op != opNull)
+        printer_outf(ctx)("op: %d\n", node->op);
+
     if (node->dt)
         printer_outf(ctx)("type: %s\n", typeGetStr(node->dt));
 
