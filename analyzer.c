@@ -30,49 +30,49 @@ static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
     error(ctx)("type %s does not apply to function %s\n", typeGetStr(arg), typeGetStr(fn));
 }
 
-static void analyzePipe (analyzerCtx* ctx, ast* node) {
+static type* analyzePipe (analyzerCtx* ctx, ast* node) {
     type *arg = node->l->dt,
          *fn = node->r->dt;
 
-    type* result;
+    type* result; {
+        if (typeAppliesToFn(arg, fn))
+            result = typeGetFnResult(fn);
 
-    if (typeAppliesToFn(arg, fn))
-        result = typeGetFnResult(fn);
+        /*If the parameter is a list, attempt to apply the function instead to
+          all of the elements individually.*/
+        else if (   typeIsList(arg)
+                 && typeAppliesToFn(typeGetListElements(arg), fn)) {
+            /*The result is a list of the results of all the calls*/
+            result = typeList(ctx->ts, typeGetFnResult(fn));
+            node->listApp = true;
 
-    /*If the parameter is a list, attempt to apply the function instead to
-      all of the elements individually.*/
-    else if (   typeIsList(arg)
-             && typeAppliesToFn(typeGetListElements(arg), fn)) {
-        /*The result is a list of the results of all the calls*/
-        result = typeList(ctx->ts, typeGetFnResult(fn));
-        node->listApp = true;
+        } else {
+            if (!typeIsInvalid(arg) && !typeIsInvalid(fn))
+                errorFnApp(ctx, arg, fn);
 
-    } else {
-        if (!typeIsInvalid(arg) && !typeIsInvalid(fn))
-            errorFnApp(ctx, arg, fn);
-
-        result = typeInvalid(ctx->ts);
+            result = typeInvalid(ctx->ts);
+        }
     }
 
-    node->dt = result;
+    return result;
 }
 
-static void analyzeBOP (analyzerCtx* ctx, ast* node) {
+static type* analyzeBOP (analyzerCtx* ctx, ast* node) {
     analyzer(ctx, node->l);
     analyzer(ctx, node->r);
 
     switch (node->op) {
-    case opPipe: analyzePipe(ctx, node); break;
+    case opPipe: return analyzePipe(ctx, node);
 
     default:
         errprintf("Unhandled binary operator kind, %d", node->op);
-        node->dt = typeInvalid(ctx->ts);
+        return typeInvalid(ctx->ts);
     }
 }
 
 /*---- End of binary operators ----*/
 
-static void analyzeFnApp (analyzerCtx* ctx, ast* node) {
+static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
     type* result = analyzer(ctx, node->r);
 
     for (int i = 0; i < node->children.length; i++) {
@@ -90,29 +90,31 @@ static void analyzeFnApp (analyzerCtx* ctx, ast* node) {
         }
     }
 
-    node->dt = result;
+    return result;
 }
 
-static void analyzeSymbol (analyzerCtx* ctx, ast* node) {
+static type* analyzeSymbol (analyzerCtx* ctx, ast* node) {
     if (node->symbol && node->symbol->dt)
-        node->dt = node->symbol->dt;
+        return node->symbol->dt;
 
     else {
         errprintf("Untyped symbol, %p %s\n", node->symbol,
                   node->symbol ? node->symbol->name : "");
-        node->dt = typeInvalid(ctx->ts);
+        return typeInvalid(ctx->ts);
     }
 }
 
-static void analyzeStrLit (analyzerCtx* ctx, ast* node) {
-    node->dt = typeInvalid(ctx->ts);
+static type* analyzeStrLit (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeInvalid(ctx->ts);
 }
 
-static void analyzeFileLit (analyzerCtx* ctx, ast* node) {
-    node->dt = typeFile(ctx->ts);
+static type* analyzeFileLit (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeFile(ctx->ts);
 }
 
-static void analyzeListLit (analyzerCtx* ctx, ast* node) {
+static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
     //todo 'a List
     assert(node->children.length != 0);
 
@@ -127,11 +129,11 @@ static void analyzeListLit (analyzerCtx* ctx, ast* node) {
         //todo lowest common interface ?
     }
 
-    node->dt = typeList(ctx->ts, elements);
+    return typeList(ctx->ts, elements);
 }
 
 static type* analyzer (analyzerCtx* ctx, ast* node) {
-    typedef void (*handler_t)(analyzerCtx*, ast*);
+    typedef type* (*handler_t)(analyzerCtx*, ast*);
 
     static handler_t table[astKindNo] = {
         [astBOP] = analyzeBOP,
@@ -145,7 +147,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
     handler_t handler = table[node->kind];
 
     if (handler)
-        handler(ctx, node);
+        node->dt = handler(ctx, node);
 
     else {
         errprintf("Unhandled AST kind, %s\n", astKindGetStr(node->kind));

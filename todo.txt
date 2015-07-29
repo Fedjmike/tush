@@ -102,4 +102,4 @@ Runner:
 [ ] Optimization for calling n-ary valueFns
 
 Analyzer:
-[ ] Each analyzer routine returns type, handler assigns
+[x] Each analyzer routine returns type, handler assigns
