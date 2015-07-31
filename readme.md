@@ -3,6 +3,8 @@
 
 Watch this space.
 
+Dependencies: [Boehm garbage collector](https://github.com/ivmai/bdwgc/), [GNU Readline](http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html), [libkiss](https://github.com/Fedjmike/libkiss)
+
 License
 -------
 

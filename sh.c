@@ -91,7 +91,7 @@ void gosh (compilerCtx* ctx, const char* str) {
 
 void repl (compilerCtx* compiler) {
     while (true) {
-        char* input = readline(" $ ");
+        char* input = readline("$ ");
         add_history(input);
 
         gosh(compiler, input);

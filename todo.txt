@@ -47,6 +47,7 @@
             [ ] Options
             [ ] Dependency functions
         [ ] if, while, for, switch
+        [ ] Working directory control
     [ ] Modules
 
 [ ] Interfacing with legacy Unix

@@ -35,7 +35,7 @@ static value* runBOP (envCtx* env, const ast* node) {
           *right = run(env, node->r);
 
     switch (node->op) {
-    case opPipe: return runPipe(env, node, left, right); break;
+    case opPipe: return runPipe(env, node, left, right);
 
     default:
         errprintf("Unhandled binary operator kind, %s", opKindGetStr(node->op));
