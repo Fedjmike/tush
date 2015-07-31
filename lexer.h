@@ -66,6 +66,43 @@ inline static void lexerEat (lexerCtx* ctx) {
     lexerSkip(ctx);
 }
 
+/*---- ----*/
+
+inline static tokenKind lexerCharOrStr (lexerCtx* ctx) {
+    char quote = lexerCurrent(ctx);
+    lexerEat(ctx);
+
+    while (lexerCurrent(ctx) != quote) {
+        if (lexerCurrent(ctx) == '\\')
+            lexerEat(ctx);
+
+        lexerEat(ctx);
+    }
+
+    lexerEat(ctx);
+
+    return quote == '"' ? tokenStrLit : tokenCharLit;
+}
+
+inline static void lexerWord (lexerCtx* ctx) {
+    bool exit = false;
+
+    do {
+        lexerEat(ctx);
+
+        switch (lexerCurrent(ctx)) {
+        case '"': case '\'':
+        case '(': case ')':
+        case '[': case ']':
+        case '{': case '}':
+        case ',': case '`':
+        case '\n': case '\r':
+        case '\t': case ' ':
+            exit = true;
+        }
+    } while (!exit && !lexerEOF(ctx));
+}
+
 inline static token lexerNext (lexerCtx* ctx) {
     /*Skip whitespace*/
     while (isspace(lexerCurrent(ctx)))
@@ -83,22 +120,10 @@ inline static token lexerNext (lexerCtx* ctx) {
 
     switch (lexerCurrent(ctx)) {
     /*String or character literal*/
-    case '"': case '\'': {
-        tok.kind = lexerCurrent(ctx) == '"' ? tokenStrLit : tokenCharLit;
+    case '"': case '\'':
+        tok.kind = lexerCharOrStr(ctx);
 
-        char quote = lexerCurrent(ctx);
-        lexerEat(ctx);
-
-        while (lexerCurrent(ctx) != quote) {
-            if (lexerCurrent(ctx) == '\\')
-                lexerEat(ctx);
-
-            lexerEat(ctx);
-        }
-
-        lexerEat(ctx);
-        break;
-    }
+    break;
 
     /*Delimiter op*/
     case '(': case ')':
@@ -110,24 +135,9 @@ inline static token lexerNext (lexerCtx* ctx) {
 
     break;
     /*"Word"*/
-    default: {
-        bool exit = false;
-
-        do {
-            lexerEat(ctx);
-
-            switch (lexerCurrent(ctx)) {
-            case '"': case '\'':
-            case '(': case ')':
-            case '[': case ']':
-            case '{': case '}':
-            case ',': case '`':
-            case '\n': case '\r':
-            case '\t': case ' ':
-                exit = true;
-            }
-        } while (!exit && !lexerEOF(ctx));
-    }}
+    default:
+        lexerWord(ctx);
+    }
 
     ctx->buffer[ctx->length++] = 0;
 
