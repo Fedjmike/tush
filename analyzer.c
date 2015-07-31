@@ -24,6 +24,11 @@ inline static printf_t* error (analyzerCtx* ctx) {
 
 /*==== ====*/
 
+static type* analyzeInvalid (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeInvalid(ctx->ts);
+}
+
 /*---- Binary operators ----*/
 
 static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
