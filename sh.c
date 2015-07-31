@@ -62,8 +62,6 @@ compilerCtx* compilerFree (compilerCtx* ctx) {
 /*==== Gosh ====*/
 
 void gosh (compilerCtx* ctx, const char* str) {
-    puts(str);
-
     int errors = 0;
     ast* tree = compile(ctx, str, &errors);
 
@@ -80,6 +78,29 @@ void gosh (compilerCtx* ctx, const char* str) {
     astDestroy(tree);
 }
 
+/*==== REPL ====*/
+
+inline static printf_t* error (void) {
+    printf("error: ");
+    return printf;
+}
+
+void repl (compilerCtx* compiler) {
+    while (true) {
+        char input[200];
+
+        printf(" $ ");
+        bool failure = fgets(input, 200, stdin) == 0;
+
+        if (failure) {
+            error()("%sThat input string was too long", 5);
+            continue;
+        }
+
+        gosh(compiler, input);
+    }
+}
+
 /*==== ====*/
 
 const char* const samples[] = {
@@ -94,13 +115,18 @@ int main (int argc, char** argv) {
     compilerCtx compiler = compilerInit();
     addBuiltins(&compiler.ts, compiler.global);
 
-    if (argc == 1)
+    if (argc == 1) {
+        puts(samples[2]);
         gosh(&compiler, samples[2]);
 
-    else if (argc == 2)
-        gosh(&compiler, argv[1]);
+    } else if (argc == 2) {
+        if (!strcmp(argv[1], "-i"))
+            repl(&compiler);
 
-    else
+        else
+            gosh(&compiler, argv[1]);
+
+    } else
         printf("Unknown arguments.\n");
 
     compilerFree(&compiler);
