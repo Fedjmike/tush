@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -std=c11 -Werror -Wall -Wextra -I../libkiss -g
-LDFLAGS = -lgc
+LDFLAGS = -lgc -lreadline
 
 HEADERS = $(wildcard *.h)
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))

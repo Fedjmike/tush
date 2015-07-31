@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 #include <gc/gc.h>
 
 #include "common.h"
@@ -80,22 +82,10 @@ void gosh (compilerCtx* ctx, const char* str) {
 
 /*==== REPL ====*/
 
-inline static printf_t* error (void) {
-    printf("error: ");
-    return printf;
-}
-
 void repl (compilerCtx* compiler) {
     while (true) {
-        char input[200];
-
-        printf(" $ ");
-        bool failure = fgets(input, 200, stdin) == 0;
-
-        if (failure) {
-            error()("%sThat input string was too long", 5);
-            continue;
-        }
+        char* input = readline(" $ ");
+        add_history(input);
 
         gosh(compiler, input);
     }
