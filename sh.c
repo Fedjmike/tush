@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -8,6 +9,7 @@
 #include "sym.h"
 #include "ast.h"
 
+#include "dirctx.h"
 #include "builtins.h"
 
 #include "lexer.h"
@@ -23,6 +25,8 @@
 
 typedef struct compilerCtx {
     typeSys ts;
+    dirCtx dirs;
+
     sym* global;
 } compilerCtx;
 
@@ -51,12 +55,15 @@ ast* compile (compilerCtx* ctx, const char* str, int* errors) {
 compilerCtx compilerInit (void) {
     return (compilerCtx) {
         .ts = typesInit(),
+        //TODO: secure_getenv ??
+        .dirs = dirsInit(getenv("PATH"), dirGetWD()),
         .global = symInit()
     };
 }
 
 compilerCtx* compilerFree (compilerCtx* ctx) {
     symEnd(ctx->global);
+    dirsFree(&ctx->dirs);
     typesFree(&ctx->ts);
     return ctx;
 }
