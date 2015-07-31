@@ -91,17 +91,17 @@ const char* const samples[] = {
 int main (int argc, char** argv) {
     GC_INIT();
 
-    compilerCtx ctx = compilerInit();
-    addBuiltins(&ctx.ts, ctx.global);
+    compilerCtx compiler = compilerInit();
+    addBuiltins(&compiler.ts, compiler.global);
 
     if (argc == 1)
-        gosh(&ctx, samples[2]);
+        gosh(&compiler, samples[2]);
 
     else if (argc == 2)
-        gosh(&ctx, argv[1]);
+        gosh(&compiler, argv[1]);
 
     else
         printf("Unknown arguments.\n");
 
-    compilerFree(&ctx);
+    compilerFree(&compiler);
 }
