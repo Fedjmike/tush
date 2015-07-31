@@ -141,6 +141,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
     typedef type* (*handler_t)(analyzerCtx*, ast*);
 
     static handler_t table[astKindNo] = {
+        [astInvalid] = analyzeInvalid,
         [astBOP] = analyzeBOP,
         [astFnApp] = analyzeFnApp,
         [astSymbol] = analyzeSymbol,
