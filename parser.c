@@ -141,8 +141,12 @@ static bool isPathToken (const char* str) {
 static ast* parserAtom (parserCtx* ctx) {
     ast* node;
 
+    if (try_match(ctx, "(")) {
+        node = parserExpr(ctx);
+        match(ctx, ")");
+
     /*List literal*/
-    if (try_match(ctx, "[")) {
+    } else if (try_match(ctx, "[")) {
         vector(ast*) nodes = vectorInit(4, malloc);
 
         if (waiting_for(ctx, "]")) do {
