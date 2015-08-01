@@ -83,8 +83,12 @@ inline static void accept (parserCtx* ctx) {
 }
 
 inline static void expected (parserCtx* ctx, const char* expected) {
-    (void) expected;
-    error(ctx)("Expected %s, found '%s'\n", expected, ctx->current.buffer);
+    if (ctx->current.kind == tokenEOF)
+        error(ctx)("Expected %s, found end of file\n", expected);
+
+    else
+        error(ctx)("Expected %s, found '%s'\n", expected, ctx->current.buffer);
+
     accept(ctx);
 }
 
