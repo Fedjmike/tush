@@ -9,6 +9,7 @@
 #include "sym.h"
 #include "ast.h"
 
+#include "paths.h"
 #include "dirctx.h"
 #include "builtins.h"
 
@@ -90,8 +91,16 @@ void gosh (compilerCtx* ctx, const char* str) {
 /*==== REPL ====*/
 
 void repl (compilerCtx* compiler) {
+    const char* homedir = pathGetHome();
+    pathcontracted wdir = {};
+
     while (true) {
-        char* input = readline("$ ");
+        /*Tilde contract the working directory, only if we've moved*/
+        pathcontrRevalidate(&wdir, compiler->dirs.workingDir, homedir, "~");
+
+        printf("%s $ ", wdir.str);
+
+        char* input = readline("");
         add_history(input);
 
         gosh(compiler, input);
