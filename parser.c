@@ -106,6 +106,12 @@ static ast* parserFnApp (parserCtx* ctx) {
     vector(ast*) nodes = vectorInit(3, malloc);
     int exprs = 0;
 
+    /*Require at least one expr*/
+    if (!see(ctx, "`")) {
+        vectorPush(&nodes, parserAtom(ctx));
+        exprs++;
+    }
+
     for (; waiting_for_delim(ctx); exprs++) {
         if (try_match(ctx, "`")) {
             if (fn) {
