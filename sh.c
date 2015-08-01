@@ -90,17 +90,37 @@ void gosh (compilerCtx* ctx, const char* str) {
 
 /*==== REPL ====*/
 
+typedef struct promptCtx {
+    char* str;
+    size_t size;
+    const char* valid_for;
+} promptCtx;
+
+void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
+    if (prompt->valid_for == wdir)
+        return;
+
+    /*Tilde contract the working directory*/
+    char* wdir_contr = pathContract(wdir, homedir, "~", malloc);
+
+    static const char* yellow = "\e[1;33m";
+    static const char* regular = "\e[0m";
+    snprintf(prompt->str, prompt->size, "%s%s%s $ ", yellow, wdir_contr, regular);
+
+    prompt->valid_for = wdir;
+    free(wdir_contr);
+}
+
 void repl (compilerCtx* compiler) {
     const char* homedir = pathGetHome();
-    pathcontracted wdir = {};
+
+    promptCtx prompt = {.size = 1024};
+    prompt.str = malloc(prompt.size);
 
     while (true) {
-        /*Tilde contract the working directory, only if we've moved*/
-        pathcontrRevalidate(&wdir, compiler->dirs.workingDir, homedir, "~");
+        writePrompt(&prompt, compiler->dirs.workingDir, homedir);
 
-        printf("%s $ ", wdir.str);
-
-        char* input = readline("");
+        char* input = readline(prompt.str);
         add_history(input);
 
         gosh(compiler, input);
