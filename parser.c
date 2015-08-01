@@ -99,6 +99,13 @@ static bool waiting_for_delim (parserCtx* ctx) {
     return waiting(ctx) && !see(ctx, "|") && !see(ctx, ",") && !see(ctx, ")") && !see(ctx, "]");
 }
 
+/**
+ * FnApp = { Atom | ( "`" Atom "`" ) }
+ *
+ * A series of at least one expr-atom. If multiple, then the last is a
+ * function to which the others are applied. Instead, one of them may
+ * be explicitly marked in backticks as the function.
+ */
 static ast* parserFnApp (parserCtx* ctx) {
     /*Filled iff there is a backtick function*/
     ast* fn = 0;
