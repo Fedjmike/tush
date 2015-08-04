@@ -28,7 +28,15 @@ parserResult parse (sym* global, lexerCtx* lexer) {
 }
 
 static ast* parserS (parserCtx* ctx) {
-    return parserExpr(ctx);
+    ast* node = parserExpr(ctx);
+
+    if (see_kind(ctx, tokenEOF))
+        accept(ctx);
+
+    else
+        error(ctx)("Expected end of text, found '%s'\n", ctx->current.buffer);
+
+    return node;
 }
 
 static ast* parserExpr (parserCtx* ctx) {
