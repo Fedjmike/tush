@@ -87,14 +87,40 @@ inline static tokenKind lexerCharOrStr (lexerCtx* ctx) {
 inline static void lexerWord (lexerCtx* ctx) {
     bool exit = false;
 
+    /*Words can contain matching brackets and braces,
+      but an unmatched one indicates the end of the word
+
+      e.g. "{module.[ch]]" is three tokens
+           "{" "module.[ch]" "]"
+
+      There is no attempt to check their proper nesting.*/
+
+    enum {
+        bracket, brace,
+        matchingMAX
+    };
+
+    int depths[matchingMAX] = {};
+
     do {
         lexerEat(ctx);
 
         switch (lexerCurrent(ctx)) {
+        case '[': depths[bracket]++; break;
+        case '{': depths[brace]++; break;
+
+        /*Don't exit if closing a bracket open within the word*/
+        case ']':
+            if (depths[bracket]-- == 0)
+                exit = true;
+
+        break;
+        case '}':
+            if (!depths[brace]-- == 0)
+                exit = true;
+
+        break;
         case '"': case '\'':
-        case '(': case ')':
-        case '[': case ']':
-        case '{': case '}':
         case ',': case '`':
         case '\n': case '\r':
         case '\t': case ' ':
