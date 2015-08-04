@@ -5,6 +5,8 @@ LDFLAGS = -lgc -lreadline
 HEADERS = $(wildcard *.h)
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 
+all: sh
+
 *.o: $(HEADERS)
 
 sh: $(OBJECTS)
@@ -16,4 +18,4 @@ test: sh
 clean:
 	rm -f *.o sh{,.exe}
 
-.PHONY: test clean
+.PHONY: all test clean
