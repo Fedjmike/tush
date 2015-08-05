@@ -22,3 +22,9 @@
    ...
    fun:GC_init
 }
+{
+   boehm44
+   Memcheck:Leak
+   ...
+   fun:GC_init
+}
