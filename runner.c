@@ -72,7 +72,7 @@ static value* runUnitLit (envCtx* env, const ast* node) {
 static value* runStrLit (envCtx* env, const ast* node) {
     (void) env;
 
-    return valueCreateFile(node->literal.str);
+    return valueCreateStr(node->literal.str);
 }
 
 static value* runFileLit (envCtx* env, const ast* node) {

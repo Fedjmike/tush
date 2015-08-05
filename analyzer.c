@@ -116,7 +116,7 @@ static type* analyzeUnitLit (analyzerCtx* ctx, ast* node) {
 
 static type* analyzeStrLit (analyzerCtx* ctx, ast* node) {
     (void) node;
-    return typeInvalid(ctx->ts);
+    return typeUnitary(ctx->ts, type_Str);
 }
 
 static type* analyzeFileLit (analyzerCtx* ctx, ast* node) {

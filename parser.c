@@ -165,7 +165,7 @@ static bool isPathToken (const char* str) {
 /**
  * Atom =   ( "(" [ Expr ] ")" )
  *        | ( "[" [{ Expr }] "]" )
- *        | Path | <Symbol>
+ *        | Path | <Str> | <Symbol>
  */
 static ast* parserAtom (parserCtx* ctx) {
     ast* node;
@@ -191,6 +191,10 @@ static ast* parserAtom (parserCtx* ctx) {
         node = astCreateListLit(nodes);
 
         match(ctx, "]");
+
+    } else if (see_kind(ctx, tokenStrLit)) {
+        node = astCreateStrLit(ctx->current.buffer);
+        accept(ctx);
 
     } else if (see_kind(ctx, tokenNormal)) {
         sym* symbol;

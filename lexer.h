@@ -70,7 +70,7 @@ inline static void lexerEat (lexerCtx* ctx) {
 
 inline static tokenKind lexerCharOrStr (lexerCtx* ctx) {
     char quote = lexerCurrent(ctx);
-    lexerEat(ctx);
+    lexerSkip(ctx);
 
     while (lexerCurrent(ctx) != quote) {
         if (lexerCurrent(ctx) == '\\')
@@ -79,7 +79,8 @@ inline static tokenKind lexerCharOrStr (lexerCtx* ctx) {
         lexerEat(ctx);
     }
 
-    lexerEat(ctx);
+    //todo eat but create other buffer without quotes
+    lexerSkip(ctx);
 
     return quote == '"' ? tokenStrLit : tokenCharLit;
 }
