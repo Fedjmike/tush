@@ -180,10 +180,17 @@ value* valueCall (const value* fn, value* arg) {
 }
 
 const char* valueGetFilename (const value* value) {
-    if (value->kind != valueFile)
+    if (value->kind == valueInvalid)
         return 0;
 
-    return value->filename;
+    assert(   value->kind == valueFile
+           || value->kind == valueStr);
+
+    if (value->kind == valueFile)
+        return value->filename;
+
+    else
+        return value->str;
 }
 
 bool valueGetIterator (value* iterable, valueIter* iter) {
