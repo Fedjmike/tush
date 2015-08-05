@@ -163,8 +163,6 @@ const char* typeGetStr (type* dt) {
 /*==== Tests and operations ====*/
 
 bool typeIsInvalid (type* dt) {
-    assert(dt);
-
     return dt->kind == type_Invalid;
 }
 
@@ -182,27 +180,19 @@ static bool typeEquals (type* l, type* r) {
 
 bool typeAppliesToFn (type* arg, type* fn) {
     assert(arg);
-    assert(fn);
-
     return fn->kind == type_Fn && typeEquals(fn->from, arg);
 }
 
 type* typeGetFnResult (type* fn) {
-    assert(fn);
     assert(fn->kind == type_Fn);
-
     return fn->to;
 }
 
 bool typeIsList (type* dt) {
-    assert(dt);
-
     return dt->kind == type_List;
 }
 
 type* typeGetListElements (type* dt) {
-    assert(dt);
     assert(typeIsList(dt));
-
     return dt->elements;
 }
