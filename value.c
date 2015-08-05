@@ -75,6 +75,8 @@ const char* valueKindGetStr (valueKind kind) {
     case valueFn: return "Fn";
     case valueFile: return "File";
     case valueInt: return "Int";
+    case valueVector: return "Vector";
+    case valueInvalid: return "<Invalid value>";
     }
 
     return "<unhandled value kind>";
