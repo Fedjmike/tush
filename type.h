@@ -3,6 +3,7 @@
 #include <vector.h>
 
 typedef enum typeKind {
+    type_Unit,
     type_Integer, type_Number, type_File,
     type_Fn, type_List,
     type_Invalid,
