@@ -6,7 +6,7 @@
 #include <common.h>
 
 typedef enum valueKind {
-    valueInvalid, valueInt, valueFn, valueFile, valueVector
+    valueInvalid, valueInt, valueFn, valueSimpleClosure, valueFile, valueVector
 } valueKind;
 
 typedef struct value {
@@ -15,6 +15,11 @@ typedef struct value {
     union {
         /*Fn*/
         value* (*fnptr)(value*);
+        /*SimpleClosure*/
+        struct {
+            value* (*simpleClosure)(void* env, value*);
+            void* simpleEnv;
+        };
         /*File*/
         char* filename;
         /*Int*/
@@ -47,6 +52,12 @@ value* valueCreateFn (value* (*fnptr)(value*)) {
     });
 }
 
+value* valueCreateSimpleClosure (void* env, value* (*fnptr)(void* env, value* arg)) {
+    return valueCreate(valueSimpleClosure, (value) {
+        .simpleClosure = fnptr, .simpleEnv = env
+    });
+}
+
 value* valueCreateFile (const char* filename) {
     return valueCreate(valueFile, (value) {
         .filename = GC_STRDUP(filename)
@@ -73,6 +84,7 @@ value* valueCreateInvalid (void) {
 const char* valueKindGetStr (valueKind kind) {
     switch (kind) {
     case valueFn: return "Fn";
+    case valueSimpleClosure: return "SimpleClosure";
     case valueFile: return "File";
     case valueInt: return "Int";
     case valueVector: return "Vector";
@@ -92,6 +104,10 @@ void valuePrint (const value* v) {
 
     case valueFn:
         printf("<fn at %p>", v->fnptr);
+        return;
+
+    case valueSimpleClosure:
+        printf("<fn at %p with env. %p>", v->simpleClosure, v->simpleEnv);
         return;
 
     case valueFile:
@@ -122,10 +138,14 @@ void valuePrint (const value* v) {
 }
 
 value* valueCall (const value* fn, value* arg) {
-    if (fn->kind == valueFn)
+    switch (fn->kind) {
+    case valueFn:
         return fn->fnptr(arg);
 
-    else {
+    case valueSimpleClosure:
+        return fn->simpleClosure(fn->simpleEnv, arg);
+
+    default:
         errprintf("Unhandled value kind, %s\n", valueKindGetStr(fn->kind));
         return valueCreateInvalid();
     }
