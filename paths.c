@@ -22,7 +22,7 @@ char* pathContract (const char* path, const char* prefix, const char* replacemen
 
     /*Able to make the substition?*/
     if (pathIsPrefix(path, prefix, prefix_length)) {
-        char* contracted = allocator(strlen(path) - prefix_length + 1);
+        char* contracted = allocator(strlen(path) - prefix_length + 2);
 
         bool prefix_includes_slash = path[prefix_length] == '/';
 
