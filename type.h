@@ -53,6 +53,7 @@ const char* typeGetStr (type* dt);
 bool typeIsInvalid (type* dt);
 
 bool typeAppliesToFn (type* arg, type* fn);
+bool typeUnitAppliesToFn (type* fn);
 type* typeGetFnResult (type* fn);
 
 bool typeIsList (type* dt);

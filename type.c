@@ -183,6 +183,10 @@ bool typeAppliesToFn (type* arg, type* fn) {
     return fn->kind == type_Fn && typeEquals(fn->from, arg);
 }
 
+bool typeUnitAppliesToFn (type* fn) {
+    return fn->kind == type_Fn && fn->from->kind == type_Unit;
+}
+
 type* typeGetFnResult (type* fn) {
     assert(fn->kind == type_Fn);
     return fn->to;
