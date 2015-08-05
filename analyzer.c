@@ -126,7 +126,8 @@ static type* analyzeFileLit (analyzerCtx* ctx, ast* node) {
 
 static type* analyzeGlobLit (analyzerCtx* ctx, ast* node) {
     (void) node;
-    return typeFnChain(2, ctx->ts, type_Unit, type_File);
+    /*() -> [File]*/
+    return typeFn(ctx->ts, typeUnitary(ctx->ts, type_Unit), typeList(ctx->ts, typeFile(ctx->ts)));
 }
 
 static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
