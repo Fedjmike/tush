@@ -34,3 +34,21 @@ char* pathContract (const char* path, const char* prefix, const char* replacemen
     } else
         return strcpy(allocator(strlen(path)), path);
 }
+
+char* pathGetSegments (const char* path, stdalloc allocator) {
+    /*Copy the string*/
+    size_t length = strlen(path);
+    char* segments = allocator(length+2);
+    memcpy(segments, path, length+1);
+    /*With a second null*/
+    segments[length+1] = 0;
+
+    /*Replace slashes with nulls*/
+    for (char *current = segments, *nextslash;
+         (nextslash = strchr(current, '/'));
+         current = nextslash+1) {
+        *nextslash = 0;
+    }
+
+    return segments;
+}
