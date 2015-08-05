@@ -138,6 +138,8 @@ const char* const samples[] = {
 int main (int argc, char** argv) {
     GC_INIT();
 
+    rl_basic_word_break_characters = " \t\n\"\\'`@$><=;|&{([,";
+
     compilerCtx compiler = compilerInit();
     addBuiltins(&compiler.ts, compiler.global);
 

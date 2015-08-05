@@ -89,7 +89,7 @@ void valuePrint (const value* v) {
         return;
 
     case valueFn:
-        printf("[fn at %p]", v->fnptr);
+        printf("<fn at %p>", v->fnptr);
         return;
 
     case valueFile:

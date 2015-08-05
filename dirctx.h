@@ -9,7 +9,9 @@ typedef struct dirCtx {
     char* workingDir;
 } dirCtx;
 
-/*Get the current working directory. Fails if there are permission issues*/
+/*Get the current working directory.
+  Fails if there are permission issues.
+  Caller owns the result.*/
 static char* dirGetWD (void);
 
 /*envPATH is the colon-seperated PATH environment variable

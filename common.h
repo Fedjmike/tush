@@ -16,7 +16,7 @@ static inline void* malloci (size_t size, void* src) {
 }
 
 /*strcat, resizing the buffer if need be*/
-inline char* strrecat (char* dest, size_t* size, const char* src) {
+static inline char* strrecat (char* dest, size_t* size, const char* src) {
     size_t length = strlen(src) + strlen(dest) + 1;
     if (length > *size) {
         *size = length*2;
