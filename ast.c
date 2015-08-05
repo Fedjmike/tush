@@ -50,6 +50,10 @@ ast* astCreateSymbol (sym* symbol) {
     });
 }
 
+ast* astCreateUnitLit (void) {
+    return astCreate(astUnitLit, (ast) {});
+}
+
 ast* astCreateStrLit (const char* str) {
     return astCreate(astStrLit, (ast) {
         .literal.str = strdup(str),
@@ -108,6 +112,7 @@ const char* astKindGetStr (astKind kind) {
     case astBOP: return "BOP";
     case astFnApp: return "FnApp";
     case astSymbol: return "Symbol";
+    case astUnitLit: return "UnitLit";
     case astStrLit: return "StrLit";
     case astFileLit: return "FileLit";
     case astGlobLit: return "GlobLit";

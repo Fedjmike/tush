@@ -6,7 +6,7 @@
 
 typedef enum astKind {
     astBOP, astFnApp, astSymbol,
-    astStrLit, astFileLit, astGlobLit, astListLit,
+    astUnitLit, astStrLit, astFileLit, astGlobLit, astListLit,
     astInvalid,
     astKindNo
 } astKind;
@@ -49,6 +49,7 @@ ast* astCreateBOP (ast* l, ast* r, opKind op);
 ast* astCreateFnApp (vector(ast*) args, ast* fn);
 ast* astCreateSymbol (sym* symbol);
 
+ast* astCreateUnitLit (void);
 ast* astCreateStrLit (const char* str);
 ast* astCreateFileLit (const char* str);
 ast* astCreateGlobLit (const char* str);
