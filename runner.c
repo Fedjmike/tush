@@ -7,6 +7,8 @@
 #include "ast.h"
 #include "value.h"
 
+#include "builtins.h"
+
 /*---- Binary operators ----*/
 
 static value* runPipe (envCtx* env, const ast* node, value* arg, value* fn) {
@@ -81,6 +83,13 @@ static value* runFileLit (envCtx* env, const ast* node) {
     return valueCreateFile(node->literal.str);
 }
 
+static value* runGlobLit (envCtx* env, const ast* node) {
+    (void) env;
+
+    return valueCreateSimpleClosure(GC_STRDUP(node->literal.str),
+                                    (simpleClosureFn) builtinExpandGlob);
+}
+
 static value* runListLit (envCtx* env, const ast* node) {
     vector(value*) result = vectorInit(node->children.length, GC_malloc);
 
@@ -102,6 +111,7 @@ value* run (envCtx* env, const ast* node) {
         [astUnitLit] = runUnitLit,
         [astStrLit] = runStrLit,
         [astFileLit] = runFileLit,
+        [astGlobLit] = runGlobLit,
         [astListLit] = runListLit
     };
 
