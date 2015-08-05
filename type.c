@@ -134,6 +134,7 @@ const char* typeGetStr (type* dt) {
     switch (dt->kind) {
     case type_Unit: return "()";
     case type_Integer: return "Integer";
+    case type_Str: return "Str";
     case type_Number: return "Number";
     case type_File: return "File";
     case type_Invalid: return "<invalid>";
