@@ -22,7 +22,8 @@ void astDestroy (ast* node) {
 
     vectorFreeObjs(&node->children, (vectorDtor) astDestroy);
 
-    if (node->kind == astStrLit || node->kind == astFileLit)
+    if (   node->kind == astStrLit || node->kind == astFileLit
+        || node->kind == astGlobLit)
         free(node->literal.str);
 
     free(node);
@@ -57,6 +58,12 @@ ast* astCreateStrLit (const char* str) {
 
 ast* astCreateFileLit (const char* str) {
     return astCreate(astFileLit, (ast) {
+        .literal.str = strdup(str),
+    });
+}
+
+ast* astCreateGlobLit (const char* str) {
+    return astCreate(astGlobLit, (ast) {
         .literal.str = strdup(str),
     });
 }
@@ -103,6 +110,7 @@ const char* astKindGetStr (astKind kind) {
     case astSymbol: return "Symbol";
     case astStrLit: return "StrLit";
     case astFileLit: return "FileLit";
+    case astGlobLit: return "GlobLit";
     case astListLit: return "ListLit";
     case astInvalid: return "Invalid";
     case astKindNo: return "<KindNo; not real>";

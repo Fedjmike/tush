@@ -119,6 +119,11 @@ static type* analyzeFileLit (analyzerCtx* ctx, ast* node) {
     return typeFile(ctx->ts);
 }
 
+static type* analyzeGlobLit (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeFnChain(2, ctx->ts, type_Unit, type_File);
+}
+
 static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
     //todo 'a List
     assert(node->children.length != 0);
@@ -147,6 +152,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
         [astSymbol] = analyzeSymbol,
         [astStrLit] = analyzeStrLit,
         [astFileLit] = analyzeFileLit,
+        [astGlobLit] = analyzeGlobLit,
         [astListLit] = analyzeListLit
     };
 

@@ -11,8 +11,8 @@ char* pathContract (const char* path, const char* prefix, const char* replacemen
 
 /*Duplicate a path with the separators ('/') replaced with nulls
   so that the segments may be easily iterated over and treated as
-  separate strings. The end of the all the segments is indicated
-  by a final segment starting with null.
+  separate strings. The end of all the segments is indicated by a
+  final segment starting with null.
 
   e.g. "xxx/yyy/zzz" -> "xxx\0yyy\0zzz\0\0"*/
-char* pathGetSegments (const char* path, stdalloc allocator)
+char* pathGetSegments (const char* path, stdalloc allocator);

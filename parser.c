@@ -3,6 +3,8 @@
 
 #include <string.h>
 
+#include "paths.h"
+
 #include "sym.h"
 #include "ast.h"
 
@@ -12,6 +14,7 @@ static ast* parserExpr (parserCtx* ctx);
 static ast* parserBOP (parserCtx* ctx, int level);
 static ast* parserFnApp (parserCtx* ctx);
 static ast* parserAtom ();
+static ast* parserPath (parserCtx* ctx);
 
 parserResult parse (sym* global, lexerCtx* lexer) {
     parserCtx ctx = parserInit(global, lexer);
@@ -182,7 +185,7 @@ static ast* parserAtom (parserCtx* ctx) {
         sym* symbol;
 
         if (isPathToken(ctx->current.buffer))
-            node = astCreateFileLit(ctx->current.buffer);
+            node = parserPath(ctx);
 
         else if ((symbol = symLookup(ctx->scope, ctx->current.buffer)))
             node = astCreateSymbol(symbol);
@@ -198,4 +201,37 @@ static ast* parserAtom (parserCtx* ctx) {
     }
 
     return node;
+}
+
+/**
+ * Path = <PathLit> | <GlobLit>
+ *
+ * A glob literal is a path with a wildcard somewhere in it.
+ */
+static ast* parserPath (parserCtx* ctx) {
+    bool modifier = false,
+         glob = false;
+
+    const char* str = ctx->current.buffer;
+
+    /*Path modifier*/
+    if (*str == '/') {
+        modifier = true;
+        str++;
+    }
+
+    /*Search the path segments looking for glob operators
+      (yes, could just strchr directly but in the future this fn
+       will use the segments)*/
+
+    char* segments = pathGetSegments(str, malloc);
+
+    for (char* segment = segments; *segment; segment += strlen(segment)+1) {
+        if (strchr(segment, '*'))
+            glob = true;
+    }
+
+    free(segments);
+
+    return (glob ? astCreateGlobLit : astCreateFileLit)(ctx->current.buffer);
 }
