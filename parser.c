@@ -13,7 +13,7 @@ static ast* parserS (parserCtx* ctx);
 static ast* parserExpr (parserCtx* ctx);
 static ast* parserBOP (parserCtx* ctx, int level);
 static ast* parserFnApp (parserCtx* ctx);
-static ast* parserAtom ();
+static ast* parserAtom (parserCtx* ctx);
 static ast* parserPath (parserCtx* ctx);
 
 parserResult parse (sym* global, lexerCtx* lexer) {
@@ -159,7 +159,7 @@ static ast* parserFnApp (parserCtx* ctx) {
 }
 
 static bool isPathToken (const char* str) {
-    return strchr(str, '/') || strchr(str, '.');
+    return strchr(str, '/') || strchr(str, '.') || strchr(str, '*');
 }
 
 /**
