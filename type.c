@@ -42,7 +42,7 @@ static void typeDestroy (type* dt) {
     free(dt);
 }
 
-static type* typeUnitary (typeSys* ts, typeKind kind) {
+type* typeUnitary (typeSys* ts, typeKind kind) {
     assert(!typeKindIsntUnitary(kind));
 
     /*Only allocate one struct per unitary type*/

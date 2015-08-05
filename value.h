@@ -29,6 +29,7 @@ typedef struct valueIter {
   This is just a normal allocation that gets scanned for GC object
   references.*/
 
+value* valueCreateUnit (void);
 value* valueCreateInt (int integer);
 value* valueCreateFn (value* (*fnptr)(value*));
 /*Takes ownership of the environment, which must be GC allocated*/

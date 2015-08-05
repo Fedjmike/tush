@@ -6,7 +6,7 @@
 #include <common.h>
 
 typedef enum valueKind {
-    valueInvalid, valueInt, valueFn, valueSimpleClosure, valueFile, valueVector
+    valueInvalid, valueUnit, valueInt, valueFn, valueSimpleClosure, valueFile, valueVector
 } valueKind;
 
 typedef struct value {
@@ -38,6 +38,10 @@ static value* valueCreate (valueKind kind, value init) {
     *v = init;
     v->kind = kind;
     return v;
+}
+
+value* valueCreateUnit (void) {
+    return valueCreate(valueUnit, (value) {});
 }
 
 value* valueCreateInt (int integer) {
@@ -83,6 +87,7 @@ value* valueCreateInvalid (void) {
 
 const char* valueKindGetStr (valueKind kind) {
     switch (kind) {
+    case valueUnit: return "Unit";
     case valueFn: return "Fn";
     case valueSimpleClosure: return "SimpleClosure";
     case valueFile: return "File";
@@ -98,6 +103,10 @@ const char* valueKindGetStr (valueKind kind) {
 
 void valuePrint (const value* v) {
     switch (v->kind) {
+    case valueUnit:
+        printf("()");
+        return;
+
     case valueInt:
         printf("%ld", v->integer);
         return;

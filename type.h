@@ -29,6 +29,8 @@ typeSys* typesFree (typeSys* ts);
   Types are immutable and their allocation is handled by the type
   system. These functions give you a reference to them.*/
 
+type* typeUnitary (typeSys* ts, typeKind kind);
+
 type* typeInteger (typeSys* ts);
 type* typeFile (typeSys* ts);
 type* typeFn (typeSys* ts, type* from, type* to);

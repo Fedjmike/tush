@@ -162,11 +162,22 @@ static bool isPathToken (const char* str) {
     return strchr(str, '/') || strchr(str, '.');
 }
 
+/**
+ * Atom =   ( "(" [ Expr ] ")" )
+ *        | ( "[" [{ Expr }] "]" )
+ *        | Path | <Symbol>
+ */
 static ast* parserAtom (parserCtx* ctx) {
     ast* node;
 
     if (try_match(ctx, "(")) {
-        node = parserExpr(ctx);
+        /*Empty brackets => unit literal*/
+        if (see(ctx, ")"))
+            node = astCreateUnitLit();
+
+        else
+            node = parserExpr(ctx);
+
         match(ctx, ")");
 
     /*List literal*/

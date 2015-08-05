@@ -64,6 +64,11 @@ static value* runSymbol (envCtx* env, const ast* node) {
     return val ? val : valueCreateInvalid();
 }
 
+static value* runUnitLit (envCtx* env, const ast* node) {
+    (void) env, (void) node;
+    return valueCreateUnit();
+}
+
 static value* runStrLit (envCtx* env, const ast* node) {
     (void) env;
 
@@ -94,6 +99,7 @@ value* run (envCtx* env, const ast* node) {
         [astBOP] = runBOP,
         [astFnApp] = runFnApp,
         [astSymbol] = runSymbol,
+        [astUnitLit] = runUnitLit,
         [astStrLit] = runStrLit,
         [astFileLit] = runFileLit,
         [astListLit] = runListLit

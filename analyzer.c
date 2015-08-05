@@ -109,6 +109,11 @@ static type* analyzeSymbol (analyzerCtx* ctx, ast* node) {
     }
 }
 
+static type* analyzeUnitLit (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeUnitary(ctx->ts, type_Unit);
+}
+
 static type* analyzeStrLit (analyzerCtx* ctx, ast* node) {
     (void) node;
     return typeInvalid(ctx->ts);
@@ -150,6 +155,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
         [astBOP] = analyzeBOP,
         [astFnApp] = analyzeFnApp,
         [astSymbol] = analyzeSymbol,
+        [astUnitLit] = analyzeUnitLit,
         [astStrLit] = analyzeStrLit,
         [astFileLit] = analyzeFileLit,
         [astGlobLit] = analyzeGlobLit,
