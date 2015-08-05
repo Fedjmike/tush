@@ -121,6 +121,7 @@ inline static void lexerWord (lexerCtx* ctx) {
                 exit = true;
 
         break;
+        case ')':
         case '"': case '\'':
         case ',': case '`':
         case '\n': case '\r':
