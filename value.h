@@ -31,6 +31,7 @@ typedef struct valueIter {
 
 value* valueCreateUnit (void);
 value* valueCreateInt (int integer);
+value* valueCreateStr (char* str);
 value* valueCreateFn (value* (*fnptr)(value*));
 /*Takes ownership of the environment, which must be GC allocated*/
 value* valueCreateSimpleClosure (void* env, value* (*fnptr)(void* env, value* arg));

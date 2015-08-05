@@ -6,13 +6,19 @@
 #include <common.h>
 
 typedef enum valueKind {
-    valueInvalid, valueUnit, valueInt, valueFn, valueSimpleClosure, valueFile, valueVector
+    valueInvalid, valueUnit, valueInt, valueStr,
+    valueFn, valueSimpleClosure, valueFile, valueVector
 } valueKind;
 
 typedef struct value {
     valueKind kind;
 
     union {
+        /*Str*/
+        struct {
+            char* str;
+            size_t strlen;
+        };
         /*Fn*/
         value* (*fnptr)(value*);
         /*SimpleClosure*/
@@ -47,6 +53,14 @@ value* valueCreateUnit (void) {
 value* valueCreateInt (int integer) {
     return valueCreate(valueInt, (value) {
         .integer = integer
+    });
+}
+
+value* valueCreateStr (char* str) {
+    size_t length = strlen(str);
+
+    return valueCreate(valueStr, (value) {
+        .str = strcpy(GC_MALLOC(length+1), str), .strlen = length
     });
 }
 
@@ -88,6 +102,7 @@ value* valueCreateInvalid (void) {
 const char* valueKindGetStr (valueKind kind) {
     switch (kind) {
     case valueUnit: return "Unit";
+    case valueStr: return "Str";
     case valueFn: return "Fn";
     case valueSimpleClosure: return "SimpleClosure";
     case valueFile: return "File";
@@ -109,6 +124,10 @@ void valuePrint (const value* v) {
 
     case valueInt:
         printf("%ld", v->integer);
+        return;
+
+    case valueStr:
+        printf("\"%s\"", v->str);
         return;
 
     case valueFn:
