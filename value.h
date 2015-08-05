@@ -34,6 +34,8 @@ value* valueCreateFn (value* (*fnptr)(value*));
 /*Takes ownership of the environment, which must be GC allocated*/
 value* valueCreateSimpleClosure (void* env, value* (*fnptr)(void* env, value* arg));
 value* valueCreateFile (const char* filename);
+/*Takes ownership of the vector and its elements. Therefore, they must
+  have been allocated using the garbage collector.*/
 value* valueCreateVector (vector(value*) elements);
 value* valueCreateInvalid (void);
 
