@@ -91,8 +91,9 @@ const char* opKindGetStr (opKind kind) {
     case opDivide: return "/";
     case opModulo: return "%";
     case opNull: return "<null op kind>";
-    default: return "<unhandled op kind>";
     }
+
+    return "<unhandled op kind>";
 }
 
 const char* astKindGetStr (astKind kind) {
@@ -105,6 +106,7 @@ const char* astKindGetStr (astKind kind) {
     case astListLit: return "ListLit";
     case astInvalid: return "Invalid";
     case astKindNo: return "<KindNo; not real>";
-    default: return "<unhandled AST kind>";
     }
+
+    return "<unhandled AST kind>";
 }

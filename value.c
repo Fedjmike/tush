@@ -75,8 +75,9 @@ const char* valueKindGetStr (valueKind kind) {
     case valueFn: return "Fn";
     case valueFile: return "File";
     case valueInt: return "Int";
-    default: return "<unhandled value kind>";
     }
+
+    return "<unhandled value kind>";
 }
 
 /*==== Operations on values ====*/
@@ -85,15 +86,15 @@ void valuePrint (const value* v) {
     switch (v->kind) {
     case valueInt:
         printf("%ld", v->integer);
-        break;
+        return;
 
     case valueFn:
         printf("[fn at %p]", v->fnptr);
-        break;
+        return;
 
     case valueFile:
         printf("%s", v->filename);
-        break;
+        return;
 
     case valueVector: {
         printf("[");
@@ -107,16 +108,15 @@ void valuePrint (const value* v) {
         }
 
         printf("]");
-        break;
+        return;
     }
 
     case valueInvalid:
         printf("<invalid>");
-        break;
-
-    default:
-        errprintf("Unhandled value kind, %s\n", valueKindGetStr(v->kind));
+        return;
     }
+
+    errprintf("Unhandled value kind, %s\n", valueKindGetStr(v->kind));
 }
 
 value* valueCall (const value* fn, value* arg) {

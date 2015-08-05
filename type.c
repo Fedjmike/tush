@@ -137,7 +137,6 @@ const char* typeGetStr (type* dt) {
     case type_File: return "File";
     case type_Invalid: return "<invalid>";
     case type_KindNo: return "<KindNo, not real>";
-    default: return "<unhandled type kind>";
 
     case type_Fn: {
         const char *from = typeGetStr(dt->from),
@@ -155,6 +154,8 @@ const char* typeGetStr (type* dt) {
         return dt->str;
     }
     }
+
+    return "<unhandled type kind>";
 }
 
 /*==== Tests and operations ====*/
