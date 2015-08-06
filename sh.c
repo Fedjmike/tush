@@ -56,8 +56,7 @@ ast* compile (compilerCtx* ctx, const char* str, int* errors) {
 compilerCtx compilerInit (void) {
     return (compilerCtx) {
         .ts = typesInit(),
-        //TODO: secure_getenv ??
-        .dirs = dirsInit(getenv("PATH"), dirGetWD()),
+        .dirs = dirsInit(initVectorFromPATH(), getWorkingDir()),
         .global = symInit()
     };
 }
@@ -121,7 +120,7 @@ void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
 }
 
 void repl (compilerCtx* compiler) {
-    const char* homedir = pathGetHome();
+    const char* homedir = getHomeDir();
 
     promptCtx prompt = {.size = 1024};
     prompt.str = malloc(prompt.size);

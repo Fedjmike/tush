@@ -1,6 +1,19 @@
-#include <common.h>
+#pragma once
 
-const char* pathGetHome (void);
+#include <errno.h>
+#include <unistd.h>
+
+#include <common.h>
+#include <vector.h>
+
+/*Get the current working directory.
+  Fails if there are permission issues.
+  Caller owns the result.*/
+char* getWorkingDir (void);
+
+const char* getHomeDir (void);
+
+vector(char*) initVectorFromPATH (void);
 
 /*Take a path and replace a directory with another string, if it prefixes the path.
   If it doesn't, the given path is duplicated.

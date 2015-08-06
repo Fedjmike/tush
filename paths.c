@@ -6,8 +6,59 @@
 
 #include "common.h"
 
-const char* pathGetHome (void) {
+char* getWorkingDir (void) {
+    int buffer_size = 256;
+
+    do {
+        char* buffer = malloc(buffer_size);
+
+        if (getcwd(buffer, buffer_size) != 0)
+            return buffer;
+
+        free(buffer);
+        buffer_size *= 2;
+
+    /*Keep trying with a larger buffer, if that was the problem*/
+    } while (errno == ERANGE);
+
+    return 0;
+}
+
+const char* getHomeDir (void) {
     return getenv("HOME");
+}
+
+vector(char*) initVectorFromPATH (void) {
+    vector(char*) paths = vectorInit(16, malloc);
+
+    //TODO: secure_getenv ??
+    const char* PATH = getenv("PATH");
+
+    /*Iterate through each colon-separated segment of the PATH,
+      add the paths to the vector*/
+    for (const char *path = PATH,
+                    *nextcolon = /*not-null, for the entry condition*/ PATH;
+         nextcolon;
+         path = nextcolon+1) {
+        /*Note: strchr can be used on UTF8 strings as long as searching for a Latin char*/
+        nextcolon = strchr(path, ':');
+
+        char* dupe;
+
+        /*Not the last path, followed by a colon*/
+        if (nextcolon) {
+            size_t pathlength = nextcolon-path;
+            /*Copy up to the colon, add a null*/
+            dupe = strncpy(malloc(pathlength+1), path, pathlength);
+            dupe[pathlength] = 0;
+
+        } else
+            dupe = strdup(path);
+
+        vectorPush(&paths, dupe);
+    }
+
+    return paths;
 }
 
 /*Check whether a path begins with another one, the prefix*/
