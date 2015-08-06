@@ -29,11 +29,18 @@ static type* analyzeInvalid (analyzerCtx* ctx, ast* node) {
     return typeInvalid(ctx->ts);
 }
 
-/*---- Binary operators ----*/
-
 static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
-    error(ctx)("type %s does not apply to function %s\n", typeGetStr(arg), typeGetStr(fn));
+    if (typeIsInvalid(fn))
+        ;
+
+    else if (!typeIsFn(fn))
+        error(ctx)("type %s is not a function\n", typeGetStr(fn));
+
+    else if (!typeIsInvalid(arg))
+        error(ctx)("type %s does not apply to function %s\n", typeGetStr(arg), typeGetStr(fn));
 }
+
+/*---- Binary operators ----*/
 
 static type* analyzePipe (analyzerCtx* ctx, ast* node) {
     type *arg = node->l->dt,
@@ -52,9 +59,7 @@ static type* analyzePipe (analyzerCtx* ctx, ast* node) {
             node->listApp = true;
 
         } else {
-            if (!typeIsInvalid(arg) && !typeIsInvalid(fn))
-                errorFnApp(ctx, arg, fn);
-
+            errorFnApp(ctx, arg, fn);
             result = typeInvalid(ctx->ts);
         }
     }
@@ -88,9 +93,7 @@ static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
             result = typeGetFnResult(result);
 
         else {
-            if (!typeIsInvalid(arg) && !typeIsInvalid(result))
-                errorFnApp(ctx, arg, result);
-
+            errorFnApp(ctx, arg, result);
             result = typeInvalid(ctx->ts);
         }
     }
