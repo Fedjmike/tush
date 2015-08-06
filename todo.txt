@@ -1,4 +1,4 @@
-[ ] Type system
+[-] Type system
     [ ] forall qualifier
     [ ] Typeclasses/traits
     [ ] Maybe
@@ -7,30 +7,34 @@
         [ ] () -> 'a
         [ ] 'a File
 
-[ ] Language
-    [ ] Literals
-        [-] Integer
-        [ ] Number
-        [ ] Lambda
-        [ ] String
-        [ ] (String) format?
-        [ ] File, Directory, Path, Glob
-        [ ] Regex
-        [ ] Option (as in flags)
-    [ ] Operators
+[-] Language
+    [-] Expressions
+        [-] Literals
+            [-] Integer
+            [ ] Number
+            [ ] Lambda
+            [ ] String
+            [ ] (String) format?
+            [ ] File, Directory, Path
+            [-] Glob
+            	[x] *
+            	[ ] {}, []
+            [ ] Regex
+            [ ] Option (as in flags)
         [ ] Files
             [ ] /
             [ ] |>
-            [ ] |+> (different spelling?)
-        [ ] Functional
+            [ ] |+> (different spelling? `append`?)
+        [-] Function
             [-] Application
             [-] Pipe op
                 - Right associative composition
             [x] Explicit fn
+            [ ] Named (optional?) arguments
             [-] Implicit conversions
                 [ ] Path -> File
                 fmap over:
-                [ ] Lists, ['a]
+                [-] Lists, ['a]
                 [ ] Maybe, 'a?
                 [ ] Generalize to all?
             [ ] Options
@@ -48,7 +52,11 @@
             [ ] Dependency functions
         [ ] if, while, for, switch
         [ ] Working directory control
+            into <dir>: {}
+    [ ] Macros
     [ ] Modules
+
+[-] Library
 
 [ ] Interfacing with legacy Unix
 
@@ -56,10 +64,18 @@
 
 [ ] Concurrent IO
 
-[ ] UI
-    [ ] Prompt
+[ ] Diagnostics
+    [ ] Position information
+    [ ] Colour
+    [ ] Underlining
+    [ ] Specific parsing issues
+        [ ] Fn-app: refer to specific args
+
+[-] UI
+    [-] Prompt
     [ ] Completion
     [ ] Syntax highlighting
+    [ ] Output highlighting
     [-] Value printing
     [ ] Job control
 
