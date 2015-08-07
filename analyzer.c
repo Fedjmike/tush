@@ -166,6 +166,11 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
         [astListLit] = analyzeListLit
     };
 
+    if (!node) {
+        errprintf("The given AST node is a null pointer\n");
+        return typeInvalid(ctx->ts);
+    }
+
     handler_t handler = table[node->kind];
 
     if (handler)

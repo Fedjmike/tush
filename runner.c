@@ -9,6 +9,11 @@
 
 #include "builtins.h"
 
+static value* runInvalid (envCtx* env, const ast* node) {
+    (void) env, (void) node;
+    return valueCreateInvalid();
+}
+
 /*---- Binary operators ----*/
 
 static value* runPipe (envCtx* env, const ast* node, value* arg, value* fn) {
@@ -105,6 +110,7 @@ value* run (envCtx* env, const ast* node) {
     typedef value* (*handler_t)(envCtx*, const ast*);
 
     static handler_t table[astKindNo] = {
+        [astInvalid] = runInvalid,
         [astBOP] = runBOP,
         [astFnApp] = runFnApp,
         [astSymbol] = runSymbol,
@@ -115,9 +121,15 @@ value* run (envCtx* env, const ast* node) {
         [astListLit] = runListLit
     };
 
-    handler_t handler = table[node->kind];
+    handler_t handler;
 
-    if (handler)
+    //todo check table for zeroes
+
+    if (!node) {
+        errprintf("The given AST node is a null pointer\n");
+        return valueCreateInvalid();
+
+    } else if ((handler = table[node->kind]))
         return handler(env, node);
 
     else {

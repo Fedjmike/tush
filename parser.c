@@ -236,6 +236,11 @@ parserResult parse (sym* global, lexerCtx* lexer) {
     parserCtx ctx = parserInit(global, lexer);
     ast* tree = parseS(&ctx);
 
+    if (!tree) {
+        errprintf("No syntax tree created\n");
+        tree = astCreateInvalid();
+    }
+
     parserResult result = {
         .tree = tree,
         .errors = ctx.errors
