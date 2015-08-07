@@ -122,15 +122,12 @@ static ast* parserFnApp (parserCtx* ctx) {
     ast* fn = 0;
 
     vector(ast*) nodes = vectorInit(3, malloc);
-    int exprs = 0;
 
     /*Require at least one expr*/
-    if (!see(ctx, "`")) {
+    if (!see(ctx, "`"))
         vectorPush(&nodes, parserAtom(ctx));
-        exprs++;
-    }
 
-    for (; waiting_for_delim(ctx); exprs++) {
+    while (waiting_for_delim(ctx)) {
         if (try_match(ctx, "`")) {
             if (fn) {
                 error(ctx)("Multiple explicit functions in backticks: '%s'\n", ctx->current.buffer);
@@ -144,10 +141,14 @@ static ast* parserFnApp (parserCtx* ctx) {
             vectorPush(&nodes, parserAtom(ctx));
     }
 
-    if (exprs == 1) {
+    if (nodes.length == 1) {
         ast* node = vectorPop(&nodes);
         vectorFree(&nodes);
         return node;
+
+    } else if (nodes.length == 0 && fn) {
+        error(ctx)("No arguments provided to backtick-marked function");
+        return fn;
 
     } else {
         /*If not explicitly marked in backticks, the last expr was the fn*/
