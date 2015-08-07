@@ -8,14 +8,14 @@
 #include "sym.h"
 #include "ast.h"
 
-static ast* parserExpr (parserCtx* ctx);
+static ast* parseExpr (parserCtx* ctx);
 
 /**
  * Path = <PathLit> | <GlobLit>
  *
  * A glob literal is a path with a wildcard somewhere in it.
  */
-static ast* parserPath (parserCtx* ctx) {
+static ast* parsePath (parserCtx* ctx) {
     bool modifier = false,
          glob = false;
 
@@ -52,7 +52,7 @@ static bool isPathToken (const char* str) {
  *        | ( "[" [{ Expr }] "]" )
  *        | Path | <Str> | <Symbol>
  */
-static ast* parserAtom (parserCtx* ctx) {
+static ast* parseAtom (parserCtx* ctx) {
     ast* node;
 
     if (try_match(ctx, "(")) {
@@ -61,7 +61,7 @@ static ast* parserAtom (parserCtx* ctx) {
             node = astCreateUnitLit();
 
         else
-            node = parserExpr(ctx);
+            node = parseExpr(ctx);
 
         match(ctx, ")");
 
@@ -70,7 +70,7 @@ static ast* parserAtom (parserCtx* ctx) {
         vector(ast*) nodes = vectorInit(4, malloc);
 
         if (waiting_for(ctx, "]")) do {
-            vectorPush(&nodes, parserExpr(ctx));
+            vectorPush(&nodes, parseExpr(ctx));
         } while (try_match(ctx, ","));
 
         node = astCreateListLit(nodes);
@@ -85,7 +85,7 @@ static ast* parserAtom (parserCtx* ctx) {
         sym* symbol;
 
         if (isPathToken(ctx->current.buffer))
-            node = parserPath(ctx);
+            node = parsePath(ctx);
 
         else if ((symbol = symLookup(ctx->scope, ctx->current.buffer)))
             node = astCreateSymbol(symbol);
@@ -114,7 +114,7 @@ static bool waiting_for_delim (parserCtx* ctx) {
  * function to which the others are applied. Instead, one of them may
  * be explicitly marked in backticks as the function.
  */
-static ast* parserFnApp (parserCtx* ctx) {
+static ast* parseFnApp (parserCtx* ctx) {
     /*Filled iff there is a backtick function*/
     ast* fn = 0;
 
@@ -122,7 +122,7 @@ static ast* parserFnApp (parserCtx* ctx) {
 
     /*Require at least one expr*/
     if (!see(ctx, "`"))
-        vectorPush(&nodes, parserAtom(ctx));
+        vectorPush(&nodes, parseAtom(ctx));
 
     while (waiting_for_delim(ctx)) {
         if (try_match(ctx, "`")) {
@@ -131,11 +131,11 @@ static ast* parserFnApp (parserCtx* ctx) {
                 vectorPush(&nodes, fn);
             }
 
-            fn = parserAtom(ctx);
+            fn = parseAtom(ctx);
             match(ctx, "`");
 
         } else
-            vectorPush(&nodes, parserAtom(ctx));
+            vectorPush(&nodes, parseAtom(ctx));
     }
 
     if (nodes.length == 1) {
@@ -169,7 +169,7 @@ static ast* parserFnApp (parserCtx* ctx) {
  * which is to say:
  *    x op y op z == (x op y) op z
  */
-static ast* parserBOP (parserCtx* ctx, int level) {
+static ast* parseBOP (parserCtx* ctx, int level) {
     /* (1) Operator precedence parsing!
       As all the productions above are essentially the same, with
       different operators, we can parse them with the same function.
@@ -179,10 +179,10 @@ static ast* parserBOP (parserCtx* ctx, int level) {
     /* (5) Finally, once we reach the top level we escape the recursion
            into... */
     if (level == 5)
-        return parserFnApp(ctx);
+        return parseFnApp(ctx);
 
     /* (2) The left hand side is the production one level up*/
-    ast* node = parserBOP(ctx, level+1);
+    ast* node = parseBOP(ctx, level+1);
     opKind op;
 
     /* (3) Accept operators associated with this level, and store
@@ -209,19 +209,19 @@ static ast* parserBOP (parserCtx* ctx, int level) {
                      : try_match(ctx, "%") ? opModulo : opNull)
            : (op = opNull)) {
         /* (4) Bundle it up with an RHS, also the level up*/
-        ast* rhs = parserBOP(ctx, level+1);
+        ast* rhs = parseBOP(ctx, level+1);
         node = astCreateBOP(node, rhs, op);
     }
 
     return node;
 }
 
-static ast* parserExpr (parserCtx* ctx) {
-    return parserBOP(ctx, 0);
+static ast* parseExpr (parserCtx* ctx) {
+    return parseBOP(ctx, 0);
 }
 
-static ast* parserS (parserCtx* ctx) {
-    ast* node = parserExpr(ctx);
+static ast* parseS (parserCtx* ctx) {
+    ast* node = parseExpr(ctx);
 
     if (see_kind(ctx, tokenEOF))
         accept(ctx);
@@ -234,7 +234,7 @@ static ast* parserS (parserCtx* ctx) {
 
 parserResult parse (sym* global, lexerCtx* lexer) {
     parserCtx ctx = parserInit(global, lexer);
-    ast* tree = parserS(&ctx);
+    ast* tree = parseS(&ctx);
 
     parserResult result = {
         .tree = tree,
