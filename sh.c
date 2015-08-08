@@ -19,8 +19,8 @@
 
 #include "ast-printer.h"
 
-#include "value.h"
 #include "runner.h"
+#include "display.h"
 
 /*==== Compiler ====*/
 
@@ -75,22 +75,11 @@ void gosh (compilerCtx* ctx, const char* str) {
     ast* tree = compile(ctx, str, &errors);
 
     if (errors == 0) {
-        type* resultType = tree->dt;
-
         /*Run the AST*/
         envCtx env = {};
         value* result = run(&env, tree);
 
-        /*If the result is () -> 'a */
-        if (typeUnitAppliesToFn(resultType)) {
-            /*Apply unit to the result and display that instead*/
-            resultType = typeGetFnResult(resultType);
-            result = valueCall(result, valueCreateUnit());
-        }
-
-        /*Print the value and type*/
-        valuePrint(result);
-        printf(" :: %s\n", typeGetStr(resultType));
+        displayResult(result, tree->dt);
     }
 
     astDestroy(tree);
