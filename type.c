@@ -182,6 +182,10 @@ static bool typeEquals (type* l, type* r) {
         return false;
 }
 
+bool typeIsFn (type* dt) {
+    return dt->kind == type_Fn;
+}
+
 bool typeAppliesToFn (type* arg, type* fn) {
     assert(arg);
     return fn->kind == type_Fn && typeEquals(fn->from, arg);

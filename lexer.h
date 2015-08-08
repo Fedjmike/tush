@@ -153,7 +153,7 @@ inline static token lexerNext (lexerCtx* ctx) {
 
     break;
 
-    /*Delimiter op*/
+    /*Operator*/
     case '(': case ')':
     case '[': case ']':
     case '{': case '}':
