@@ -25,7 +25,7 @@ static value* runPipe (envCtx* env, const ast* node, value* arg, value* fn) {
         /*Fails if the arg isn't an iterable value*/
         assert(valueGetIterator(arg, &iter));
 
-        vector(value*) results = vectorInit(valueGuessIterSize(iter), GC_malloc);
+        vector(value*) results = vectorInit(valueGuessIterLength(iter), GC_malloc);
 
         /*Apply it to each element*/
         for (value* element; (element = valueIterRead(&iter));)

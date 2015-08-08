@@ -52,5 +52,5 @@ value* valueCall (const value* fn, value* arg);
 const char* valueGetFilename (const value* file);
 
 bool valueGetIterator (value* iterable, valueIter* iter_out);
-int valueGuessIterSize (valueIter iterator);
+int valueGuessIterLength (valueIter iterator);
 value* valueIterRead (valueIter* iterator);

@@ -205,7 +205,7 @@ bool valueGetIterator (value* iterable, valueIter* iter) {
     }
 }
 
-int valueGuessIterSize (valueIter iterator) {
+int valueGuessIterLength (valueIter iterator) {
     assert(iterator.iterable->kind == valueVector);
     return iterator.iterable->vec.length;
 }
