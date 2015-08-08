@@ -193,15 +193,23 @@ const char* valueGetFilename (const value* value) {
         return value->str;
 }
 
+static bool isIterable (value* iterable) {
+    return iterable->kind == valueVector;
+}
+
 bool valueGetIterator (value* iterable, valueIter* iter) {
-    if (iterable->kind != valueVector)
+    if (!isIterable(iterable))
         return false;
 
-    else {
+    else if (iterable->kind == valueVector) {
         *iter = (valueIter) {
             .iterable = iterable, .n = 0
         };
         return true;
+
+    } else {
+        errprintf("Unhandled iterable kind, %s\n", valueKindGetStr(iterable->kind));
+        return false;
     }
 }
 
@@ -216,6 +224,6 @@ value* valueIterRead (valueIter* iterator) {
 }
 
 vector(const value*) valueGetVector (value* iterable) {
-    assert(iterable->kind == valueVector);
+    assert(isIterable(iterable));
     return iterable->vec;
 }
