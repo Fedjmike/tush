@@ -166,6 +166,10 @@ bool typeIsInvalid (type* dt) {
     return dt->kind == type_Invalid;
 }
 
+bool typeIsKind (type* dt, typeKind kind) {
+    return dt->kind == kind;
+}
+
 static bool typeEquals (type* l, type* r) {
     assert(l);
     assert(r);

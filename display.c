@@ -72,6 +72,66 @@ static void displayFileStats (const char* filename) {
     printf(")\n");
 }
 
+static int intdiv_roundup (int dividend, int divisor) {
+    return (dividend - 1) / divisor + 1;
+}
+
+/*Display a list of files as a grid of names, going down the rows
+  first and then wrapping up to the next column.*/
+static void displayFileList (value* result, type* resultType) {
+    /*Turn the file list into a vector of names*/
+    vector(const char*) names = vectorMapInit((vectorMapper) valueGetFilename,
+                                              valueGetVector(result), malloc);
+
+
+    /*Dimensions of the grid*/
+    int length = names.length;
+    enum {columns = 4, gap = 3};
+    int rows = intdiv_roundup(length, columns);
+
+    /*Work out the widths of the column
+      (max width of any filename plus the gap)*/
+
+    size_t columnWidth[columns] = {};
+
+    for (int i = 0, col = 0; col < columns; col++) {
+        for (int row = 0; i < length && row < rows; i++, row++) {
+            const char* name = vectorGet(names, i);
+            //todo cache strlen
+            //strlen -> str actual column wdith
+            size_t namelen = strlen(name);
+
+            if (columnWidth[col] < namelen+gap)
+                columnWidth[col] = namelen+gap;
+        }
+    }
+
+    /*Print row-by-row*/
+
+    for (int row = 0; row < rows; row++) {
+        for (int col = 0; col < columns; col++) {
+            const char* name = vectorGet(names, row + col*rows);
+
+            if (!name)
+                break;
+
+            printf("%s", name);
+
+            size_t namelen = strlen(name);
+            size_t padding = columnWidth[col]-namelen;
+
+            for (unsigned int i = 0; i < padding; i++)
+                putchar(' ');
+        }
+
+        printf("\n");
+    }
+
+    vectorFree(&names);
+
+    printf(" :: %s\n", typeGetStr(resultType));
+}
+
 void displayResult (value* result, type* resultType) {
     /*If the result is () -> 'a ...*/
     if (typeUnitAppliesToFn(resultType)) {
@@ -83,9 +143,15 @@ void displayResult (value* result, type* resultType) {
     }
 
     /*Print the value and type*/
-    valuePrint(result);
-    printf(" :: %s\n", typeGetStr(resultType));
 
-    if (typeIsKind(resultType, type_File))
-        displayFileStats(valueGetFilename(result));
+    if (typeIsList(resultType) && typeIsKind(typeGetListElements(resultType), type_File))
+        displayFileList(result, resultType);
+
+    else {
+        valuePrint(result);
+        printf(" :: %s\n", typeGetStr(resultType));
+
+        if (typeIsKind(resultType, type_File))
+            displayFileStats(valueGetFilename(result));
+    }
 }

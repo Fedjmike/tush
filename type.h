@@ -51,6 +51,7 @@ const char* typeGetStr (type* dt);
 /*==== Tests and getters ====*/
 
 bool typeIsInvalid (type* dt);
+bool typeIsKind (type* dt, typeKind kind);
 
 bool typeAppliesToFn (type* arg, type* fn);
 bool typeUnitAppliesToFn (type* fn);

@@ -54,3 +54,6 @@ const char* valueGetFilename (const value* file);
 bool valueGetIterator (value* iterable, valueIter* iter_out);
 int valueGuessIterLength (valueIter iterator);
 value* valueIterRead (valueIter* iterator);
+
+/*Convert an iterable to a vector*/
+vector(const value*) valueGetVector (value* iterable);

@@ -214,3 +214,8 @@ value* valueIterRead (valueIter* iterator) {
     assert(iterator->iterable->kind == valueVector);
     return vectorGet(iterator->iterable->vec, iterator->n++);
 }
+
+vector(const value*) valueGetVector (value* iterable) {
+    assert(iterable->kind == valueVector);
+    return iterable->vec;
+}
