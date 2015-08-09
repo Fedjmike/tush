@@ -97,8 +97,7 @@ static void displayFileList (value* result, type* resultType) {
     for (int i = 0, col = 0; col < columns; col++) {
         for (int row = 0; i < length && row < rows; i++, row++) {
             const char* name = vectorGet(names, i);
-            //todo cache strlen
-            //strlen -> str actual column wdith
+            //todo strlen -> str actual column width
             size_t namelen = strlen(name);
 
             if (columnWidth[col] < namelen+gap)
@@ -115,9 +114,7 @@ static void displayFileList (value* result, type* resultType) {
             if (!name)
                 break;
 
-            printf("%s", name);
-
-            size_t namelen = strlen(name);
+            size_t namelen = printf("%s", name);
             size_t padding = columnWidth[col]-namelen;
 
             for (unsigned int i = 0; i < padding; i++)
