@@ -7,7 +7,7 @@
 #include "value.h"
 #include "sym.h"
 
-static value* builtinSize (value* file) {
+static value* builtinSize (const value* file) {
     const char* filename = valueGetFilename(file);
 
     if (!filename)

@@ -16,7 +16,7 @@ static value* runInvalid (envCtx* env, const ast* node) {
 
 /*---- Binary operators ----*/
 
-static value* runPipe (envCtx* env, const ast* node, value* arg, value* fn) {
+static value* runPipe (envCtx* env, const ast* node, const value* arg, const value* fn) {
     (void) env;
 
     /*Implicit map*/
@@ -37,11 +37,11 @@ static value* runPipe (envCtx* env, const ast* node, value* arg, value* fn) {
         return valueCall(fn, arg);
 }
 
-static value* runConcat (envCtx* env, const ast* node, value* left, value* right) {
+static value* runConcat (envCtx* env, const ast* node, const value* left, const value* right) {
     (void) env, (void) node;
 
-    vector(value*) lvec = valueGetVector(left),
-                   rvec = valueGetVector(right);
+    vector(const value*) lvec = valueGetVector(left),
+                         rvec = valueGetVector(right);
 
     //todo opt.
     vector(value*) result = vectorInit(lvec.length + rvec.length, malloc);
@@ -52,8 +52,8 @@ static value* runConcat (envCtx* env, const ast* node, value* left, value* right
 }
 
 static value* runBOP (envCtx* env, const ast* node) {
-    value *left = run(env, node->l),
-          *right = run(env, node->r);
+    const value *left = run(env, node->l),
+                *right = run(env, node->r);
 
     switch (node->op) {
     case opPipe: return runPipe(env, node, left, right);

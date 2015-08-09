@@ -9,7 +9,7 @@
 typedef struct value value;
 
 typedef struct valueIter {
-    value* iterable;
+    const value* iterable;
 
     /*Information depends on the iterable implementations kind*/
     union {
@@ -29,12 +29,12 @@ typedef struct valueIter {
   This is just a normal allocation that gets scanned for GC object
   references.*/
 
-typedef value* (*simpleClosureFn)(void* env, value* arg);
+typedef value* (*simpleClosureFn)(void* env, const value* arg);
 
 value* valueCreateUnit (void);
 value* valueCreateInt (int integer);
 value* valueCreateStr (char* str);
-value* valueCreateFn (value* (*fnptr)(value*));
+value* valueCreateFn (value* (*fnptr)(const value*));
 /*Takes ownership of the environment, which must be GC allocated*/
 value* valueCreateSimpleClosure (void* env, simpleClosureFn fnptr);
 value* valueCreateFile (const char* filename);
@@ -49,13 +49,13 @@ bool valueIsInvalid (const value* v);
 
 void valuePrint (const value* v);
 
-value* valueCall (const value* fn, value* arg);
+value* valueCall (const value* fn, const value* arg);
 
 const char* valueGetFilename (const value* file);
 
-bool valueGetIterator (value* iterable, valueIter* iter_out);
+bool valueGetIterator (const value* iterable, valueIter* iter_out);
 int valueGuessIterLength (valueIter iterator);
 value* valueIterRead (valueIter* iterator);
 
 /*Convert an iterable to a vector*/
-vector(const value*) valueGetVector (value* iterable);
+vector(const value*) valueGetVector (const value* iterable);

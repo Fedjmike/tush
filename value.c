@@ -20,10 +20,10 @@ typedef struct value {
             size_t strlen;
         };
         /*Fn*/
-        value* (*fnptr)(value*);
+        value* (*fnptr)(const value*);
         /*SimpleClosure*/
         struct {
-            value* (*simpleClosure)(void* env, value*);
+            value* (*simpleClosure)(void* env, const value*);
             void* simpleEnv;
         };
         /*File*/
@@ -64,13 +64,13 @@ value* valueCreateStr (char* str) {
     });
 }
 
-value* valueCreateFn (value* (*fnptr)(value*)) {
+value* valueCreateFn (value* (*fnptr)(const value*)) {
     return valueCreate(valueFn, (value) {
         .fnptr = fnptr
     });
 }
 
-value* valueCreateSimpleClosure (void* env, value* (*fnptr)(void* env, value* arg)) {
+value* valueCreateSimpleClosure (void* env, value* (*fnptr)(void* env, const value* arg)) {
     return valueCreate(valueSimpleClosure, (value) {
         .simpleClosure = fnptr, .simpleEnv = env
     });
@@ -169,7 +169,7 @@ void valuePrint (const value* v) {
     errprintf("Unhandled value kind, %s\n", valueKindGetStr(v->kind));
 }
 
-value* valueCall (const value* fn, value* arg) {
+value* valueCall (const value* fn, const value* arg) {
     switch (fn->kind) {
     case valueFn:
         return fn->fnptr(arg);
@@ -197,11 +197,11 @@ const char* valueGetFilename (const value* value) {
         return value->str;
 }
 
-static bool isIterable (value* iterable) {
+static bool isIterable (const value* iterable) {
     return iterable->kind == valueVector;
 }
 
-bool valueGetIterator (value* iterable, valueIter* iter) {
+bool valueGetIterator (const value* iterable, valueIter* iter) {
     if (!isIterable(iterable))
         return false;
 
@@ -227,7 +227,7 @@ value* valueIterRead (valueIter* iterator) {
     return vectorGet(iterator->iterable->vec, iterator->n++);
 }
 
-vector(const value*) valueGetVector (value* iterable) {
+vector(const value*) valueGetVector (const value* iterable) {
     assert(isIterable(iterable));
     return iterable->vec;
 }
