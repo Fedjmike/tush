@@ -177,7 +177,12 @@ inline static token lexerNext (lexerCtx* ctx) {
     /*"Word"*/
     default:
         lexerWord(ctx);
+    }
 
+    ctx->buffer[ctx->length++] = 0;
+
+    /*Reassign the kind if the buffer matches an operator*/
+    if (tok.kind == tokenNormal) {
         if (hashsetTest(&lexerOps, tok.buffer))
             tok.kind = tokenOp;
     }
