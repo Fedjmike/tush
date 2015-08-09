@@ -106,8 +106,7 @@ static value* runFileLit (envCtx* env, const ast* node) {
 static value* runGlobLit (envCtx* env, const ast* node) {
     (void) env;
 
-    return valueCreateSimpleClosure(GC_STRDUP(node->literal.str),
-                                    (simpleClosureFn) builtinExpandGlob);
+    return builtinExpandGlob(node->literal.str, valueCreateUnit());
 }
 
 static value* runListLit (envCtx* env, const ast* node) {
