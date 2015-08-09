@@ -45,8 +45,8 @@ static value* runBOP (envCtx* env, const ast* node) {
     case opPipe: return runPipe(env, node, left, right);
 
     default:
-        errprintf("Unhandled binary operator kind, %s", opKindGetStr(node->op));
-        return 0;
+        errprintf("Unhandled binary operator kind, %s\n", opKindGetStr(node->op));
+        return valueCreateInvalid();
     }
 }
 
