@@ -118,6 +118,11 @@ void repl (compilerCtx* compiler) {
         writePrompt(&prompt, compiler->dirs.workingDir, homedir);
 
         char* input = readline(prompt.str);
+
+        /*Skip empty strings*/
+        if (input[0] == 0)
+            continue;
+
         add_history(input);
 
         gosh(compiler, input);

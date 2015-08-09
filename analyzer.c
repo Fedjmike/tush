@@ -71,7 +71,7 @@ static void errorConcatIsntList (analyzerCtx* ctx, bool left, type* operand) {
     if (typeIsInvalid(operand))
         return;
 
-    error(ctx)("%s operand, %s, of concat operator (++) is not a list\n",
+    error(ctx)("%s operand of concat operator (++), %s, is not a list\n",
                left ? "Left" : "Right",
                typeGetStr(operand));
 }
@@ -80,7 +80,7 @@ static void errorConcatMismatch (analyzerCtx* ctx, type* left, type* right) {
     if (typeIsInvalid(left) || typeIsInvalid(right))
         return;
 
-    error(ctx)("Operands, %s and %s, of concat operator (++) do not match\n",
+    error(ctx)("Operands of concat operator (++), %s and %s, do not match\n",
                typeGetStr(left), typeGetStr(right));
 }
 

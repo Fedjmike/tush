@@ -7,10 +7,7 @@ typedef struct dirCtx {
     char* workingDir;
 } dirCtx;
 
-/*envPATH is the colon-seperated PATH environment variable
-  workingDir:
-  - is now owned by the dirCtx,
-  - is allowed to be null.*/
+/*Takes ownership of the parameters. workingDir is allowed to be null.*/
 static dirCtx dirsInit (vector(char*) searchPaths, char* workingDir);
 
 static dirCtx* dirsFree (dirCtx* dirs);
