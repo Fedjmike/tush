@@ -1,5 +1,6 @@
 #include "display.h"
 
+#include <sys/ioctl.h>
 #include <nicestat.h>
 
 #include "type.h"
@@ -76,6 +77,13 @@ static int intdiv_roundup (int dividend, int divisor) {
     return (dividend - 1) / divisor + 1;
 }
 
+static unsigned int getWindowWidth (void) {
+    struct winsize size;
+    ioctl(0, TIOCGWINSZ, &size);
+
+    return size.ws_col;
+}
+
 /*Display a list of files as a grid of names, going down the rows
   first and then wrapping up to the next column.*/
 static void displayFileList (value* result, type* resultType) {
@@ -83,27 +91,28 @@ static void displayFileList (value* result, type* resultType) {
     vector(const char*) names = vectorMapInit((vectorMapper) valueGetFilename,
                                               valueGetVector(result), malloc);
 
+    /*Find the longest filename*/
 
-    /*Dimensions of the grid*/
-    int length = names.length;
-    enum {columns = 4, gap = 3};
-    int rows = intdiv_roundup(length, columns);
+    size_t columnWidth = 0;
 
-    /*Work out the widths of the column
-      (max width of any filename plus the gap)*/
+    for (int i = 0; i < names.length; i++) {
+        const char* name = vectorGet(names, i);
+        //todo strlen -> str actual column width
+        size_t namelen = strlen(name);
 
-    size_t columnWidth[columns] = {};
-
-    for (int i = 0, col = 0; col < columns; col++) {
-        for (int row = 0; i < length && row < rows; i++, row++) {
-            const char* name = vectorGet(names, i);
-            //todo strlen -> str actual column width
-            size_t namelen = strlen(name);
-
-            if (columnWidth[col] < namelen+gap)
-                columnWidth[col] = namelen+gap;
-        }
+        if (columnWidth < namelen)
+            columnWidth = namelen;
     }
+
+    /*Work out the dimensions of the grid*/
+
+    enum {gap = 2};
+    columnWidth += gap;
+
+    int windowWidth = getWindowWidth();
+
+    int columns = windowWidth / columnWidth;
+    int rows = intdiv_roundup(names.length, columns);
 
     /*Print row-by-row*/
 
@@ -115,7 +124,7 @@ static void displayFileList (value* result, type* resultType) {
                 break;
 
             size_t namelen = printf("%s", name);
-            size_t padding = columnWidth[col]-namelen;
+            size_t padding = columnWidth-namelen;
 
             for (unsigned int i = 0; i < padding; i++)
                 putchar(' ');
