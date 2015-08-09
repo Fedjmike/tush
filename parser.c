@@ -104,7 +104,10 @@ static ast* parseAtom (parserCtx* ctx) {
 }
 
 static bool waiting_for_delim (parserCtx* ctx) {
-    return waiting(ctx) && !see(ctx, "|") && !see(ctx, ",") && !see(ctx, ")") && !see(ctx, "]");
+    bool seeLowPrecOp =    see_kind(ctx, tokenOp)
+                        && !(see(ctx, "(") || see(ctx, "["));
+
+    return waiting(ctx) && !seeLowPrecOp;
 }
 
 /**
@@ -161,7 +164,7 @@ static ast* parseFnApp (parserCtx* ctx) {
  * Pipe    = Logical  [{ "|" | "|>" Logical }]
  * Logical = Equality [{ "&&" | "||" Equality }]
  * Equality = Sum     [{ "==" | "!=" | "<" | "<=" | ">" | ">=" Sum }]
- * Sum     = Product  [{ "+" | "-" Product }]
+ * Sum     = Product  [{ "+" | "-" | "++" Product }]
  * Product = Exit     [{ "*" | "/" | "%" Exit }]
  * Exit = FnApp
  *
@@ -202,7 +205,8 @@ static ast* parseBOP (parserCtx* ctx, int level) {
                      : try_match(ctx, ">=") ? opGreaterEqual : opNull)
            : level == 3
              ? (op =   try_match(ctx, "+") ? opAdd
-                     : try_match(ctx, "-") ? opSubtract : opNull)
+                     : try_match(ctx, "-") ? opSubtract
+                     : try_match(ctx, "++") ? opConcat : opNull)
            : level == 4
              ? (op =   try_match(ctx, "*") ? opMultiply
                      : try_match(ctx, "/") ? opDivide

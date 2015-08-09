@@ -98,6 +98,7 @@ const char* opKindGetStr (opKind kind) {
     case opGreaterEqual: return ">=";
     case opAdd: return "+";
     case opSubtract: return "-";
+    case opConcat: return "++";
     case opMultiply: return "*";
     case opDivide: return "/";
     case opModulo: return "%";

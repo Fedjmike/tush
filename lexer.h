@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <ctype.h>
+#include <hashmap.h>
 
 #include "common.h"
 #include "token.h"
@@ -28,7 +29,18 @@ static token lexerNext (lexerCtx* ctx);
 
 /*==== Inline implementations ====*/
 
+hashset lexerOps;
+
+static void lexerOpsInit (void);
+
 inline static lexerCtx lexerInit (const char* str) {
+    static bool opsInited = false;
+
+    if (!opsInited) {
+        lexerOpsInit();
+        opsInited = true;
+    }
+
     return (lexerCtx) {
         .input = str,
         .pos = 0,
@@ -165,9 +177,29 @@ inline static token lexerNext (lexerCtx* ctx) {
     /*"Word"*/
     default:
         lexerWord(ctx);
+
+        if (hashsetTest(&lexerOps, tok.buffer))
+            tok.kind = tokenOp;
     }
 
     ctx->buffer[ctx->length++] = 0;
 
     return tok;
 };
+
+static inline void lexerOpsInit (void) {
+    lexerOps = hashsetInit(1024, malloc);
+
+    static const char* ops[] = {
+        "|", "|>", "&&", "||",
+        "==", "!=", "<", "<=", ">", ">=",
+        /*No *, would override globs (todo)*/
+        "+", "-", "++",
+        "/", "%"
+    };
+
+    int opNo = sizeof(ops) / sizeof(*ops);
+
+    for (int i = 0; i < opNo; i++)
+        hashsetAdd(&lexerOps, ops[i]);
+}

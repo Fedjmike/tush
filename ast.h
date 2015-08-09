@@ -16,7 +16,7 @@ typedef enum opKind {
     opPipe, opWrite,
     opLogicalAnd, opLogicalOr,
     opEqual, opNotEqual, opLess, opLessEqual, opGreater, opGreaterEqual,
-    opAdd, opSubtract,
+    opAdd, opSubtract, opConcat,
     opMultiply, opDivide, opModulo
 } opKind;
 
