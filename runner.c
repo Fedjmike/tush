@@ -37,12 +37,27 @@ static value* runPipe (envCtx* env, const ast* node, value* arg, value* fn) {
         return valueCall(fn, arg);
 }
 
+static value* runConcat (envCtx* env, const ast* node, value* left, value* right) {
+    (void) env, (void) node;
+
+    vector(value*) lvec = valueGetVector(left),
+                   rvec = valueGetVector(right);
+
+    //todo opt.
+    vector(value*) result = vectorInit(lvec.length + rvec.length, malloc);
+    vectorPushFromVector(&result, lvec);
+    vectorPushFromVector(&result, rvec);
+
+    return valueCreateVector(result);
+}
+
 static value* runBOP (envCtx* env, const ast* node) {
     value *left = run(env, node->l),
           *right = run(env, node->r);
 
     switch (node->op) {
     case opPipe: return runPipe(env, node, left, right);
+    case opConcat: return runConcat(env, node, left, right);
 
     default:
         errprintf("Unhandled binary operator kind, %s\n", opKindGetStr(node->op));
