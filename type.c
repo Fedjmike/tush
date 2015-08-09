@@ -170,16 +170,31 @@ bool typeIsKind (type* dt, typeKind kind) {
     return dt->kind == kind;
 }
 
-static bool typeEquals (type* l, type* r) {
+bool typeIsEqual (type* l, type* r) {
     assert(l);
     assert(r);
 
-    if (l == r || typeIsInvalid(l) || typeIsInvalid(r))
+    if (l == r)
         return true;
 
-    else
-        //todo
+    else if (l->kind != r->kind)
         return false;
+
+    else {
+        switch (l->kind) {
+        case type_Fn:
+            return    typeIsEqual(l->from, r->from)
+                   && typeIsEqual(l->to, r->to);
+
+        case type_List:
+            return typeIsEqual(l->elements, r->elements);
+
+        default:
+            errprintf("Unhandled type kind, %s\n", typeGetStr(l));
+            return false;
+            //todo
+        }
+    }
 }
 
 bool typeIsFn (type* dt) {
@@ -188,7 +203,7 @@ bool typeIsFn (type* dt) {
 
 bool typeAppliesToFn (type* arg, type* fn) {
     assert(arg);
-    return fn->kind == type_Fn && typeEquals(fn->from, arg);
+    return fn->kind == type_Fn && typeIsEqual(fn->from, arg);
 }
 
 bool typeUnitAppliesToFn (type* fn) {

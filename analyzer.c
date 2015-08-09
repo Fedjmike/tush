@@ -67,12 +67,48 @@ static type* analyzePipe (analyzerCtx* ctx, ast* node, type* arg, type* fn) {
     return result;
 }
 
+static void errorConcatIsntList (analyzerCtx* ctx, bool left, type* operand) {
+    if (typeIsInvalid(operand))
+        return;
+
+    error(ctx)("%s operand, %s, of concat operator (++) is not a list\n",
+               left ? "Left" : "Right",
+               typeGetStr(operand));
+}
+
+static void errorConcatMismatch (analyzerCtx* ctx, type* left, type* right) {
+    if (typeIsInvalid(left) || typeIsInvalid(right))
+        return;
+
+    error(ctx)("Operands, %s and %s, of concat operator (++) do not match\n",
+               typeGetStr(left), typeGetStr(right));
+}
+
+static type* analyzeConcat (analyzerCtx* ctx, ast* node, type* left, type* right) {
+    (void) node;
+
+    if (!typeIsList(left))
+        errorConcatIsntList(ctx, true, left);
+
+    if (!typeIsList(right))
+        errorConcatIsntList(ctx, false, right);
+
+    if (typeIsEqual(left, right))
+        return left; //arbitrary
+
+    else {
+        errorConcatMismatch(ctx, left, right);
+        return typeInvalid(ctx->ts);
+    }
+}
+
 static type* analyzeBOP (analyzerCtx* ctx, ast* node) {
     type *left = analyzer(ctx, node->l),
          *right = analyzer(ctx, node->r);
 
     switch (node->op) {
     case opPipe: return analyzePipe(ctx, node, left, right);
+    case opConcat: return analyzeConcat(ctx, node, left, right);
 
     default:
         errprintf("Unhandled binary operator kind, %s\n", opKindGetStr(node->op));

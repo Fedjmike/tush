@@ -53,6 +53,8 @@ const char* typeGetStr (type* dt);
 bool typeIsInvalid (type* dt);
 bool typeIsKind (type* dt, typeKind kind);
 
+bool typeIsEqual (type* l, type* r);
+
 bool typeIsFn (type* dt);
 bool typeAppliesToFn (type* arg, type* fn);
 bool typeUnitAppliesToFn (type* fn);
