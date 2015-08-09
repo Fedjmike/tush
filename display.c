@@ -142,7 +142,7 @@ static void displayRegular (value* result, type* resultType) {
     valuePrint(result);
     printf(" :: %s\n", typeGetStr(resultType));
 
-    if (typeIsKind(resultType, type_File))
+    if (typeIsKind(type_File, resultType))
         displayFileStats(valueGetFilename(result));
 }
 
@@ -161,7 +161,7 @@ void displayResult (value* result, type* resultType) {
     if (valueIsInvalid(result))
         displayRegular(result, resultType);
 
-    else if (typeIsList(resultType) && typeIsKind(typeGetListElements(resultType), type_File))
+    else if (typeIsList(resultType) && typeIsKind(type_File, typeGetListElements(resultType)))
         displayFileList(result, resultType);
 
     else

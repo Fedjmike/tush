@@ -166,7 +166,7 @@ bool typeIsInvalid (type* dt) {
     return dt->kind == type_Invalid;
 }
 
-bool typeIsKind (type* dt, typeKind kind) {
+bool typeIsKind (typeKind kind, type* dt) {
     return dt->kind == kind;
 }
 
