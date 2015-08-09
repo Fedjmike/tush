@@ -129,6 +129,14 @@ static void displayFileList (value* result, type* resultType) {
     printf(" :: %s\n", typeGetStr(resultType));
 }
 
+static void displayRegular (value* result, type* resultType) {
+    valuePrint(result);
+    printf(" :: %s\n", typeGetStr(resultType));
+
+    if (typeIsKind(resultType, type_File))
+        displayFileStats(valueGetFilename(result));
+}
+
 void displayResult (value* result, type* resultType) {
     /*If the result is () -> 'a ...*/
     if (typeUnitAppliesToFn(resultType)) {
@@ -141,14 +149,12 @@ void displayResult (value* result, type* resultType) {
 
     /*Print the value and type*/
 
-    if (typeIsList(resultType) && typeIsKind(typeGetListElements(resultType), type_File))
+    if (valueIsInvalid(result))
+        displayRegular(result, resultType);
+
+    else if (typeIsList(resultType) && typeIsKind(typeGetListElements(resultType), type_File))
         displayFileList(result, resultType);
 
-    else {
-        valuePrint(result);
-        printf(" :: %s\n", typeGetStr(resultType));
-
-        if (typeIsKind(resultType, type_File))
-            displayFileStats(valueGetFilename(result));
-    }
+    else
+        displayRegular(result, resultType);
 }

@@ -36,7 +36,10 @@ static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
     else if (!typeIsFn(fn))
         error(ctx)("type %s is not a function\n", typeGetStr(fn));
 
-    else if (!typeIsInvalid(arg))
+    else if (typeIsInvalid(arg))
+        ;
+
+    else
         error(ctx)("type %s does not apply to function %s\n", typeGetStr(arg), typeGetStr(fn));
 }
 

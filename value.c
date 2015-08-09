@@ -116,6 +116,10 @@ const char* valueKindGetStr (valueKind kind) {
 
 /*==== Operations on values ====*/
 
+bool valueIsInvalid (const value* v) {
+    return v->kind == valueInvalid;
+}
+
 void valuePrint (const value* v) {
     switch (v->kind) {
     case valueUnit:

@@ -45,6 +45,8 @@ value* valueCreateInvalid (void);
 
 /*==== (Kind generic) Operations ====*/
 
+bool valueIsInvalid (const value* v);
+
 void valuePrint (const value* v);
 
 value* valueCall (const value* fn, value* arg);
