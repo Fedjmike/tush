@@ -42,37 +42,34 @@ static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
 
 /*---- Binary operators ----*/
 
-static type* analyzePipe (analyzerCtx* ctx, ast* node) {
-    type *arg = node->l->dt,
-         *fn = node->r->dt;
+static type* analyzePipe (analyzerCtx* ctx, ast* node, type* arg, type* fn) {
+    type* result;
 
-    type* result; {
-        if (typeAppliesToFn(arg, fn))
-            result = typeGetFnResult(fn);
+    if (typeAppliesToFn(arg, fn))
+        result = typeGetFnResult(fn);
 
-        /*If the parameter is a list, attempt to apply the function instead to
-          all of the elements individually.*/
-        else if (   typeIsList(arg)
-                 && typeAppliesToFn(typeGetListElements(arg), fn)) {
-            /*The result is a list of the results of all the calls*/
-            result = typeList(ctx->ts, typeGetFnResult(fn));
-            node->listApp = true;
+    /*If the parameter is a list, attempt to apply the function instead to
+      all of the elements individually.*/
+    else if (   typeIsList(arg)
+             && typeAppliesToFn(typeGetListElements(arg), fn)) {
+        /*The result is a list of the results of all the calls*/
+        result = typeList(ctx->ts, typeGetFnResult(fn));
+        node->listApp = true;
 
-        } else {
-            errorFnApp(ctx, arg, fn);
-            result = typeInvalid(ctx->ts);
-        }
+    } else {
+        errorFnApp(ctx, arg, fn);
+        result = typeInvalid(ctx->ts);
     }
 
     return result;
 }
 
 static type* analyzeBOP (analyzerCtx* ctx, ast* node) {
-    analyzer(ctx, node->l);
-    analyzer(ctx, node->r);
+    type *left = analyzer(ctx, node->l),
+         *right = analyzer(ctx, node->r);
 
     switch (node->op) {
-    case opPipe: return analyzePipe(ctx, node);
+    case opPipe: return analyzePipe(ctx, node, left, right);
 
     default:
         errprintf("Unhandled binary operator kind, %s\n", opKindGetStr(node->op));
