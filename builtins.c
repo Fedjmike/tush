@@ -1,8 +1,8 @@
-#include <sys/stat.h>
 #include <glob.h>
 
 #include <gc.h>
 #include <vector.h>
+#include <nicestat.h>
 
 #include "type.h"
 #include "value.h"
@@ -14,13 +14,13 @@ static value* builtinSize (const value* file) {
     if (!filename)
         return valueCreateInvalid();
 
-    struct stat st;
-    bool fail = stat(filename, &st);
+    stat_t st;
+    bool fail = nicestat(filename, &st);
 
     if (fail)
         return valueCreateInvalid();
 
-    return valueCreateInt(st.st_size);
+    return valueCreateInt(st.size);
 }
 
 static value* builtinZipf (const value* fn, const value* arg) {
