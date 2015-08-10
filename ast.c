@@ -78,6 +78,12 @@ ast* astCreateListLit (vector(ast*) elements) {
     });
 }
 
+ast* astCreateTupleLit (vector(ast*) elements) {
+    return astCreate(astTupleLit, (ast) {
+        .children = elements,
+    });
+}
+
 ast* astCreateInvalid (void) {
     return astCreate(astInvalid, (ast) {});
 }
@@ -118,6 +124,7 @@ const char* astKindGetStr (astKind kind) {
     case astFileLit: return "FileLit";
     case astGlobLit: return "GlobLit";
     case astListLit: return "ListLit";
+    case astTupleLit: return "TupleLit";
     case astInvalid: return "Invalid";
     case astKindNo: return "<KindNo; not real>";
     }

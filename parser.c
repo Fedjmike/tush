@@ -48,7 +48,7 @@ static bool isPathToken (const char* str) {
 }
 
 /**
- * Atom =   ( "(" [ Expr ] ")" )
+ * Atom =   ( "(" [ Expr [{ "," Expr }] ] ")" )
  *        | ( "[" [{ Expr }] "]" )
  *        | Path | <Str> | <Symbol>
  */
@@ -60,8 +60,20 @@ static ast* parseAtom (parserCtx* ctx) {
         if (see(ctx, ")"))
             node = astCreateUnitLit();
 
-        else
+        else {
             node = parseExpr(ctx);
+
+            /*Tuple literal*/
+            if (see(ctx, ",")) {
+                vector(ast*) nodes = vectorInit(3, malloc);
+                vectorPush(&nodes, node);
+
+                while (try_match(ctx, ","))
+                    vectorPush(&nodes, parseExpr(ctx));
+
+                node = astCreateTupleLit(nodes);
+            }
+        }
 
         match(ctx, ")");
 

@@ -47,6 +47,16 @@ static value* runListLit (envCtx* env, const ast* node) {
     return valueCreateVector(result);
 }
 
+static value* runTupleLit (envCtx* env, const ast* node) {
+    vector(value*) result = vectorInit(node->children.length, GC_malloc);
+
+    for_vector (ast* element, node->children, {
+        vectorPush(&result, run(env, element));
+    })
+
+    return valueCreateVector(result);
+}
+
 static value* runSymbol (envCtx* env, const ast* node) {
     (void) env;
     value* val = node->symbol->val;
@@ -129,7 +139,8 @@ value* run (envCtx* env, const ast* node) {
         [astStrLit] = runStrLit,
         [astFileLit] = runFileLit,
         [astGlobLit] = runGlobLit,
-        [astListLit] = runListLit
+        [astListLit] = runListLit,
+        [astTupleLit] = runTupleLit
     };
 
     handler_t handler;

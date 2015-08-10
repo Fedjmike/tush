@@ -81,20 +81,7 @@ type* typeList (typeSys* ts, type* elements) {
     return dt;
 }
 
-type* typeTuple (int arity, typeSys* ts, ...) {
-    va_list args;
-    va_start(args, ts);
-
-    vector(type*) types = vectorInit(arity, malloc);
-
-    /*Turn the arg list into a vector*/
-    for (int i = 0; i < arity; i++) {
-        type* dt = va_arg(args, type*);
-        vectorPush(&types, dt);
-    }
-
-    va_end(args);
-
+type* typeTuple (typeSys* ts, vector(type*) types) {
     type* dt = typeCreate(type_Tuple, (type) {
         .types = types
     });
@@ -151,6 +138,23 @@ type* typeFnChain (int kindNo, typeSys* ts, ...) {
     va_end(args);
 
     return result;
+}
+
+type* typeTupleChain (int arity, typeSys* ts, ...) {
+    va_list args;
+    va_start(args, ts);
+
+    vector(type*) types = vectorInit(arity, malloc);
+
+    /*Turn the arg list into a vector*/
+    for (int i = 0; i < arity; i++) {
+        type* dt = va_arg(args, type*);
+        vectorPush(&types, dt);
+    }
+
+    va_end(args);
+
+    return typeTuple(ts, types);
 }
 
 const char* typeGetStr (type* dt) {

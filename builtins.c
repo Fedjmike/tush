@@ -73,7 +73,7 @@ void addBuiltins (typeSys* ts, sym* global) {
                /*(File -> Integer) -> File -> (File, Integer)*/
                typeFn(ts, typeFnChain(2, ts, type_File, type_Integer),
                           typeFn(ts, typeFile(ts),
-                                     typeTuple(2, ts, typeFile(ts),
-                                                      typeInteger(ts)))),
+                                     typeTupleChain(2, ts, typeFile(ts),
+                                                           typeInteger(ts)))),
                valueCreateFn(builtinZipfCurried));
 }
