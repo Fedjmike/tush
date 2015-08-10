@@ -73,10 +73,6 @@ static void displayFileStats (const char* filename) {
     printf(")\n");
 }
 
-static int intdiv_roundup (int dividend, int divisor) {
-    return (dividend - 1) / divisor + 1;
-}
-
 static unsigned int getWindowWidth (void) {
     struct winsize size;
     ioctl(0, TIOCGWINSZ, &size);
