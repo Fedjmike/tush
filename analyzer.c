@@ -29,6 +29,55 @@ static type* analyzeInvalid (analyzerCtx* ctx, ast* node) {
     return typeInvalid(ctx->ts);
 }
 
+static type* analyzeUnitLit (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeUnitary(ctx->ts, type_Unit);
+}
+
+static type* analyzeStrLit (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeUnitary(ctx->ts, type_Str);
+}
+
+static type* analyzeFileLit (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeFile(ctx->ts);
+}
+
+static type* analyzeGlobLit (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeList(ctx->ts, typeFile(ctx->ts));
+}
+
+static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
+    //todo 'a List
+    assert(node->children.length != 0);
+
+    type* elements;
+
+    for (int i = 0; i < node->children.length; i++) {
+        ast* element = vectorGet(node->children, i);
+        elements = analyzer(ctx, element);
+
+        //todo check equality
+        //mode average if they differ
+        //todo lowest common interface ?
+    })
+
+    return typeList(ctx->ts, elements);
+}
+
+static type* analyzeSymbol (analyzerCtx* ctx, ast* node) {
+    if (node->symbol && node->symbol->dt)
+        return node->symbol->dt;
+
+    else {
+        errprintf("Untyped symbol, %p %s\n", node->symbol,
+                  node->symbol ? node->symbol->name : "");
+        return typeInvalid(ctx->ts);
+    }
+}
+
 static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
     if (typeIsInvalid(fn))
         ;
@@ -41,6 +90,26 @@ static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
 
     else
         error(ctx)("type %s does not apply to function %s\n", typeGetStr(arg), typeGetStr(fn));
+}
+
+static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
+    type* result = analyzer(ctx, node->r);
+
+    /*Successively apply each argument to the previous result*/
+    for (int i = 0; i < node->children.length; i++) {
+        ast* argNode = vectorGet(node->children, i);
+        type* arg = analyzer(ctx, argNode);
+
+        if (typeAppliesToFn(arg, result))
+            result = typeGetFnResult(result);
+
+        else {
+            errorFnApp(ctx, arg, result);
+            result = typeInvalid(ctx->ts);
+        }
+    }
+
+    return result;
 }
 
 /*---- Binary operators ----*/
@@ -118,87 +187,19 @@ static type* analyzeBOP (analyzerCtx* ctx, ast* node) {
 
 /*---- End of binary operators ----*/
 
-static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
-    type* result = analyzer(ctx, node->r);
-
-    for (int i = 0; i < node->children.length; i++) {
-        ast* argNode = vectorGet(node->children, i);
-        type* arg = analyzer(ctx, argNode);
-
-        if (typeAppliesToFn(arg, result))
-            result = typeGetFnResult(result);
-
-        else {
-            errorFnApp(ctx, arg, result);
-            result = typeInvalid(ctx->ts);
-        }
-    }
-
-    return result;
-}
-
-static type* analyzeSymbol (analyzerCtx* ctx, ast* node) {
-    if (node->symbol && node->symbol->dt)
-        return node->symbol->dt;
-
-    else {
-        errprintf("Untyped symbol, %p %s\n", node->symbol,
-                  node->symbol ? node->symbol->name : "");
-        return typeInvalid(ctx->ts);
-    }
-}
-
-static type* analyzeUnitLit (analyzerCtx* ctx, ast* node) {
-    (void) node;
-    return typeUnitary(ctx->ts, type_Unit);
-}
-
-static type* analyzeStrLit (analyzerCtx* ctx, ast* node) {
-    (void) node;
-    return typeUnitary(ctx->ts, type_Str);
-}
-
-static type* analyzeFileLit (analyzerCtx* ctx, ast* node) {
-    (void) node;
-    return typeFile(ctx->ts);
-}
-
-static type* analyzeGlobLit (analyzerCtx* ctx, ast* node) {
-    (void) node;
-    return typeList(ctx->ts, typeFile(ctx->ts));
-}
-
-static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
-    //todo 'a List
-    assert(node->children.length != 0);
-
-    type* elements;
-
-    for (int i = 0; i < node->children.length; i++) {
-        ast* element = vectorGet(node->children, i);
-        elements = analyzer(ctx, element);
-
-        //todo check equality
-        //mode average if they differ
-        //todo lowest common interface ?
-    }
-
-    return typeList(ctx->ts, elements);
-}
-
 static type* analyzer (analyzerCtx* ctx, ast* node) {
     typedef type* (*handler_t)(analyzerCtx*, ast*);
 
     static handler_t table[astKindNo] = {
         [astInvalid] = analyzeInvalid,
-        [astBOP] = analyzeBOP,
-        [astFnApp] = analyzeFnApp,
-        [astSymbol] = analyzeSymbol,
         [astUnitLit] = analyzeUnitLit,
         [astStrLit] = analyzeStrLit,
         [astFileLit] = analyzeFileLit,
         [astGlobLit] = analyzeGlobLit,
-        [astListLit] = analyzeListLit
+        [astListLit] = analyzeListLit,
+        [astSymbol] = analyzeSymbol,
+        [astFnApp] = analyzeFnApp,
+        [astBOP] = analyzeBOP
     };
 
     if (!node) {

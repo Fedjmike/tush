@@ -14,6 +14,59 @@ static value* runInvalid (envCtx* env, const ast* node) {
     return valueCreateInvalid();
 }
 
+static value* runUnitLit (envCtx* env, const ast* node) {
+    (void) env, (void) node;
+    return valueCreateUnit();
+}
+
+static value* runStrLit (envCtx* env, const ast* node) {
+    (void) env;
+
+    return valueCreateStr(node->literal.str);
+}
+
+static value* runFileLit (envCtx* env, const ast* node) {
+    (void) env;
+
+    return valueCreateFile(node->literal.str);
+}
+
+static value* runGlobLit (envCtx* env, const ast* node) {
+    (void) env;
+
+    return builtinExpandGlob(node->literal.str, valueCreateUnit());
+}
+
+static value* runListLit (envCtx* env, const ast* node) {
+    vector(value*) result = vectorInit(node->children.length, GC_malloc);
+
+    for (int i = 0; i < node->children.length; i++) {
+        ast* element = vectorGet(node->children, i);
+        vectorPush(&result, run(env, element));
+    }
+
+    return valueCreateVector(result);
+}
+
+static value* runSymbol (envCtx* env, const ast* node) {
+    (void) env;
+    value* val = node->symbol->val;
+    return val ? val : valueCreateInvalid();
+}
+
+static value* runFnApp (envCtx* env, const ast* node) {
+    value* result = run(env, node->r);
+
+    for (int i = 0; i < node->children.length; i++) {
+        ast* argNode = vectorGet(node->children, i);
+        value* arg = run(env, argNode);
+
+        result = valueCall(result, arg);
+    }
+
+    return result;
+}
+
 /*---- Binary operators ----*/
 
 static value* runPipe (envCtx* env, const ast* node, const value* arg, const value* fn) {
@@ -66,59 +119,6 @@ static value* runBOP (envCtx* env, const ast* node) {
 }
 
 /*---- End of binary operators ----*/
-
-static value* runFnApp (envCtx* env, const ast* node) {
-    value* result = run(env, node->r);
-
-    for (int i = 0; i < node->children.length; i++) {
-        ast* argNode = vectorGet(node->children, i);
-        value* arg = run(env, argNode);
-
-        result = valueCall(result, arg);
-    }
-
-    return result;
-}
-
-static value* runSymbol (envCtx* env, const ast* node) {
-    (void) env;
-    value* val = node->symbol->val;
-    return val ? val : valueCreateInvalid();
-}
-
-static value* runUnitLit (envCtx* env, const ast* node) {
-    (void) env, (void) node;
-    return valueCreateUnit();
-}
-
-static value* runStrLit (envCtx* env, const ast* node) {
-    (void) env;
-
-    return valueCreateStr(node->literal.str);
-}
-
-static value* runFileLit (envCtx* env, const ast* node) {
-    (void) env;
-
-    return valueCreateFile(node->literal.str);
-}
-
-static value* runGlobLit (envCtx* env, const ast* node) {
-    (void) env;
-
-    return builtinExpandGlob(node->literal.str, valueCreateUnit());
-}
-
-static value* runListLit (envCtx* env, const ast* node) {
-    vector(value*) result = vectorInit(node->children.length, GC_malloc);
-
-    for (int i = 0; i < node->children.length; i++) {
-        ast* element = vectorGet(node->children, i);
-        vectorPush(&result, run(env, element));
-    }
-
-    return valueCreateVector(result);
-}
 
 value* run (envCtx* env, const ast* node) {
     typedef value* (*handler_t)(envCtx*, const ast*);
