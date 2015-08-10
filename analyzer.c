@@ -55,8 +55,7 @@ static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
 
     type* elements;
 
-    for (int i = 0; i < node->children.length; i++) {
-        ast* element = vectorGet(node->children, i);
+    for_vector (ast* element, node->children, {
         elements = analyzer(ctx, element);
 
         //todo check equality
@@ -96,8 +95,7 @@ static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
     type* result = analyzer(ctx, node->r);
 
     /*Successively apply each argument to the previous result*/
-    for (int i = 0; i < node->children.length; i++) {
-        ast* argNode = vectorGet(node->children, i);
+    for_vector (ast* argNode, node->children, {
         type* arg = analyzer(ctx, argNode);
 
         if (typeAppliesToFn(arg, result))
@@ -107,7 +105,7 @@ static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
             errorFnApp(ctx, arg, result);
             result = typeInvalid(ctx->ts);
         }
-    }
+    })
 
     return result;
 }

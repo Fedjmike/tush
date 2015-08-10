@@ -25,10 +25,9 @@ static void printer (printerCtx* ctx, const ast* node);
 /*==== ====*/
 
 static void printChildren (printerCtx* ctx, const ast* node) {
-    for (int i = 0; i < node->children.length; i++) {
-        ast* child = vectorGet(node->children, i);
+    for_vector (ast* child, node->children, {
         printer(ctx, child);
-    }
+    })
 }
 
 static void printLR (printerCtx* ctx, const ast* node) {

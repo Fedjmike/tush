@@ -40,10 +40,9 @@ static value* runGlobLit (envCtx* env, const ast* node) {
 static value* runListLit (envCtx* env, const ast* node) {
     vector(value*) result = vectorInit(node->children.length, GC_malloc);
 
-    for (int i = 0; i < node->children.length; i++) {
-        ast* element = vectorGet(node->children, i);
+    for_vector (ast* element, node->children, {
         vectorPush(&result, run(env, element));
-    }
+    })
 
     return valueCreateVector(result);
 }
@@ -57,12 +56,10 @@ static value* runSymbol (envCtx* env, const ast* node) {
 static value* runFnApp (envCtx* env, const ast* node) {
     value* result = run(env, node->r);
 
-    for (int i = 0; i < node->children.length; i++) {
-        ast* argNode = vectorGet(node->children, i);
+    for_vector (ast* argNode, node->children, {
         value* arg = run(env, argNode);
-
         result = valueCall(result, arg);
-    }
+    })
 
     return result;
 }

@@ -95,14 +95,13 @@ static void displayFileList (value* result, type* resultType) {
 
     size_t columnWidth = 0;
 
-    for (int i = 0; i < names.length; i++) {
-        const char* name = vectorGet(names, i);
+    for_vector (const char* name, names, {
         //todo strlen -> str actual column width
         size_t namelen = strlen(name);
 
         if (columnWidth < namelen)
             columnWidth = namelen;
-    }
+    })
 
     /*Work out the dimensions of the grid*/
 
