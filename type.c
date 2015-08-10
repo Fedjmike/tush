@@ -144,8 +144,10 @@ const char* typeGetStr (type* dt) {
         const char *from = typeGetStr(dt->from),
                    *to = typeGetStr(dt->to);
 
-        dt->str = malloc(strlen(from) + 4 + strlen(to) + 1);
-        sprintf(dt->str, "%s -> %s", from, to);
+        bool higherOrderFn = dt->from->kind == type_Fn;
+
+        dt->str = malloc((higherOrderFn ? 2 : 0) + strlen(from) + 4 + strlen(to) + 1);
+        sprintf(dt->str, higherOrderFn ? "(%s) -> %s" : "%s -> %s", from, to);
         return dt->str;
     }
 
