@@ -23,6 +23,18 @@ static value* builtinSize (const value* file) {
     return valueCreateInt(st.size);
 }
 
+static value* builtinSum (const value* numbers) {
+    int64_t total = 0;
+
+    //todo adapt for Number, when it exists
+
+    for_vector (value* number, valueGetVector(numbers), {
+        total += valueGetInt(number);
+    })
+
+    return valueCreateInt(total);
+}
+
 static value* builtinZipf (const value* fn, const value* arg) {
     const value *first = arg,
                 *second = valueCall(fn, arg);
@@ -68,6 +80,10 @@ void addBuiltins (typeSys* ts, sym* global) {
     addBuiltin(global, "size",
                typeFnChain(2, ts, type_File, type_Integer),
                valueCreateFn(builtinSize));
+
+    addBuiltin(global, "sum",
+               typeFn(ts, typeList(ts, typeInteger(ts)), typeInteger(ts)),
+               valueCreateFn(builtinSum));
 
     addBuiltin(global, "zipf",
                /*(File -> Integer) -> File -> (File, Integer)*/

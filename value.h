@@ -52,6 +52,8 @@ bool valueIsInvalid (const value* v);
 int valueGetWidthOfStr (const value* v);
 int valuePrint (const value* v);
 
+int64_t valueGetInt (const value* num);
+
 value* valueCall (const value* fn, const value* arg);
 
 const char* valueGetFilename (const value* file);

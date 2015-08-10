@@ -170,6 +170,11 @@ int valuePrint (const value* v) {
     return valuePrintImpl(v, printf);
 }
 
+int64_t valueGetInt (const value* num) {
+    assert(num->kind == valueInt);
+    return num->integer;
+}
+
 value* valueCall (const value* fn, const value* arg) {
     switch (fn->kind) {
     case valueFn:
