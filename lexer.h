@@ -129,7 +129,7 @@ inline static void lexerWord (lexerCtx* ctx) {
 
         break;
         case '}':
-            if (!depths[brace]-- == 0)
+            if (depths[brace]-- == 0)
                 exit = true;
 
         break;
