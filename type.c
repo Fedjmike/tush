@@ -281,3 +281,8 @@ type* typeGetListElements (type* dt) {
     assert(typeIsList(dt));
     return dt->elements;
 }
+
+vector(const type*) typeGetTupleTypes (type* dt) {
+    assert(typeIsKind(type_Tuple, dt));
+    return dt->types;
+}

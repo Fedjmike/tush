@@ -63,3 +63,5 @@ type* typeGetFnResult (type* fn);
 
 bool typeIsList (type* dt);
 type* typeGetListElements (type* dt);
+
+vector(const type*) typeGetTupleTypes (type* dt);
