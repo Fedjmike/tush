@@ -197,6 +197,10 @@ void displayResult (value* result, type* resultType) {
     else if (typeIsList(resultType)) {
         type* elements = typeGetListElements(resultType);
 
+        /*Display empty or singular iterables the normal way instead one of the following*/
+        if (valueGetVector(result).length <= 1)
+            displayRegular(result, resultType);
+
         /* [File] -- File lists are displayed in an autocomplete-like grid*/
         else if (typeIsKind(type_File, elements))
             displayFileList(result, resultType);
