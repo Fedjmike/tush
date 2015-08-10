@@ -108,7 +108,11 @@ void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
     free(wdir_contr);
 }
 
+const char* historyFilename = ".gosh_history";
+
 void repl (compilerCtx* compiler) {
+    read_history(".gosh_history");
+
     const char* homedir = getHomeDir();
 
     promptCtx prompt = {.size = 1024};
@@ -124,9 +128,12 @@ void repl (compilerCtx* compiler) {
             continue;
 
         add_history(input);
+        write_history(".gosh_history");
 
         gosh(compiler, input);
     }
+
+    free(prompt.str);
 }
 
 /*==== ====*/
