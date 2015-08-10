@@ -23,8 +23,8 @@ typedef struct value {
         value* (*fnptr)(const value*);
         /*SimpleClosure*/
         struct {
-            value* (*simpleClosure)(void* env, const value*);
-            void* simpleEnv;
+            value* (*simpleClosure)(const void* env, const value*);
+            const void* simpleEnv;
         };
         /*File*/
         char* filename;
@@ -70,7 +70,7 @@ value* valueCreateFn (value* (*fnptr)(const value*)) {
     });
 }
 
-value* valueCreateSimpleClosure (void* env, value* (*fnptr)(void* env, const value* arg)) {
+value* valueCreateSimpleClosure (const void* env, simpleClosureFn fnptr) {
     return valueCreate(valueSimpleClosure, (value) {
         .simpleClosure = fnptr, .simpleEnv = env
     });

@@ -29,14 +29,14 @@ typedef struct valueIter {
   This is just a normal allocation that gets scanned for GC object
   references.*/
 
-typedef value* (*simpleClosureFn)(void* env, const value* arg);
+typedef value* (*simpleClosureFn)(const void* env, const value* arg);
 
 value* valueCreateUnit (void);
 value* valueCreateInt (int integer);
 value* valueCreateStr (char* str);
 value* valueCreateFn (value* (*fnptr)(const value*));
 /*Takes ownership of the environment, which must be GC allocated*/
-value* valueCreateSimpleClosure (void* env, simpleClosureFn fnptr);
+value* valueCreateSimpleClosure (const void* env, simpleClosureFn fnptr);
 value* valueCreateFile (const char* filename);
 /*Takes ownership of the vector and its elements. Therefore, they must
   have been allocated using the garbage collector.*/
