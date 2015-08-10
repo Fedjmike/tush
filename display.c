@@ -80,6 +80,11 @@ static unsigned int getWindowWidth (void) {
     return size.ws_col;
 }
 
+static void displayRegular (value* result, type* resultType) {
+    valuePrint(result);
+    printf(" :: %s\n", typeGetStr(resultType));
+}
+
 /*Display a list of files as a grid of names, going down the rows
   first and then wrapping up to the next column.*/
 static void displayFileList (value* result, type* resultType) {
@@ -171,14 +176,6 @@ static void displayTable (value* result, type* resultType) {
     printf(" :: %s\n", typeGetStr(resultType));
 }
 
-static void displayRegular (value* result, type* resultType) {
-    valuePrint(result);
-    printf(" :: %s\n", typeGetStr(resultType));
-
-    if (typeIsKind(type_File, resultType))
-        displayFileStats(valueGetFilename(result));
-}
-
 void displayResult (value* result, type* resultType) {
     /*If the result is () -> 'a ...*/
     if (typeUnitAppliesToFn(resultType)) {
@@ -212,6 +209,10 @@ void displayResult (value* result, type* resultType) {
         else
             displayRegular(result, resultType);
 
-    } else
+    } else {
         displayRegular(result, resultType);
+
+        if (typeIsKind(type_File, resultType))
+            displayFileStats(valueGetFilename(result));
+    }
 }
