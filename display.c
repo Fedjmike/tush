@@ -194,14 +194,20 @@ void displayResult (value* result, type* resultType) {
     if (valueIsInvalid(result))
         displayRegular(result, resultType);
 
-    /* [File] -- File lists are displayed in an autocomplete-like grid*/
-    else if (typeIsList(resultType) && typeIsKind(type_File, typeGetListElements(resultType)))
-        displayFileList(result, resultType);
+    else if (typeIsList(resultType)) {
+        type* elements = typeGetListElements(resultType);
 
-    /* [('a, 'b, ...)] -- A table */
-    else if (typeIsList(resultType) && typeIsKind(type_Tuple, typeGetListElements(resultType)))
-        displayTable(result, resultType);
+        /* [File] -- File lists are displayed in an autocomplete-like grid*/
+        else if (typeIsKind(type_File, elements))
+            displayFileList(result, resultType);
 
-    else
+        /* [('a, 'b, ...)] -- A table */
+        else if (typeIsKind(type_Tuple, elements))
+            displayTable(result, resultType);
+
+        else
+            displayRegular(result, resultType);
+
+    } else
         displayRegular(result, resultType);
 }
