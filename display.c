@@ -137,6 +137,46 @@ static void displayFileList (value* result, type* resultType) {
     printf(" :: %s\n", typeGetStr(resultType));
 }
 
+/*Display a tuple list as a table
+  (because they are tuples, the result is square*/
+static void displayTable (value* result, type* resultType) {
+    /*result :: ['tuple]*/
+    type* tuple = typeGetListElements(resultType);
+
+    int columns = typeGetTupleTypes(tuple).length;
+
+    /*Note: VLA*/
+    size_t columnWidths[columns];
+    memset(columnWidths, 0, sizeof(columnWidths));
+
+    /*Find the max size of any value for each column*/
+    for_vector (value* inner, valueGetVector(result), {
+        for_vector_indexed (col, value* item, valueGetVector(inner), {
+            size_t width = valueGetWidthOfStr(item);
+
+            if (columnWidths[col] < width)
+                columnWidths[col] = width;
+        })
+    })
+
+    enum {gap = 2};
+
+    /*Print it*/
+    
+    for_vector (value* inner, valueGetVector(result), {
+        for_vector_indexed (col, value* item, valueGetVector(inner), {
+            size_t width = valuePrint(item);
+
+            size_t padding = columnWidths[col] + gap - width;
+            putnchar(' ', padding);
+        })
+
+        putchar('\n');
+    })
+
+    printf(" :: %s\n", typeGetStr(resultType));
+}
+
 static void displayRegular (value* result, type* resultType) {
     valuePrint(result);
     printf(" :: %s\n", typeGetStr(resultType));
@@ -160,8 +200,13 @@ void displayResult (value* result, type* resultType) {
     if (valueIsInvalid(result))
         displayRegular(result, resultType);
 
+    /* [File] -- File lists are displayed in an autocomplete-like grid*/
     else if (typeIsList(resultType) && typeIsKind(type_File, typeGetListElements(resultType)))
         displayFileList(result, resultType);
+
+    /* [('a, 'b, ...)] -- A table */
+    else if (typeIsList(resultType) && typeIsKind(type_Tuple, typeGetListElements(resultType)))
+        displayTable(result, resultType);
 
     else
         displayRegular(result, resultType);
