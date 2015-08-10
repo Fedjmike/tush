@@ -47,7 +47,10 @@ value* valueCreateInvalid (void);
 
 bool valueIsInvalid (const value* v);
 
-void valuePrint (const value* v);
+/*Both of these return the width of the string representation of a value.
+  valuePrint actually prints it.*/
+int valueGetWidthOfStr (const value* v);
+int valuePrint (const value* v);
 
 value* valueCall (const value* fn, const value* arg);
 

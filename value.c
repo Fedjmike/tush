@@ -120,53 +120,60 @@ bool valueIsInvalid (const value* v) {
     return v->kind == valueInvalid;
 }
 
-void valuePrint (const value* v) {
+int valuePrintImpl (const value* v, bool dryrun) {
     switch (v->kind) {
     case valueUnit:
-        printf("()");
-        return;
+        return dryrun ? 2 : printf("()");
 
     case valueInt:
-        printf("%ld", v->integer);
-        return;
+        return dryrun ? intlen(v->integer)
+                      : printf("%ld", v->integer);
 
     case valueStr:
-        printf("\"%s\"", v->str);
-        return;
+        return dryrun ? strlen(v->str) + 2
+                      : printf("\"%s\"", v->str);
 
     case valueFn:
-        printf("<fn at %p>", v->fnptr);
-        return;
+        //todo implement
+        assert(!dryrun);
+        return dryrun ? 0 : printf("<fn at %p>", v->fnptr);
 
     case valueSimpleClosure:
-        printf("<fn at %p with env. %p>", v->simpleClosure, v->simpleEnv);
-        return;
+        //todo implement
+        assert(!dryrun);
+        return dryrun ? 0 : printf("<fn at %p with env. %p>", v->simpleClosure, v->simpleEnv);
 
     case valueFile:
-        printf("%s", v->filename);
-        return;
+        return dryrun ? strlen(v->filename) : printf("%s", v->filename);
 
     case valueVector: {
-        printf("[");
+        int length = dryrun ? 1 : printf("[");
 
         for (int i = 0; i < v->vec.length; i++) {
             if (i != 0)
-                printf(", ");
+                length += dryrun ? 2 : printf(", ");
 
             value* element = vectorGet(v->vec, i);
-            valuePrint(element);
+            length += valuePrintImpl(element, dryrun);
         }
 
-        printf("]");
-        return;
+        return length += dryrun ? 1 : printf("]");
     }
 
     case valueInvalid:
-        printf("<invalid>");
-        return;
+        return (dryrun ? strlen : (__typeof__(&strlen)) printf)("<invalid>");
     }
 
     errprintf("Unhandled value kind, %s\n", valueKindGetStr(v->kind));
+    return 0;
+}
+
+int valueGetWidthOfStr (const value* v) {
+    return valuePrintImpl(v, true);
+}
+
+int valuePrint (const value* v) {
+    return valuePrintImpl(v, false);
 }
 
 value* valueCall (const value* fn, const value* arg) {
