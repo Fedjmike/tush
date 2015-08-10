@@ -124,9 +124,7 @@ static void displayFileList (value* result, type* resultType) {
 
             size_t namelen = printf("%s", name);
             size_t padding = columnWidth-namelen;
-
-            for (unsigned int i = 0; i < padding; i++)
-                putchar(' ');
+            putnchar(' ', padding);
         }
 
         printf("\n");
