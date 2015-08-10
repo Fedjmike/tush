@@ -7,7 +7,7 @@ typedef enum typeKind {
     type_Integer, type_Number,
     type_Str,
     type_File,
-    type_Fn, type_List,
+    type_Fn, type_List, type_Tuple,
     type_Invalid,
     type_KindNo
 } typeKind;
@@ -37,6 +37,7 @@ type* typeInteger (typeSys* ts);
 type* typeFile (typeSys* ts);
 type* typeFn (typeSys* ts, type* from, type* to);
 type* typeList (typeSys* ts, type* elements);
+type* typeTuple (int arity, typeSys* ts, ...);
 
 type* typeInvalid (typeSys* ts);
 

@@ -15,6 +15,8 @@ typedef struct type {
         };
         /*List*/
         type* elements;
+        /*Tuple*/
+        vector(type*) types;
     };
 
     /*Not used by all types
@@ -24,7 +26,7 @@ typedef struct type {
 
 
 static bool typeKindIsntUnitary (typeKind kind) {
-    return kind == type_Fn || kind == type_List;
+    return kind == type_Fn || kind == type_List || kind == type_Tuple;
 }
 
 /*==== Type ctors and dtors ====*/
@@ -38,6 +40,9 @@ static type* typeCreate (typeKind kind, type init) {
 }
 
 static void typeDestroy (type* dt) {
+    if (dt->kind == type_Tuple)
+        vectorFree(&dt->types);
+
     free(dt->str);
     free(dt);
 }
@@ -71,6 +76,27 @@ type* typeFn (typeSys* ts, type* from, type* to) {
 type* typeList (typeSys* ts, type* elements) {
     type* dt = typeCreate(type_List, (type) {
         .elements = elements
+    });
+    vectorPush(&ts->others, dt);
+    return dt;
+}
+
+type* typeTuple (int arity, typeSys* ts, ...) {
+    va_list args;
+    va_start(args, ts);
+
+    vector(type*) types = vectorInit(arity, malloc);
+
+    /*Turn the arg list into a vector*/
+    for (int i = 0; i < arity; i++) {
+        type* dt = va_arg(args, type*);
+        vectorPush(&types, dt);
+    }
+
+    va_end(args);
+
+    type* dt = typeCreate(type_Tuple, (type) {
+        .types = types
     });
     vectorPush(&ts->others, dt);
     return dt;
@@ -155,6 +181,36 @@ const char* typeGetStr (type* dt) {
         const char* elements = typeGetStr(dt->elements);
         dt->str = malloc(strlen(elements) + 2 + 1);
         sprintf(dt->str, "[%s]", elements);
+        return dt->str;
+    }
+
+    case type_Tuple: {
+        vector(const char*) typeStrs = vectorInit(dt->types.length, malloc);
+        int length = 0;
+
+        /*Work out the length of all the subtypes and store their strings*/
+        for_vector (type* dt, dt->types, {
+            const char* typeStr = typeGetStr(dt);
+            length += strlen(typeStr) + 2;
+            vectorPush(&typeStrs, typeStr);
+        })
+
+        length += 3;
+        dt->str = malloc(length);
+        strcpy(dt->str, "(");
+
+        bool first = true;
+        int pos = 1;
+
+        for_vector(const char* typeStr, typeStrs, {
+            pos += snprintf(dt->str+pos, length-pos, first ? "%s" : ", %s", typeStr);
+            first = false;
+        })
+
+        strcpy(dt->str+pos, ")");
+
+        vectorFree(&typeStrs);
+
         return dt->str;
     }
     }
