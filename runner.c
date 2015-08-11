@@ -19,6 +19,12 @@ static value* runUnitLit (envCtx* env, const ast* node) {
     return valueCreateUnit();
 }
 
+static value* runIntLit (envCtx* env, const ast* node) {
+    (void) env;
+
+    return valueCreateInt(node->literal.integer);
+}
+
 static value* runStrLit (envCtx* env, const ast* node) {
     (void) env;
 
@@ -136,6 +142,7 @@ value* run (envCtx* env, const ast* node) {
         [astFnApp] = runFnApp,
         [astSymbol] = runSymbol,
         [astUnitLit] = runUnitLit,
+        [astIntLit] = runIntLit,
         [astStrLit] = runStrLit,
         [astFileLit] = runFileLit,
         [astGlobLit] = runGlobLit,

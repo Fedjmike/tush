@@ -89,6 +89,10 @@ static ast* parseAtom (parserCtx* ctx) {
 
         match(ctx, "]");
 
+    } else if (see_kind(ctx, tokenIntLit)) {
+        node = astCreateIntLit(atoi(ctx->current.buffer));
+        accept(ctx);
+
     } else if (see_kind(ctx, tokenStrLit)) {
         node = astCreateStrLit(ctx->current.buffer);
         accept(ctx);

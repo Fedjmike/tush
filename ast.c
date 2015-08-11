@@ -54,6 +54,12 @@ ast* astCreateUnitLit (void) {
     return astCreate(astUnitLit, (ast) {});
 }
 
+ast* astCreateIntLit (int64_t integer) {
+    return astCreate(astIntLit, (ast) {
+        .literal.integer = integer,
+    });
+}
+
 ast* astCreateStrLit (const char* str) {
     return astCreate(astStrLit, (ast) {
         .literal.str = strdup(str),
@@ -120,6 +126,7 @@ const char* astKindGetStr (astKind kind) {
     case astFnApp: return "FnApp";
     case astSymbol: return "Symbol";
     case astUnitLit: return "UnitLit";
+    case astIntLit: return "IntLit";
     case astStrLit: return "StrLit";
     case astFileLit: return "FileLit";
     case astGlobLit: return "GlobLit";

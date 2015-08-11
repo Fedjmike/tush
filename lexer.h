@@ -97,7 +97,27 @@ inline static tokenKind lexerCharOrStr (lexerCtx* ctx) {
     return quote == '"' ? tokenStrLit : tokenCharLit;
 }
 
-inline static void lexerWord (lexerCtx* ctx) {
+inline static tokenKind lexerWord (lexerCtx* ctx) {
+    /*Eat while digit*/
+    while (isdigit(lexerCurrent(ctx)) && !lexerEOF(ctx))
+        lexerEat(ctx);
+
+    /*If that's the end of the token, then it's an integer literal*/
+
+    switch (lexerCurrent(ctx)) {
+    case '[': case ']':
+    case '{': case '}':
+    case '(': case ')':
+    case '"': case '\'':
+    case '\n': case '\r':
+    case '\t': case ' ':
+    case '`': case ',':
+        return tokenIntLit;
+    }
+
+    if (lexerEOF(ctx))
+        return tokenIntLit;
+
     bool exit = false;
 
     /*Words can contain matching brackets and braces,
@@ -145,6 +165,8 @@ inline static void lexerWord (lexerCtx* ctx) {
             exit = true;
         }
     } while (!exit && !lexerEOF(ctx));
+
+    return tokenNormal;
 }
 
 inline static token lexerNext (lexerCtx* ctx) {
@@ -180,7 +202,7 @@ inline static token lexerNext (lexerCtx* ctx) {
     break;
     /*"Word"*/
     default:
-        lexerWord(ctx);
+        tok.kind = lexerWord(ctx);
     }
 
     ctx->buffer[ctx->length++] = 0;

@@ -6,7 +6,7 @@
 
 typedef enum astKind {
     astBOP, astFnApp, astSymbol,
-    astUnitLit, astStrLit, astFileLit, astGlobLit, astListLit, astTupleLit,
+    astUnitLit, astIntLit, astStrLit, astFileLit, astGlobLit, astListLit, astTupleLit,
     astInvalid,
     astKindNo
 } astKind;
@@ -33,6 +33,8 @@ typedef struct ast {
 
     union {
         union {
+            /*IntLit*/
+            int64_t integer;
             /*StrLit FileLit GlobLit*/
             char* str;
         } literal;
@@ -50,6 +52,7 @@ ast* astCreateFnApp (vector(ast*) args, ast* fn);
 ast* astCreateSymbol (sym* symbol);
 
 ast* astCreateUnitLit (void);
+ast* astCreateIntLit (int64_t integer);
 ast* astCreateStrLit (const char* str);
 ast* astCreateFileLit (const char* str);
 ast* astCreateGlobLit (const char* str);

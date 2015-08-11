@@ -34,6 +34,11 @@ static type* analyzeUnitLit (analyzerCtx* ctx, ast* node) {
     return typeUnitary(ctx->ts, type_Unit);
 }
 
+static type* analyzeIntLit (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeUnitary(ctx->ts, type_Integer);
+}
+
 static type* analyzeStrLit (analyzerCtx* ctx, ast* node) {
     (void) node;
     return typeUnitary(ctx->ts, type_Str);
@@ -203,6 +208,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
     static handler_t table[astKindNo] = {
         [astInvalid] = analyzeInvalid,
         [astUnitLit] = analyzeUnitLit,
+        [astIntLit] = analyzeIntLit,
         [astStrLit] = analyzeStrLit,
         [astFileLit] = analyzeFileLit,
         [astGlobLit] = analyzeGlobLit,
