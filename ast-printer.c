@@ -12,11 +12,7 @@ typedef struct printerCtx {
 } printerCtx;
 
 static printf_t* printer_outf (printerCtx* ctx) {
-    putchar(' ');
-
-    for (int i = 0; i < ctx->depth; i++)
-        printf("  ");
-
+    putnchar(' ', ctx->depth*2 + 1);
     return printf;
 }
 
