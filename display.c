@@ -176,6 +176,25 @@ static void displayTable (value* result, type* resultType) {
     printf(" :: %s\n", typeGetStr(resultType));
 }
 
+void displayStr (value* result, type* resultType) {
+    size_t length;
+    const char* str = valueGetStr(result, &length);
+
+    /*Special handling for multiline strings
+       - Check for final EOL and warn if missing
+       - Display without quotes, with the type on a new line*/
+    if (strchr(str, '\n')) {
+        bool missingEOL = str[length-1] != '\n';
+
+        printf(missingEOL ? "%s\n :: %s\n" : "%s :: %s\n", str, typeGetStr(resultType));
+
+        if (missingEOL)
+            printf("(This string was missing a final end of line character.)\n");
+
+    } else
+        displayRegular(result, resultType);
+}
+
 void displayResult (value* result, type* resultType) {
     /*If the result is () -> 'a ...*/
     if (typeUnitAppliesToFn(resultType)) {
@@ -208,6 +227,9 @@ void displayResult (value* result, type* resultType) {
 
         else
             displayRegular(result, resultType);
+
+    } else if (typeIsKind(type_Str, resultType)) {
+        displayStr(result, resultType);
 
     } else {
         displayRegular(result, resultType);
