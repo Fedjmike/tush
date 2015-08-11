@@ -161,7 +161,7 @@ static void displayTable (value* result, type* resultType) {
     enum {gap = 2};
 
     /*Print it*/
-    
+
     for_vector (value* inner, valueGetVector(result), {
         for_vector_indexed (col, value* item, valueGetVector(inner), {
             size_t width = valuePrint(item);

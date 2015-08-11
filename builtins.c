@@ -36,8 +36,8 @@ static value* builtinSum (const value* numbers) {
 }
 
 static value* builtinZipf (const value* fn, const value* arg) {
-    const value *first = arg,
-                *second = valueCall(fn, arg);
+    const value *first = valueCall(fn, arg),
+                *second = arg;
 
     vector(const value*) vec = vectorInit(2, malloc);
     vectorPushFromArray(&vec, (void**) (const value*[]) {first, second}, 2, sizeof(value*));
@@ -86,10 +86,10 @@ void addBuiltins (typeSys* ts, sym* global) {
                valueCreateFn(builtinSum));
 
     addBuiltin(global, "zipf",
-               /*(File -> Integer) -> File -> (File, Integer)*/
+               /*(File -> Integer) -> File -> (Integer, File)*/
                typeFn(ts, typeFnChain(2, ts, type_File, type_Integer),
                           typeFn(ts, typeFile(ts),
-                                     typeTupleChain(2, ts, typeFile(ts),
-                                                           typeInteger(ts)))),
+                                     typeTupleChain(2, ts, typeInteger(ts),
+                                                           typeFile(ts)))),
                valueCreateFn(builtinZipfCurried));
 }

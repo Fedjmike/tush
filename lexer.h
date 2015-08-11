@@ -118,8 +118,6 @@ inline static tokenKind lexerWord (lexerCtx* ctx) {
     if (lexerEOF(ctx))
         return tokenIntLit;
 
-    bool exit = false;
-
     /*Words can contain matching brackets and braces,
       but an unmatched one indicates the end of the word
 
@@ -134,6 +132,8 @@ inline static tokenKind lexerWord (lexerCtx* ctx) {
     };
 
     int depths[matchingMAX] = {};
+
+    bool exit = false;
 
     do {
         lexerEat(ctx);
@@ -158,10 +158,11 @@ inline static tokenKind lexerWord (lexerCtx* ctx) {
                 exit = true;
 
         break;
-        case ')': case '`':
+        case '(': case ')':
         case '"': case '\'':
         case '\n': case '\r':
         case '\t': case ' ':
+        case '`':
             exit = true;
         }
     } while (!exit && !lexerEOF(ctx));
@@ -191,6 +192,12 @@ inline static token lexerNext (lexerCtx* ctx) {
 
     break;
 
+    /*"Word"*/
+    default:
+        tok.kind = lexerWord(ctx);
+
+    break;
+
     /*Operator*/
     case '(': case ')':
     case '[': case ']':
@@ -198,11 +205,6 @@ inline static token lexerNext (lexerCtx* ctx) {
     case ',': case '`':
         tok.kind = tokenOp;
         lexerEat(ctx);
-
-    break;
-    /*"Word"*/
-    default:
-        tok.kind = lexerWord(ctx);
     }
 
     ctx->buffer[ctx->length++] = 0;
@@ -212,8 +214,6 @@ inline static token lexerNext (lexerCtx* ctx) {
         if (hashsetTest(&lexerOps, tok.buffer))
             tok.kind = tokenOp;
     }
-
-    ctx->buffer[ctx->length++] = 0;
 
     return tok;
 };

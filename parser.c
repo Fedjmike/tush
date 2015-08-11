@@ -107,7 +107,7 @@ static ast* parseAtom (parserCtx* ctx) {
             node = astCreateSymbol(symbol);
 
         else
-            node = astCreateStrLit(ctx->current.buffer);
+            node = astCreateFileLit(ctx->current.buffer);
 
         accept(ctx);
 

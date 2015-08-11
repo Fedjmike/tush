@@ -7,10 +7,15 @@ OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 
 all: sh
 
-*.o: $(HEADERS)
+%.o: %.c $(HEADERS)
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo " [CC] $@"
 
 sh: $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	@$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	@echo " [LD] $@"
+	@du -h $@
+	@echo
 
 test: sh
 	valgrind -q --leak-check=full --suppressions=boehm-gc.supp ./sh

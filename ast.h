@@ -41,7 +41,7 @@ typedef struct ast {
 
         /*Symbol*/
         sym* symbol;
-        /*PipeApp*/
+        /*BOP[o=Pipe]*/
         bool listApp;
     };
     //todo combine bools into a flags field
