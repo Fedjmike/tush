@@ -1,3 +1,6 @@
+/*For fmemopen*/
+#define _XOPEN_SOURCE 700
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <readline/readline.h>
@@ -9,6 +12,7 @@
 #include "sym.h"
 #include "ast.h"
 
+#include "terminal.h"
 #include "paths.h"
 #include "dirctx.h"
 #include "builtins.h"
@@ -100,9 +104,9 @@ void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
     /*Tilde contract the working directory*/
     char* wdir_contr = pathContract(wdir, homedir, "~", malloc);
 
-    static const char* yellow = "\e[1;33m";
-    static const char* regular = "\e[0m";
-    snprintf(prompt->str, prompt->size, "%s%s%s $ ", yellow, wdir_contr, regular);
+    FILE* promptf = fmemopen(prompt->str, prompt->size, "w");
+    fprintf_style(promptf, "{%s} $ ", styleYellow, wdir_contr);
+    fclose(promptf);
 
     prompt->valid_for = wdir;
     free(wdir_contr);
