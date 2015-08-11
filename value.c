@@ -175,6 +175,15 @@ int64_t valueGetInt (const value* num) {
     return num->integer;
 }
 
+const char* valueGetStr (const value* str, size_t* length) {
+    assert(str->kind == valueStr);
+
+    if (length)
+        *length = str->strlen;
+
+    return str->str;
+}
+
 value* valueCall (const value* fn, const value* arg) {
     switch (fn->kind) {
     case valueFn:
