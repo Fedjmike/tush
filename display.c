@@ -176,6 +176,64 @@ static void displayTable (value* result, type* resultType) {
     printf(" :: %s\n", typeGetStr(resultType));
 }
 
+/*Options for lists of lists*/
+enum {
+    displayListList_bracesOnOwnLine = false,
+    displayListList_bracesOnOwnLineIfRecursing = true
+};
+
+void displayListList (value* result, type* resultType, int depth) {
+    vector(value*) elements = valueGetVector(result);
+    type* elementType = typeGetListElements(resultType);
+
+    /*Is the element type *also* a list of lists?*/
+    bool recursing = typeIsList(typeGetListElements(elementType));
+
+    /*Put the braces on their own line, if the options say so*/
+    bool bracesOnOwnLine =    displayListList_bracesOnOwnLine
+                           || (   recursing
+                               && displayListList_bracesOnOwnLineIfRecursing);
+
+    putchar('[');
+
+    if (bracesOnOwnLine) {
+        putchar('\n');
+        putnchar(' ', depth+1);
+    }
+
+    for_vector_indexed (i, value* element, elements, {
+        if (i != 0)
+            putnchar(' ', depth+1);
+
+        if (recursing)
+            displayListList(element, elementType, depth+1);
+
+        else
+            valuePrint(element);
+
+        if (i < elements.length-1) {
+            putchar(',');
+            putchar('\n');
+        }
+    })
+
+    if (bracesOnOwnLine) {
+        putchar('\n');
+        putnchar(' ', depth);
+    }
+
+    putchar(']');
+
+    if (depth == 0) {
+        /*If the braces are on a same line as the rest of the list
+          then there is room for the type*/
+        if (!bracesOnOwnLine)
+            putchar('\n');
+
+        printf(" :: %s\n", typeGetStr(resultType));
+    }
+}
+
 void displayStr (value* result, type* resultType) {
     size_t length;
     const char* str = valueGetStr(result, &length);
@@ -213,8 +271,12 @@ void displayResult (value* result, type* resultType) {
     else if (typeIsList(resultType)) {
         type* elements = typeGetListElements(resultType);
 
+        /* [['a]] -- List of lists (and possibly recursive) */
+        if (typeIsList(elements))
+            displayListList(result, resultType, 0);
+
         /*Display empty or singular iterables the normal way instead one of the following*/
-        if (valueGetVector(result).length <= 1)
+        else if (valueGetVector(result).length <= 1)
             displayRegular(result, resultType);
 
         /* [File] -- File lists are displayed in an autocomplete-like grid*/
