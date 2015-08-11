@@ -3,6 +3,9 @@
 #include <sys/ioctl.h>
 #include <nicestat.h>
 
+#include "terminal.h"
+#include "paths.h"
+
 #include "type.h"
 #include "value.h"
 
@@ -123,7 +126,8 @@ static void displayFileList (value* result, type* resultType) {
             if (!name)
                 break;
 
-            size_t namelen = printf("%s", name);
+            size_t namelen = pathIsDir(name) ? printf_style("{%s}/", styleBlue, name)
+                                             : printf("%s", name);
             size_t padding = columnWidth-namelen;
             putnchar(' ', padding);
         }
