@@ -1,6 +1,7 @@
 #include "display.h"
 
 #include <sys/ioctl.h>
+#include <dirent.h>
 #include <nicestat.h>
 
 #include "terminal.h"
@@ -76,6 +77,33 @@ static void displayGrid (vector(const char*) entries, int (*printEntry)(const ch
     }
 }
 
+static void displayDirectory (const char* dirname) {
+    DIR* dir = opendir(dirname);
+
+    /*Get a listing of all the files and find the largest name*/
+
+    vector(const char*) filenames = vectorInit(20, malloc);
+
+    size_t largest = 0;
+
+    for (struct dirent* entry; (entry = readdir(dir));) {
+		vectorPush(&filenames, entry->d_name);
+        //todo width
+        size_t namelen = strlen(entry->d_name);
+
+        if (largest < namelen)
+            largest = namelen;
+    }
+
+    /*Display in a grid, in alphabetical order*/
+    qsort(filenames.buffer, filenames.length, sizeof(void*), qsort_cstr);
+    displayGrid(filenames, printFilename, largest);
+
+    /*Kept the dir open til now as the filenames belonged to it*/
+    closedir(dir);
+    vectorFree(&filenames);
+}
+
 static void displayFileStats (const char* filename) {
     stat_t file;
     staterr error = nicestat(filename, &file);
@@ -109,6 +137,9 @@ static void displayFileStats (const char* filename) {
     }
 
     printf(")\n");
+
+    if (!error && file.mode == file_dir)
+        displayDirectory(filename);
 }
 
 static unsigned int getWindowWidth (void) {
