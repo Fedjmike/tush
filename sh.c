@@ -124,7 +124,7 @@ void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
     free(wdir_contr);
 }
 
-const char* historyFilename = ".gosh_history";
+char* historyFilename;
 
 void replCD (compilerCtx* compiler, const char* input) {
     goshResult result = gosh(compiler, input, false);
@@ -145,9 +145,12 @@ void replCD (compilerCtx* compiler, const char* input) {
 }
 
 void repl (compilerCtx* compiler) {
-    read_history(".gosh_history");
-
     const char* homedir = getHomeDir();
+
+    historyFilename = malloc(strlen(homedir) + 15);
+    sprintf(historyFilename, "%s/.gosh_history", homedir);
+
+    read_history(historyFilename);
 
     promptCtx prompt = {.size = 1024};
     prompt.str = malloc(prompt.size);
@@ -166,7 +169,7 @@ void repl (compilerCtx* compiler) {
             break;
 
         add_history(input);
-        write_history(".gosh_history");
+        write_history(historyFilename);
 
         if (!strncmp(input, ":cd ", 4))
             replCD(compiler, input+4);
@@ -176,6 +179,7 @@ void repl (compilerCtx* compiler) {
     }
 
     free(prompt.str);
+    free(historyFilename);
 }
 
 /*==== ====*/
