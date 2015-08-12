@@ -1,10 +1,36 @@
+/*For realpath and PATH_MAX*/
+#define _XOPEN_SOURCE 700
+
 #include "paths.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
+
+#include <limits.h>
+#include <nicestat.h>
 
 #include "common.h"
+
+char* pathGetAbsolute (const char* path, stdalloc allocator) {
+    char* absolute = allocator(PATH_MAX+1);
+    bool success = realpath(path, absolute);
+
+    if (success)
+        return absolute;
+
+    else {
+        free(absolute);
+        return 0;
+    }
+}
+
+bool pathIsDir (const char* path) {
+    stat_t file;
+    bool error = nicestat(path, &file);
+    return !error && file.mode == file_dir;
+}
 
 char* getWorkingDir (void) {
     int buffer_size = 256;
