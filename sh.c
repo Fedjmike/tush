@@ -142,12 +142,6 @@ void repl (compilerCtx* compiler) {
 
 /*==== ====*/
 
-const char* const samples[] = {
-    "sh.c size",
-    "[sh.c, parser.c]",
-    "[sh.c, parser.c] | size"
-};
-
 int main (int argc, char** argv) {
     GC_INIT();
 
@@ -156,19 +150,17 @@ int main (int argc, char** argv) {
     compilerCtx compiler = compilerInit();
     addBuiltins(&compiler.ts, compiler.global);
 
-    if (argc == 1) {
-        puts(samples[2]);
-        gosh(&compiler, samples[2]);
+    if (argc == 1)
+        repl(&compiler);
 
-    } else if (argc == 2) {
-        if (!strcmp(argv[1], "-i"))
-            repl(&compiler);
+    else if (argc == 2)
+        gosh(&compiler, argv[1]);
 
-        else
-            gosh(&compiler, argv[1]);
-
-    } else
-        printf("Unknown arguments.\n");
+    else {
+        char* input = strjoinwith(argc, argv, " ", malloc);
+        gosh(&compiler, input);
+        free(input);
+    }
 
     compilerFree(&compiler);
 }
