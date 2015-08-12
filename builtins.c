@@ -49,6 +49,25 @@ static value* builtinZipfCurried (const value* fn) {
     return valueCreateSimpleClosure(fn, (simpleClosureFn) builtinZipf);
 }
 
+int compareTuple (const value** left, const value** right) {
+    const value *firstOfLeft = valueGetTupleNth(*left, 0),
+                *firstOfRight = valueGetTupleNth(*right, 0);
+
+    int64_t indexOfLeft = valueGetInt(firstOfLeft),
+            indexOfRight = valueGetInt(firstOfRight);
+
+    return indexOfLeft - indexOfRight;
+}
+
+static value* builtinSort (const value* list) {
+    vector(const value*) vec = vectorDup(valueGetVector(list), malloc);
+
+    qsort(vec.buffer, vec.length, sizeof(void*),
+          (int (*)(const void *, const void *)) compareTuple);
+
+    return valueCreateVector(vec);
+}
+
 value* builtinExpandGlob (const char* pattern, value* arg) {
     (void) arg;
 
@@ -92,4 +111,12 @@ void addBuiltins (typeSys* ts, sym* global) {
                                      typeTupleChain(2, ts, typeInteger(ts),
                                                            typeFile(ts)))),
                valueCreateFn(builtinZipfCurried));
+
+    addBuiltin(global, "sort",
+               /*[(Integer, File)] -> [(Integer, File)]*/
+               typeFn(ts, typeList(ts, typeTupleChain(2, ts, typeInteger(ts),
+                                                             typeFile(ts))),
+                          typeList(ts, typeTupleChain(2, ts, typeInteger(ts),
+                                                             typeFile(ts)))),
+               valueCreateFn(builtinSort));
 }
