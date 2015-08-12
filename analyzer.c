@@ -200,7 +200,7 @@ static type* analyzeBOP (analyzerCtx* ctx, ast* node) {
     }
 }
 
-/*---- End of binary operators ----*/
+/*---- ----*/
 
 static type* analyzer (analyzerCtx* ctx, ast* node) {
     typedef type* (*handler_t)(analyzerCtx*, ast*);

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "stdarg.h"
-#include "stdio.h"
+#include <stdarg.h>
+#include <stdio.h>
 
 #define styleBlack   "\e[1;30m"
 #define styleRed     "\e[1;31m"

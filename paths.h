@@ -11,9 +11,8 @@ char* pathGetAbsolute (const char* path, stdalloc allocator);
 /*Stats the path to see if it's a directory. Returns false for non-files.*/
 bool pathIsDir (const char* path);
 
-/*Get the current working directory.
-  Fails if there are permission issues.
-  Caller owns the result.*/
+/*Get the current working directory. Caller owns the result.
+  Fails if there are permission issues.*/
 char* getWorkingDir (void);
 
 const char* getHomeDir (void);

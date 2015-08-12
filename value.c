@@ -212,6 +212,8 @@ const char* valueGetFilename (const value* value) {
         return value->str;
 }
 
+/*---- Iterables ----*/
+
 static bool isIterable (const value* iterable) {
     return iterable->kind == valueVector;
 }
@@ -246,3 +248,5 @@ vector(const value*) valueGetVector (const value* iterable) {
     assert(isIterable(iterable));
     return iterable->vec;
 }
+
+/*---- ----*/

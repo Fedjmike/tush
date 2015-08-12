@@ -153,6 +153,7 @@ void repl (compilerCtx* compiler) {
     prompt.str = malloc(prompt.size);
 
     while (true) {
+        /*Regenerate the prompt (if necessary)*/
         writePrompt(&prompt, compiler->dirs.workingDir, homedir);
 
         char* input = readline(prompt.str);

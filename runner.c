@@ -131,7 +131,7 @@ static value* runBOP (envCtx* env, const ast* node) {
     }
 }
 
-/*---- End of binary operators ----*/
+/*---- ----*/
 
 value* run (envCtx* env, const ast* node) {
     typedef value* (*handler_t)(envCtx*, const ast*);

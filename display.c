@@ -103,7 +103,7 @@ static void displayDirectory (const char* dirname) {
     vectorFree(&filenames);
 }
 
-static void displayFileStats (const char* filename) {
+static void displayFile (const char* filename) {
     stat_t file;
     staterr error = nicestat(filename, &file);
 
@@ -335,6 +335,6 @@ void displayResult (value* result, type* resultType) {
         displayRegular(result, resultType);
 
         if (typeIsKind(type_File, resultType))
-            displayFileStats(valueGetFilename(result));
+            displayFile(valueGetFilename(result));
     }
 }
