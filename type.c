@@ -251,6 +251,20 @@ bool typeIsEqual (type* l, type* r) {
         case type_List:
             return typeIsEqual(l->elements, r->elements);
 
+        case type_Tuple:
+            if (l->types.length != r->types.length)
+                return false;
+
+            for (int i = 0; i < l->types.length; i++) {
+                type *typeL = vectorGet(l->types, i),
+                     *typeR = vectorGet(r->types, i);
+
+                if (!typeIsEqual(typeL, typeR))
+                    return false;
+            }
+
+            return true;
+
         default:
             errprintf("Unhandled type kind, %s\n", typeGetStr(l));
             return false;
