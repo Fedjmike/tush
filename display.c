@@ -41,6 +41,41 @@ static void printSizeNicely (size_t size) {
     printf("%.*f %s", digitsAfterPoint, relativeSize, unit);
 }
 
+static int printFilename (const char* name) {
+    return   pathIsDir(name)
+           ? printf_style("{%s}/", styleBlue, name)
+           : printf("%s", name);
+}
+
+static void displayGrid (vector(const char*) entries, int (*printEntry)(const char*), size_t columnWidth) {
+    enum {gap = 2};
+    columnWidth += gap;
+
+    /*Work out the dimensions of the grid*/
+
+    int windowWidth = getWindowWidth();
+
+    int columns = windowWidth / columnWidth;
+    int rows = intdiv_roundup(entries.length, columns);
+
+    /*Print row-by-row*/
+
+    for (int row = 0; row < rows; row++) {
+        for (int col = 0; col < columns; col++) {
+            const char* entry = vectorGet(entries, row + col*rows);
+
+            if (!entry)
+                break;
+
+            size_t entrywidth = printEntry(entry);
+            size_t padding = columnWidth-entrywidth;
+            putnchar(' ', padding);
+        }
+
+        printf("\n");
+    }
+}
+
 static void displayFileStats (const char* filename) {
     stat_t file;
     staterr error = nicestat(filename, &file);
@@ -107,33 +142,9 @@ static void displayFileList (value* result, type* resultType) {
             columnWidth = namelen;
     })
 
-    /*Work out the dimensions of the grid*/
+    /* */
 
-    enum {gap = 2};
-    columnWidth += gap;
-
-    int windowWidth = getWindowWidth();
-
-    int columns = windowWidth / columnWidth;
-    int rows = intdiv_roundup(names.length, columns);
-
-    /*Print row-by-row*/
-
-    for (int row = 0; row < rows; row++) {
-        for (int col = 0; col < columns; col++) {
-            const char* name = vectorGet(names, row + col*rows);
-
-            if (!name)
-                break;
-
-            size_t namelen = pathIsDir(name) ? printf_style("{%s}/", styleBlue, name)
-                                             : printf("%s", name);
-            size_t padding = columnWidth-namelen;
-            putnchar(' ', padding);
-        }
-
-        printf("\n");
-    }
+    displayGrid(names, printFilename, columnWidth);
 
     vectorFree(&names);
 
