@@ -23,6 +23,7 @@
 
 #include "ast-printer.h"
 
+#include "value.h"
 #include "runner.h"
 #include "display.h"
 
@@ -74,19 +75,30 @@ compilerCtx* compilerFree (compilerCtx* ctx) {
 
 /*==== Gosh ====*/
 
-void gosh (compilerCtx* ctx, const char* str) {
+typedef struct goshResult {
+    value* v;
+    type* dt;
+} goshResult;
+
+goshResult gosh (compilerCtx* ctx, const char* str, bool display) {
     int errors = 0;
     ast* tree = compile(ctx, str, &errors);
+
+    value* result = 0;
+    type* dt = tree->dt;
 
     if (errors == 0) {
         /*Run the AST*/
         envCtx env = {};
-        value* result = run(&env, tree);
+        result = run(&env, tree);
 
-        displayResult(result, tree->dt);
+        if (display)
+            displayResult(result, dt);
     }
 
     astDestroy(tree);
+
+    return (goshResult) {.v = result, .dt = dt};
 }
 
 /*==== REPL ====*/
@@ -114,6 +126,24 @@ void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
 
 const char* historyFilename = ".gosh_history";
 
+void replCD (compilerCtx* compiler, const char* input) {
+    goshResult result = gosh(compiler, input, false);
+
+    if (!result.v)
+        return;
+
+    if (!typeIsKind(type_File, result.dt)) {
+        printf(":cd requires a File argument, given %s\n", typeGetStr(result.dt));
+        return;
+    }
+
+    const char* newWD = valueGetFilename(result.v);
+    bool error = dirsChangeWD(&compiler->dirs, newWD);
+
+    if (error)
+        printf("Unable to enter directory \"%s\"\n", newWD);
+}
+
 void repl (compilerCtx* compiler) {
     read_history(".gosh_history");
 
@@ -131,10 +161,17 @@ void repl (compilerCtx* compiler) {
         if (input[0] == 0)
             continue;
 
+        else if (!strcmp(input, ":exit"))
+            break;
+
         add_history(input);
         write_history(".gosh_history");
 
-        gosh(compiler, input);
+        if (!strncmp(input, ":cd ", 4))
+            replCD(compiler, input+4);
+
+        else
+            gosh(compiler, input, true);
     }
 
     free(prompt.str);
@@ -154,11 +191,11 @@ int main (int argc, char** argv) {
         repl(&compiler);
 
     else if (argc == 2)
-        gosh(&compiler, argv[1]);
+        gosh(&compiler, argv[1], true);
 
     else {
         char* input = strjoinwith(argc, argv, " ", malloc);
-        gosh(&compiler, input);
+        gosh(&compiler, input, true);
         free(input);
     }
 
