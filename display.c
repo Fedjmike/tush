@@ -1,6 +1,5 @@
 #include "display.h"
 
-#include <sys/ioctl.h>
 #include <dirent.h>
 #include <nicestat.h>
 
@@ -140,13 +139,6 @@ static void displayFileStats (const char* filename) {
 
     if (!error && file.mode == file_dir)
         displayDirectory(filename);
-}
-
-static unsigned int getWindowWidth (void) {
-    struct winsize size;
-    ioctl(0, TIOCGWINSZ, &size);
-
-    return size.ws_col;
 }
 
 static void displayRegular (value* result, type* resultType) {

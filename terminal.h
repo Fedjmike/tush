@@ -13,5 +13,7 @@
 #define styleWhite   "\e[1;37m"
 #define styleReset   "\e[0m"
 
+unsigned int getWindowWidth (void);
+
 int printf_style (const char* format, ...);
 int fprintf_style (FILE* file, const char* format, ...);

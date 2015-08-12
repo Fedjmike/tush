@@ -3,6 +3,14 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+#include <sys/ioctl.h>
+
+unsigned int getWindowWidth (void) {
+    struct winsize size;
+    ioctl(0, TIOCGWINSZ, &size);
+
+    return size.ws_col;
+}
 
 static int vfprintf_style (FILE* file, const char* roformat, va_list args) {
     int printed = 0;
