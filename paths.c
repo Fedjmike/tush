@@ -109,7 +109,7 @@ char* pathContract (const char* path, const char* prefix, const char* replacemen
         return contracted;
 
     } else
-        return strcpy(allocator(strlen(path)), path);
+        return strcpy(allocator(strlen(path)+1), path);
 }
 
 char* pathGetSegments (const char* path, stdalloc allocator) {
