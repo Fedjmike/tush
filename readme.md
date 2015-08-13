@@ -7,7 +7,7 @@ Gosh is a modern, statically typed shell and scripting language. It is a major d
 - **Functional** in syntax and type system, but imperative for working with the file system.
 - **Concise but not cryptic**. No more `@du -dh "$v" >$@` or `[[ -e "$f" ]]`
 
-[![asciicast](https://asciinema.org/a/bo7yronzsxl11yrrjzppt2966.png)](https://asciinema.org/a/bo7yronzsxl11yrrjzppt2966)
+[![gif](img/glob-size-zipf-demo.gif)](https://asciinema.org/a/bo7yronzsxl11yrrjzppt2966)
 
 Design
 ------
