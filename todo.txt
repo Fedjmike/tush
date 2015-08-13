@@ -10,17 +10,22 @@
 [-] Language
     [-] Expressions
         [-] Literals
-            [-] Integer
+            [x] Integer
             [ ] Number
             [ ] Lambda
-            [ ] String
-            [ ] (String) format?
-            [ ] File, Directory, Path
+            [x] Str
+            [-] File
             [-] Glob
-            	[x] *
-            	[ ] {}, []
+                [x] *
+                [-] []
+                [ ] {}
+            [x] Tuple
+            [-] List
+            [ ] (String) format?
+            [ ] Directory (trailing /)
             [ ] Regex
             [ ] Option (as in flags)
+            [ ] Operators bracketed as functions
         [ ] Files
             [ ] /
             [ ] |>
@@ -34,14 +39,16 @@
             [-] Implicit conversions
                 [ ] Path -> File
                 fmap over:
-                [-] Lists, ['a]
+                [x] Lists, ['a]
                 [ ] Maybe, 'a?
                 [ ] Generalize to all?
             [ ] Options
         [ ] Arithmetic
         [ ] String
+            [ ] Concat
             [ ] Formatting
-        [ ] Iterables
+        [-] Iterables
+            [x] List concat
         [ ] Comparison
         [ ] Boolean
         [ ] Branching
@@ -53,12 +60,20 @@
         [ ] if, while, for, switch
         [ ] Working directory control
             into <dir>: {}
+    [ ] Error handling
     [ ] Macros
     [ ] Modules
 
 [-] Library
+    [x] size :: File -> Integer
+        - Size
+        - Exceptions? Return Maybe?
+    [x] sum :: [Integer] -> Integer
+        - Adapt for Number
+    [x] zipf :: (File -> Integer) -> File -> (Integer, File)
+        - Make polymorphic
 
-[ ] Interfacing with legacy Unix
+[-] Interfacing with legacy Unix
 
 [ ] C API
 
@@ -75,37 +90,43 @@
     [-] Prompt
     [ ] Completion
     [ ] Syntax highlighting
-    [ ] Output highlighting
+    [-] Output highlighting
     [-] Value printing
     [ ] Job control
 
 ---------
 
 [-] Gather todos
-[ ] minimize asserts
+[ ] Minimize asserts
 [ ] Multithreaded Boehm leaks (currently suppressed)
+[ ] Pull bool fns from loops
+[ ] "Optimizations the compiler can't make"
+[ ] hsearch and tsearch for hashmap
+[ ] Document the purpose of each module
 
 == Structures
 
 [ ] No {ast,sym}::children by default, allocate on need
+[ ] Value printing must depend on the type
 
 type:
 [ ] Each type T contains a hashmap of fn types T -> K where K is the key. Use this to only allocate one of each fn type.
 [ ] And for lists. Then generalize for any parametric type.
-[ ] Create type str in the ctor
-[ ] Type equality
+[ ] Create type str in the ctor?
+[-] Type equality
 
 ast:
 [ ] Make AST::children a const_vector (combined length and size fields)
 [ ] Pooled allocator for AST
 [ ] Unpackers for the AST (and others?)
 [x] opKind -> str
+[ ] Add a field to the AST, a reference to relevant token
 
 sym:
 [ ] Change sym::children to a hashmap
 
 value:
-[ ] valueError
+[x] valueInvalid
 
 == Passes
 
@@ -113,11 +134,10 @@ Lexer:
 [ ] Unicode
 [ ] Make the lexer create a vector of tokens which persist, own their buffers
 [ ] Put location info in tokens
-[ ] Add a field to the AST, a reference to relevant token
 [ ] Lexer op classes
-
-Runner:
-[ ] Optimization for calling n-ary valueFns
 
 Analyzer:
 [x] Each analyzer routine returns type, handler assigns
+
+Runner:
+[ ] Optimization for calling n-ary valueFns (creating curried values)
