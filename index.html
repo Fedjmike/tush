@@ -1,0 +1,150 @@
+<!doctype html>
+<html>
+<head>
+    <title>Gosh &ndash; Your shell in five years time</title>
+
+    <meta name="description" content="Gosh - a modern, structured, functional shell." />
+    <meta name="keywords" content="gosh, shell, functional, structured, data, unix, sam nipps"/>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="shortcut icon" href="favicon.png" />
+    
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/pure-min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+    
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-old-ie-min.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
+    <!--<![endif]-->
+
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!--<div class="menu">
+        <span class="main-title">$ gosh <span class="blink">&#9611;</span></span>
+    </div>-->
+    <div class="content">
+        <h1>Gosh &ndash; The Unix shell reinvented</h1>
+        
+        <p>Gosh is a major departure from classic Unix shells that were centred around string manipulation and substitution. It is a modern, statically typed shell and scripting language.</p>
+        
+        <ul class="pure-g">
+            <li class="pure-u-1 pure-u-md-1-3"><div class="u-box">
+                <strong>Structured<span class="sm">.</span></strong><br class="md"/> Work with lists, tuples, functions and files, not just raw strings.
+            </div></li>
+            <li class="pure-u-1 pure-u-md-1-3"><div class="u-box">
+                <strong>Functional</strong> in syntax and type system, but imperative for working with the file system.
+            </div></li>
+            <li class="pure-u-1 pure-u-md-1-3" style="padding-left: 0em;"><div class="u-box">
+                <strong>Concise but not cryptic<span class="sm">.</span></strong><br class="md"/> No more &nbsp<code>@du -hs "$v" >$@</code> or&nbsp;<code>[[&nbsp;-e&nbsp;"$f"&nbsp;]]</code>
+            </div></li>
+        </ul>
+    </div>
+        
+    <div class="ribbon">
+        <div class="content">
+            <div class="pure-g">
+                <div class="pure-u-1 pure-u-md-1-3">
+                    <h1 class="content-head content-head-ribbon">Get involved</h1>
+                    <p class="md">Gosh welcomes your input!</p>
+                </div>
+                <div class="pure-u">
+                    <ul>
+                        <li>Give your thoughts on the language.</li>
+                        <li>Read the <a href="http://github.com/Fedjmike/gosh">source</a>. Help write more features.</li>
+                        <li><em>Use it!</em></li>
+                    </ul>
+                </div>
+                <div class="pure-u md" style="margin-left: 4em; padding-top: 1.2em">
+                    <a target=_blank href="http://github.com/Fedjmike/gosh"><i class="fa fa-external-link fa-4x"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="content">
+        <p>A video for your eyeballs. Watch the types, they're half the story.</p>
+        <iframe src="https://asciinema.org/api/asciicasts/bo7yronzsxl11yrrjzppt2966?size=small" scrolling="no" allowfullscreen="true" style="overflow: hidden; margin: 0px; border: 0px; display: inline-block; width: 100%; float: none; visibility: visible; height: 548px;"></iframe>
+        
+        <section>
+            <h1 class="content-head">Design</h1>
+            
+            <ul>
+                <li>An expressive type system. Parametric polymorphism, algebraic types and typeclasses. Immutable data.</li>
+                <li>Programs are functions. Command line arguments and pipes are unified as parameters.</li>
+                <li>Files, globs and <span title="regices?">regexes</span> are first-class features with syntax for literals.</li>
+                <li>Lists, tuples and dictionaries, with handling operations inspired by relational algebra.</li>
+                <li>A full scripting language with sane control flow, pattern matching and macros.</li>
+            </ul>
+            
+            <p>The language design has lots of open questions. Among them, how to:</p>
+            
+            <ul class="tight">
+                <li>Handle errors &mdash; exceptions, <kbd>Maybe</kbd> monad, other possibilites?</li>
+                <li>Dynamically type files &mdash; existential types?</li>
+                <li>Create a language that can be seamlessly used interactively, but also for safe scripting, for programming in the large.</li>
+                <li>Disambiguate the multiply operator (<kbd>*</kbd>) from a wildcard.</li>
+            </ul>
+        </section>
+        
+        <section>
+            <h1 class="content-head">Getting it</h1>
+            
+            You can download a precompiled Linux binary here:
+            
+            <pre><code>wget </code><a href="https://github.com/Fedjmike/gosh/releases/download/alpha/gosh"><code>https://github.com/Fedjmike/gosh/releases/download/alpha/gosh</code></a><code>
+chmod +x gosh
+sudo mv gosh /usr/local/bin</code></pre>
+            
+            
+            <p>The source code is hosted on <a href="http://github.com/Fedjmike/gosh">GitHub</a>, released under the GPL. Call <kbd>make</kbd> to build it. Caveat: you won't actually be able to because it relies on a bunch of libraries.</p>
+        </section>
+    <!--</div>
+        
+    <div class="ribbon">
+        <div class="content">
+            <h1 class="content-head"><a href="http://github.com/Fedjmike/gosh/releases">Releases</a></h1>
+        </div>
+    </div>
+    
+    <div class="content">-->
+        <section>
+            <h1 class="content-head">Development</h1>
+            
+            <p>Development began in July 2015. Gosh is written in C11 and tested on Linux. Currently, it uses the <a href="https://github.com/ivmai/bdwgc/">Boehm garbage collector</a> and <a href="http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html">GNU Readline</a>.</p>
+            
+            <h2 class="content-head">Future</h2>
+            
+            <p>There's a lot for us to implement. The repo contains a <a href="https://github.com/Fedjmike/gosh/blob/master/todo.txt">todo list</a> which will help you find out what's been done and what's there is to do.</p>
+            
+            <p>Beyond the language itself, there's:</p>
+            
+            <ul class="tight">
+                <li>A C API for writing native Gosh programs.</li>
+                <li>Better interactive features. Syntax highlighting, intelligent completion, history autocompletion, job control.</li>
+                <li>Support for BSD, OS X and Windows.</li>
+                <li>JIT compilation?</li>
+            </ul>
+        </section>
+    </div>
+    
+    <script type="text/javascript">
+    var sc_project=10556267; 
+    var sc_invisible=1; 
+    var sc_security="c4c0cd81"; 
+    var scJsHost = (("https:" == document.location.protocol) ?
+    "https://secure." : "http://www.");
+    document.write("<sc"+"ript type='text/javascript' src='" + scJsHost + "statcounter.com/counter/counter.js'></" + "script>");
+    </script>
+    <noscript><div class="statcounter"><a title="hit counter"
+    href="http://statcounter.com/free-hit-counter/"
+    target="_blank"><img class="statcounter"
+    src="http://c.statcounter.com/10556267/0/c4c0cd81/1/"
+    alt="hit counter"></a></div></noscript>
+</body>
+</html>
