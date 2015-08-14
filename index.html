@@ -1,10 +1,10 @@
 <!doctype html>
 <html>
 <head>
-    <title>Gosh &ndash; Your shell in five years time</title>
+    <title>Tush &ndash; Your shell in five years</title>
 
-    <meta name="description" content="Gosh - a modern, structured, functional shell." />
-    <meta name="keywords" content="gosh, shell, functional, structured, data, unix, sam nipps"/>
+    <meta name="description" content="Tush: a modern, structured, functional shell." />
+    <meta name="keywords" content="tush, shell, functional, structured, data, unix, sam nipps"/>
     
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
@@ -21,17 +21,13 @@
         <link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.6.0/grids-responsive-min.css">
     <!--<![endif]-->
 
-
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!--<div class="menu">
-        <span class="main-title">$ gosh <span class="blink">&#9611;</span></span>
-    </div>-->
     <div class="content">
-        <h1>Gosh &ndash; The Unix shell reinvented</h1>
+        <h1><kbd>tush</kbd> &ndash; The Unix shell reinvented</h1>
         
-        <p>Gosh is a major departure from classic Unix shells that were centred around string manipulation and substitution. It is a modern, statically typed shell and scripting language.</p>
+        <p>Tush is a major departure from classic Unix shells that were centred around string manipulation and substitution. It is a modern, statically typed shell and scripting language.</p>
         
         <ul class="pure-g">
             <li class="pure-u-1 pure-u-md-1-3"><div class="u-box">
@@ -51,17 +47,17 @@
             <div class="pure-g">
                 <div class="pure-u-1 pure-u-md-1-3">
                     <h1 class="content-head content-head-ribbon">Get involved</h1>
-                    <p class="md">Gosh welcomes your input!</p>
+                    <p class="md">Tush welcomes your input!</p>
                 </div>
-                <div class="pure-u">
+                <div class="pure-u pure-u-md-1-2">
                     <ul>
                         <li>Give your thoughts on the language.</li>
-                        <li>Read the <a href="http://github.com/Fedjmike/gosh">source</a>. Help write more features.</li>
+                        <li>Read the <a href="http://github.com/Fedjmike/tush">source</a>. Help write more features.</li>
                         <li><em>Use it!</em></li>
                     </ul>
                 </div>
-                <div class="pure-u md" style="margin-left: 4em; padding-top: 1.2em">
-                    <a target=_blank href="http://github.com/Fedjmike/gosh"><i class="fa fa-external-link fa-4x"></i></a>
+                <div class="pure-u ribbon-icon">
+                    <a target=_blank href="http://github.com/Fedjmike/tush"><i class="fa fa-external-link fa-4x"></i></a>
                 </div>
             </div>
         </div>
@@ -75,63 +71,67 @@
             <h1 class="content-head">Design</h1>
             
             <ul>
-                <li>An expressive type system. Parametric polymorphism, algebraic types and typeclasses. Immutable data.</li>
+                <li>An <span title="Haskell, basically">expressive type system</span>. Parametric polymorphism, algebraic types and typeclasses. Immutable data.</li>
                 <li>Programs are functions. Command line arguments and pipes are unified as parameters.</li>
-                <li>Files, globs and <span title="regices?">regexes</span> are first-class features with syntax for literals.</li>
+                <li>Files, globs and <span title="regices?">regexes</span> are first-class features with syntax for literals and path construction operators.</li>
                 <li>Lists, tuples and dictionaries, with handling operations inspired by relational algebra.</li>
+                <li>A new set of coreutils taking advantage of these facilities.</li>
                 <li>A full scripting language with sane control flow, pattern matching and macros.</li>
             </ul>
-            
-            <p>The language design has lots of open questions. Among them, how to:</p>
-            
-            <ul class="tight">
-                <li>Handle errors &mdash; exceptions, <kbd>Maybe</kbd> monad, other possibilites?</li>
-                <li>Dynamically type files &mdash; existential types?</li>
-                <li>Create a language that can be seamlessly used interactively, but also for safe scripting, for programming in the large.</li>
-                <li>Disambiguate the multiply operator (<kbd>*</kbd>) from a wildcard.</li>
-            </ul>
         </section>
-        
+        <section>
+            <h1 class="content-head">Comparison to other shells</h1>
+            <ul>
+                <li>Stringly-typed shells: bash, zsh, fish etc &ndash; &ldquo;The outdated&rdquo;</li>
+                <li>Shell libraries: <a href="https://plumbum.readthedocs.org/">Plumbum</a> (Python), <a href="https://github.com/chrisdone/hell">Hell</a> (Haskell), <a href="http://lihaoyi.github.io/Ammonite">Ammonite</a> (Scala) &ndash; &ldquo;The verbose&rdquo;</li>
+                <li><a href="https://github.com/elves/elvish">Elvish</a>, <a href="https://github.com/michaelmacinnis/oh">oh</a>, <a href="https://github.com/nfomon/shok">shok</a> &ndash; &ldquo;The not radical enough&rdquo;</li>
+                <!--Powershell - The wrong company! (:P)
+                <!--Perl shell, Scheme shell-->
+            </ul>
+            
+            <p>(To be written.)</p>
+        </section>
         <section>
             <h1 class="content-head">Getting it</h1>
             
             You can download a precompiled Linux binary here:
             
-            <pre><code>wget </code><a href="https://github.com/Fedjmike/gosh/releases/download/alpha/gosh"><code>https://github.com/Fedjmike/gosh/releases/download/alpha/gosh</code></a><code>
-chmod +x gosh
-sudo mv gosh /usr/local/bin</code></pre>
+            <pre><code>wget </code><a href="https://github.com/Fedjmike/tush/releases/download/alpha/tush"><code>https://github.com/Fedjmike/tush/releases/download/alpha/tush</code></a><code>
+chmod +x tush
+sudo mv tush /usr/local/bin</code></pre>
             
             
-            <p>The source code is hosted on <a href="http://github.com/Fedjmike/gosh">GitHub</a>, released under the GPL. Call <kbd>make</kbd> to build it. Caveat: you won't actually be able to because it relies on a bunch of libraries.</p>
+            <p>The source code is hosted on <a href="http://github.com/Fedjmike/tush">GitHub</a>, released under the GPL. Call <kbd>make</kbd> to build it. Caveat: you won't actually be able to because it relies on a bunch of libraries.</p>
         </section>
-    <!--</div>
-        
-    <div class="ribbon">
-        <div class="content">
-            <h1 class="content-head"><a href="http://github.com/Fedjmike/gosh/releases">Releases</a></h1>
-        </div>
-    </div>
-    
-    <div class="content">-->
         <section>
             <h1 class="content-head">Development</h1>
             
-            <p>Development began in July 2015. Gosh is written in C11 and tested on Linux. Currently, it uses the <a href="https://github.com/ivmai/bdwgc/">Boehm garbage collector</a> and <a href="http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html">GNU Readline</a>.</p>
+            <p>Development began in July 2015. Tush is written in C11 and tested on Linux. It uses the <a href="https://github.com/ivmai/bdwgc/">Boehm garbage collector</a> and <a href="http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html">GNU Readline</a>. The repo contains a <a href="https://github.com/Fedjmike/tush/blob/master/todo.txt">todo list</a> saying what's been done and what there is to do.</p>
+            
+            <p>Implemented so far:</p>
+            <ul class="tight">
+                <li>Files, globs, strings, integers, lists and tuples.</li>
+                <li>Function application, list concatenation.</li>
+                <li>Some builtins: <code>size</code>, <code>cat</code>, <code>lc</code> (line count), <code>sum</code>, <code>zipf</code>.</li>
+                <li>Output display for type names, files and directories, file lists, tuple lists (a.k.a. tables) and nested lists.</li>
+                <li>A readline based REPL.</li>
+            </ul>
             
             <h2 class="content-head">Future</h2>
-            
-            <p>There's a lot for us to implement. The repo contains a <a href="https://github.com/Fedjmike/gosh/blob/master/todo.txt">todo list</a> which will help you find out what's been done and what's there is to do.</p>
-            
-            <p>Beyond the language itself, there's:</p>
-            
+            <p>On the immediate horizon is polymorphism, and program invocation. The latter will start with classic Unix programs taking and returning strings.</p>
+            <p>Beyond the language itself, Tush will have:</p>
             <ul class="tight">
-                <li>A C API for writing native Gosh programs.</li>
-                <li>Better interactive features. Syntax highlighting, intelligent completion, history autocompletion, job control.</li>
+                <li>A C API for writing native Tush programs.</li>
+                <li>Better interactive features. Syntax highlighting, intelligent completion, job control. See: <a href="http://fishshell.com/">Fish</a>, <a href="https://github.com/mooz/percol">Percol</a>.</li>
                 <li>Support for BSD, OS X and Windows.</li>
                 <li>JIT compilation?</li>
             </ul>
         </section>
     </div>
+    
+    <footer class="ribbon">
+        Last updated 15/08/2015.
+    </footer>
     
     <script type="text/javascript">
     var sc_project=10556267; 
