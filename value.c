@@ -239,7 +239,7 @@ int valueGuessIterLength (valueIter iterator) {
     return iterator.iterable->vec.length;
 }
 
-value* valueIterRead (valueIter* iterator) {
+const value* valueIterRead (valueIter* iterator) {
     assert(iterator->iterable->kind == valueVector);
     return vectorGet(iterator->iterable->vec, iterator->n++);
 }
