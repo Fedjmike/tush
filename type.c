@@ -305,11 +305,21 @@ const char* typeGetStr (type* dt) {
 
 /*==== Tests and operations ====*/
 
+static void seeThroughQuantifier (type** dt) {
+    if ((*dt)->kind == type_Forall)
+        *dt = (*dt)->dt;
+}
+
 bool typeIsInvalid (type* dt) {
+    seeThroughQuantifier(&dt);
     return dt->kind == type_Invalid;
 }
 
+/*Returns whether the type is logically of a kind
+  There may be indirection through quantifiers.
+  Do not use this if you will access the structure of the type.*/
 bool typeIsKind (typeKind kind, type* dt) {
+    seeThroughQuantifier(&dt);
     return dt->kind == kind;
 }
 
@@ -355,7 +365,7 @@ bool typeIsEqual (type* l, type* r) {
 }
 
 bool typeIsFn (type* dt) {
-    return dt->kind == type_Fn;
+    return typeIsKind(type_Fn, dt);
 }
 
 bool typeAppliesToFn (type* arg, type* fn) {
@@ -373,15 +383,16 @@ type* typeGetFnResult (type* fn) {
 }
 
 bool typeIsList (type* dt) {
-    return dt->kind == type_List;
+    return typeIsKind(type_List, dt);
 }
 
 type* typeGetListElements (type* dt) {
-    assert(typeIsList(dt));
+    seeThroughQuantifier(&dt);
+    assert(dt->kind == type_List);
     return dt->elements;
 }
 
 vector(const type*) typeGetTupleTypes (type* dt) {
-    assert(typeIsKind(type_Tuple, dt));
+    assert(dt->kind = type_Tuple);
     return dt->types;
 }
