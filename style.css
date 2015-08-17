@@ -168,6 +168,18 @@ section {
     padding-top: 0.5em;
 }
 
+.asciicast {
+    width: 100%;
+    height: 411px;
+}
+
+.asciicast > * {
+    transform: scale(0.75);
+    transform-origin: 0 0;
+    width: 133%;
+    margin: 0 auto;
+}
+
 /*
  * -- TABLET (AND UP) MEDIA QUERIES --
  * On tablets and other medium-sized devices, we want to customize some
@@ -219,6 +231,15 @@ section {
     .ribbon-icon {
         margin-left: 0;
         padding-top: 1.2em
+    }
+    
+    .asciicast {
+        height: auto;
+    }
+    
+    .asciicast > * {
+        width: 672px;
+        transform: none;
     }
 }
 
