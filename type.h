@@ -8,6 +8,7 @@ typedef enum typeKind {
     type_Str,
     type_File,
     type_Fn, type_List, type_Tuple,
+    type_Var, type_Forall,
     type_Invalid,
     type_KindNo
 } typeKind;
@@ -38,6 +39,9 @@ type* typeFile (typeSys* ts);
 type* typeFn (typeSys* ts, type* from, type* to);
 type* typeList (typeSys* ts, type* elements);
 type* typeTuple (typeSys* ts, vector(type*) types);
+
+type* typeVar (typeSys* ts);
+type* typeForall (typeSys* ts, vector(type*) typevars, type* dt);
 
 type* typeInvalid (typeSys* ts);
 

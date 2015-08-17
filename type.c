@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <vector.h>
+#include <hashmap.h>
 
 #include "common.h"
 
@@ -17,6 +18,11 @@ typedef struct type {
         type* elements;
         /*Tuple*/
         vector(type*) types;
+        /*Forall*/
+        struct {
+            vector(type*) typevars;
+            type* dt;
+        };
     };
 
     /*Not used by all types
@@ -26,7 +32,8 @@ typedef struct type {
 
 
 static bool typeKindIsntUnitary (typeKind kind) {
-    return kind == type_Fn || kind == type_List || kind == type_Tuple;
+    return    kind == type_Fn || kind == type_List || kind == type_Tuple
+           || kind == type_Forall;
 }
 
 /*==== Type ctors and dtors ====*/
@@ -65,28 +72,38 @@ type* typeFile (typeSys* ts) {
     return typeUnitary(ts, type_File);
 }
 
-type* typeFn (typeSys* ts, type* from, type* to) {
-    type* dt = typeCreate(type_Fn, (type) {
-        .from = from, .to = to
-    });
+static type* typeNonUnitary (typeSys* ts, typeKind kind, type init) {
+    type* dt = typeCreate(kind, init);
     vectorPush(&ts->others, dt);
     return dt;
+}
+
+type* typeFn (typeSys* ts, type* from, type* to) {
+    return typeNonUnitary(ts, type_Fn, (type) {
+        .from = from, .to = to
+    });
 }
 
 type* typeList (typeSys* ts, type* elements) {
-    type* dt = typeCreate(type_List, (type) {
+    return typeNonUnitary(ts, type_List, (type) {
         .elements = elements
     });
-    vectorPush(&ts->others, dt);
-    return dt;
 }
 
 type* typeTuple (typeSys* ts, vector(type*) types) {
-    type* dt = typeCreate(type_Tuple, (type) {
+    return typeNonUnitary(ts, type_Tuple, (type) {
         .types = types
     });
-    vectorPush(&ts->others, dt);
-    return dt;
+}
+
+type* typeVar (typeSys* ts) {
+    return typeNonUnitary(ts, type_Var, (type) {});
+}
+
+type* typeForall (typeSys* ts, vector(type*) typevars, type* dt) {
+    return typeNonUnitary(ts, type_Forall, (type) {
+        .typevars = typevars, .dt = dt
+    });
 }
 
 type* typeInvalid (typeSys* ts) {
@@ -157,7 +174,41 @@ type* typeTupleChain (int arity, typeSys* ts, ...) {
     return typeTuple(ts, types);
 }
 
-const char* typeGetStr (type* dt) {
+/*==== String representation ===*/
+
+typedef struct strCtx {
+    /*Use a vector because n is small?*/
+    intmap(type*, const char*) typevars;
+    int namesGiven;
+} strCtx;
+
+static const char* strNewTypevar (strCtx* ctx) {
+    static const char* strs[10] = {"'a", "'b", "'c", "'d", "'e", "'f", "'g", "'h", "'i", "'j"};
+
+    if (ctx->namesGiven >= 10) {
+        errprintf("Run out of static strings to allocate\n");
+        return "'";
+
+    } else
+        return strs[ctx->namesGiven++];
+}
+
+static const char* strMapTypevar (strCtx* ctx, const type* dt) {
+    if (mapNull(ctx->typevars))
+        ctx->typevars = intmapInit(32, malloc);
+
+    const char* str = intmapMap(&ctx->typevars, (intptr_t) dt);
+
+    /*Get a new string if the typevar isn't already mapped*/
+    if (!str) {
+        str = strNewTypevar(ctx);
+        intmapAdd(&ctx->typevars, (intptr_t) dt, (void*) str);
+    }
+
+    return str;
+}
+
+static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
     if (dt->str)
         return dt->str;
 
@@ -171,8 +222,8 @@ const char* typeGetStr (type* dt) {
     case type_KindNo: return "<KindNo, not real>";
 
     case type_Fn: {
-        const char *from = typeGetStr(dt->from),
-                   *to = typeGetStr(dt->to);
+        const char *from = typeGetStrImpl(ctx, dt->from),
+                   *to = typeGetStrImpl(ctx, dt->to);
 
         bool higherOrderFn = dt->from->kind == type_Fn;
 
@@ -182,7 +233,7 @@ const char* typeGetStr (type* dt) {
     }
 
     case type_List: {
-        const char* elements = typeGetStr(dt->elements);
+        const char* elements = typeGetStrImpl(ctx, dt->elements);
         dt->str = malloc(strlen(elements) + 2 + 1);
         sprintf(dt->str, "[%s]", elements);
         return dt->str;
@@ -194,7 +245,7 @@ const char* typeGetStr (type* dt) {
 
         /*Work out the length of all the subtypes and store their strings*/
         for_vector (type* dt, dt->types, {
-            const char* typeStr = typeGetStr(dt);
+            const char* typeStr = typeGetStrImpl(ctx, dt);
             length += strlen(typeStr) + 2;
             vectorPush(&typeStrs, typeStr);
         })
@@ -217,9 +268,39 @@ const char* typeGetStr (type* dt) {
 
         return dt->str;
     }
+
+    case type_Var:
+        return strMapTypevar(ctx, dt);
+
+    case type_Forall:
+        //todo add typevars to ensure order
+        return typeGetStrImpl(ctx, dt->dt);
     }
 
     return "<unhandled type kind>";
+}
+
+strCtx strCtxInit () {
+    return (strCtx) {
+        /*Avoid a malloc unless necessary*/
+        .typevars = {},
+        .namesGiven = 0
+    };
+}
+
+strCtx* strCtxFree (strCtx* ctx) {
+    intmapFree(&ctx->typevars);
+    return ctx;
+}
+
+const char* typeGetStr (type* dt) {
+	/*The context keeps track of typevars already given names
+	  and which names have been given.*/
+    strCtx ctx = strCtxInit();
+    const char* str = typeGetStrImpl(&ctx, dt);
+    strCtxFree(&ctx);
+
+    return str;
 }
 
 /*==== Tests and operations ====*/
