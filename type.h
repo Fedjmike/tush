@@ -64,9 +64,8 @@ bool typeIsKind (typeKind kind, type* dt);
 bool typeIsEqual (type* l, type* r);
 
 bool typeIsFn (type* dt);
-bool typeAppliesToFn (type* arg, type* fn);
-bool typeUnitAppliesToFn (type* fn);
-type* typeGetFnResult (type* fn);
+bool typeAppliesToFn (type* arg, type* fn, type** result);
+bool typeUnitAppliesToFn (type* fn, type** result);
 
 bool typeIsList (type* dt);
 type* typeGetListElements (type* dt);

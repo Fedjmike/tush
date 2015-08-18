@@ -368,18 +368,24 @@ bool typeIsFn (type* dt) {
     return typeIsKind(type_Fn, dt);
 }
 
-bool typeAppliesToFn (type* arg, type* fn) {
+bool typeAppliesToFn (type* arg, type* fn, type** result) {
     assert(arg);
-    return fn->kind == type_Fn && typeIsEqual(fn->from, arg);
+
+    bool applies = fn->kind == type_Fn && typeIsEqual(fn->from, arg);
+
+    if (applies && result)
+        *result = fn->to;
+
+    return applies;
 }
 
-bool typeUnitAppliesToFn (type* fn) {
-    return fn->kind == type_Fn && fn->from->kind == type_Unit;
-}
+bool typeUnitAppliesToFn (type* fn, type** result) {
+    bool applies = fn->kind == type_Fn && fn->from->kind == type_Unit;
 
-type* typeGetFnResult (type* fn) {
-    assert(fn->kind == type_Fn);
-    return fn->to;
+    if (applies && result)
+        *result = fn->to;
+
+    return applies;
 }
 
 bool typeIsList (type* dt) {
