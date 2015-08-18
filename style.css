@@ -23,7 +23,7 @@ h4,
 h5,
 h6,
 label {
-    color: #34495e;
+    color: #5C7A99;
 }
 
 h1 {
@@ -41,7 +41,7 @@ ul.tight {
 }
 
 a {
-    color: #1F1F99;
+    color: #2D86B3;
 }
 
 .pure-img-responsive {
@@ -142,13 +142,13 @@ footer > * {
 }
 
 section {
-    margin-bottom: 3em;
+    padding-bottom: 2em;
 }
 
 /* This is the class used for the dark-background areas. */
 .ribbon {
-    background: #2d3e50;
-    color: #aaa;
+    background: #3D5166;
+    color: #bbb;
 }
 
 .ribbon h1 {
