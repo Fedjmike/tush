@@ -65,3 +65,5 @@ const value* valueIterRead (valueIter* iterator);
 
 /*Convert an iterable to a vector*/
 vector(const value*) valueGetVector (const value* iterable);
+
+const value* valueGetTupleNth (const value* tuple, int n);

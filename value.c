@@ -250,3 +250,8 @@ vector(const value*) valueGetVector (const value* iterable) {
 }
 
 /*---- ----*/
+
+const value* valueGetTupleNth (const value* tuple, int n) {
+    assert(tuple->kind == valueVector);
+    return vectorGet(tuple->vec, n);
+}
