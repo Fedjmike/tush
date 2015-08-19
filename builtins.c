@@ -121,11 +121,18 @@ void addBuiltins (typeSys* ts, sym* global) {
                    valueCreateFn(builtinZipfCurried));
     }
 
-    addBuiltin(global, "sort",
-               /*[(Integer, File)] -> [(Integer, File)]*/
-               typeFn(ts, typeList(ts, typeTupleChain(2, ts, typeInteger(ts),
-                                                             typeFile(ts))),
-                          typeList(ts, typeTupleChain(2, ts, typeInteger(ts),
-                                                             typeFile(ts)))),
-               valueCreateFn(builtinSort));
+    {
+        type* A = typeVar(ts);
+
+        //todo forall chain
+        vector(type*) typevars = vectorInit(1, malloc);
+        vectorPush(&typevars, A);
+
+        addBuiltin(global, "sort",
+                   /*[(Integer, 'a)] -> [(Integer, 'a)]*/
+                   typeForall(ts, typevars,
+                       typeFn(ts, typeList(ts, typeTupleChain(2, ts, typeInteger(ts), A)),
+                                  typeList(ts, typeTupleChain(2, ts, typeInteger(ts), A)))),
+                   valueCreateFn(builtinSort));
+    }
 }
