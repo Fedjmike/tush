@@ -29,15 +29,15 @@ static token lexerNext (lexerCtx* ctx);
 
 /*==== Inline implementations ====*/
 
-hashset lexerOps;
+hashmap(tokenKind) lexerKeywords;
 
-static void lexerOpsInit (void);
+static void lexerKeywordsInit (void);
 
 inline static lexerCtx lexerInit (const char* str) {
     static bool opsInited = false;
 
     if (!opsInited) {
-        lexerOpsInit();
+        lexerKeywordsInit();
         opsInited = true;
     }
 
@@ -209,17 +209,19 @@ inline static token lexerNext (lexerCtx* ctx) {
 
     ctx->buffer[ctx->length++] = 0;
 
-    /*Reassign the kind if the buffer matches an operator*/
+    /*Reassign the kind if the buffer matches an operator or keyword*/
     if (tok.kind == tokenNormal) {
-        if (hashsetTest(&lexerOps, tok.buffer))
-            tok.kind = tokenOp;
+        tokenKind newkind = (tokenKind) hashmapMap(&lexerKeywords, tok.buffer);
+
+        if (newkind)
+            tok.kind = newkind;
     }
 
     return tok;
 };
 
-static inline void lexerOpsInit (void) {
-    lexerOps = hashsetInit(1024, malloc);
+static inline void lexerKeywordsInit (void) {
+    lexerKeywords = hashmapInit(1024, malloc);
 
     static const char* ops[] = {
         "|", "|>", "&&", "||",
@@ -229,8 +231,22 @@ static inline void lexerOpsInit (void) {
         "/", "%"
     };
 
+    static const char* kws[] = {
+        "if", "while", "for", "switch", "case",
+        "break", "continue", "return", "let", "true", "false"
+    };
+
+    /*Add the operators*/
+
     int opNo = sizeof(ops) / sizeof(*ops);
 
     for (int i = 0; i < opNo; i++)
-        hashsetAdd(&lexerOps, ops[i]);
+        hashmapAdd(&lexerKeywords, ops[i], (void*) tokenOp);
+
+    /*And keywords*/
+
+    int kwNo = sizeof(kws) / sizeof(*kws);
+
+    for (int i = 0; i < kwNo; i++)
+        hashmapAdd(&lexerKeywords, kws[i], (void*) tokenKeyword);
 }
