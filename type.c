@@ -222,17 +222,14 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
             vectorPush(&typeStrs, typeStr);
         })
 
+        /*Print the subtypes in parentheses, with comma separators*/
+
         length += 3;
         dt->str = malloc(length);
         strcpy(dt->str, "(");
 
-        bool first = true;
-        int pos = 1;
-
-        for_vector(const char* typeStr, typeStrs, {
-            pos += snprintf(dt->str+pos, length-pos, first ? "%s" : ", %s", typeStr);
-            first = false;
-        })
+        size_t pos = 1;
+        pos += strcatwith(dt->str+pos, typeStrs.length, (char**) typeStrs.buffer, ", ");
 
         strcpy(dt->str+pos, ")");
 
