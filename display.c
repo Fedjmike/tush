@@ -199,10 +199,24 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
 
     for_vector (value* inner, valueGetVector(result), {
         for_vector_indexed (col, value* item, valueGetVector(inner), {
-            size_t width = valuePrint(item);
+            putnchar(' ', gap);
 
-            size_t padding = columnWidths[col] + gap - width;
-            putnchar(' ', padding);
+            /*Right align (i.e. print padding before the item)
+              if the column is an int*/
+
+            type* itemType = vectorGet(tuple, col);
+            bool rightAlign = typeIsKind(type_Int, itemType);
+
+            size_t width = (rightAlign ? valueGetWidthOfStr : valuePrint)(item);
+            size_t padding = columnWidths[col] - width;
+
+            if (rightAlign) {
+                putnchar(' ', padding);
+                valuePrint(item);
+
+            } else
+                /*Value already printed*/
+                putnchar(' ', padding);
         })
 
         putchar('\n');
