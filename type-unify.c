@@ -146,6 +146,20 @@ bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
         case type_List:
             return typeUnifies(ts, infs, l->elements, r->elements);
 
+        case type_Tuple:
+            if (l->types.length != r->types.length)
+                return false;
+
+            for (int i = 0; i < l->types.length; i++) {
+                type *ldt = vectorGet(l->types, i),
+                     *rdt = vectorGet(r->types, i);
+
+                if (!typeUnifies(ts, infs, ldt, rdt))
+                    return false;
+            }
+
+            return true;
+
         default:
             errprintf("Unhandled type, kind %d, %s\n", l->kind, typeGetStr(l));
             return false;
