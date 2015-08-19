@@ -8,6 +8,27 @@
 #include "value.h"
 #include "sym.h"
 
+value* builtinExpandGlob (const char* pattern, value* arg) {
+    (void) arg;
+
+    vector(char*) results = {};
+
+    glob_t matches = {};
+    int error = glob(pattern, 0, 0, &matches);
+
+    if (!error) {
+        results = vectorInit(matches.gl_pathc, GC_malloc);
+
+        /*Turn the matches into a vector*/
+        for (unsigned int n = 0; n < matches.gl_pathc; n++)
+            vectorPush(&results, valueCreateStr(matches.gl_pathv[n]));
+    }
+
+    globfree(&matches);
+
+    return valueCreateVector(results);
+}
+
 static value* builtinSize (const value* file) {
     const char* filename = valueGetFilename(file);
 
@@ -66,27 +87,6 @@ static value* builtinSort (const value* list) {
           (int (*)(const void *, const void *)) compareTuple);
 
     return valueCreateVector(vec);
-}
-
-value* builtinExpandGlob (const char* pattern, value* arg) {
-    (void) arg;
-
-    vector(char*) results = {};
-
-    glob_t matches = {};
-    int error = glob(pattern, 0, 0, &matches);
-
-    if (!error) {
-        results = vectorInit(matches.gl_pathc, GC_malloc);
-
-        /*Turn the matches into a vector*/
-        for (unsigned int n = 0; n < matches.gl_pathc; n++)
-            vectorPush(&results, valueCreateStr(matches.gl_pathv[n]));
-    }
-
-    globfree(&matches);
-
-    return valueCreateVector(results);
 }
 
 static void addBuiltin (sym* global, const char* name, type* dt, value* val) {
