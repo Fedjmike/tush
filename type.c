@@ -274,7 +274,7 @@ const char* typeGetStr (const type* dt) {
     return str;
 }
 
-/*==== Tests and operations ====*/
+/*==== Tests ====*/
 
 static void seeThroughQuantifier (const type** dt) {
     if ((*dt)->kind == type_Forall)
@@ -343,6 +343,8 @@ bool typeIsEqual (const type* l, const type* r) {
     }
 }
 
+/*==== Operations ====*/
+
 bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** result) {
     assert(arg);
 
@@ -373,7 +375,7 @@ bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** resul
     }
 }
 
-bool typeUnitAppliesToFn (type* fn, type** result) {
+bool typeUnitAppliesToFn (const type* fn, type** result) {
     bool applies = fn->kind == type_Fn && fn->from->kind == type_Unit;
 
     if (applies && result)
@@ -382,13 +384,24 @@ bool typeUnitAppliesToFn (type* fn, type** result) {
     return applies;
 }
 
-type* typeGetListElements (const type* dt) {
+bool typeIsListOf (const type* dt, type** elements) {
     seeThroughQuantifier(&dt);
-    assert(dt->kind == type_List);
-    return dt->elements;
+
+    if (dt->kind == type_List) {
+        *elements = dt->elements;
+        return true;
+
+    } else
+        return false;
 }
 
-vector(const type*) typeGetTupleTypes (type* dt) {
-    assert(dt->kind = type_Tuple);
-    return dt->types;
+bool typeIsTupleOf (const type* dt, vector(const type*)* types) {
+    seeThroughQuantifier(&dt);
+
+    if (dt->kind == type_Tuple) {
+        *types = dt->types;
+        return true;
+
+    } else
+        return false;
 }

@@ -140,15 +140,15 @@ static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
 /*---- Binary operators ----*/
 
 static type* analyzePipe (analyzerCtx* ctx, ast* node, type* arg, type* fn) {
-    type *result, *callResult;
+    type *result, *callResult, *elements;
 
     if (typeAppliesToFn(ctx->ts, arg, fn, &callResult))
         result = callResult;
 
     /*If the parameter is a list, attempt to apply the function instead to
       all of the elements individually.*/
-    else if (   typeIsList(arg)
-             && typeAppliesToFn(ctx->ts, typeGetListElements(arg), fn, &callResult)) {
+    else if (   typeIsListOf(arg, &elements)
+             && typeAppliesToFn(ctx->ts, elements, fn, &callResult)) {
         /*The result is a list of the results of all the calls*/
         result = typeList(ctx->ts, callResult);
         node->listApp = true;

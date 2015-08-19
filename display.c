@@ -176,11 +176,8 @@ static void displayFileList (value* result, type* resultType) {
 
 /*Display a tuple list as a table
   (because they are tuples, the result is square*/
-static void displayTable (value* result, type* resultType) {
-    /*result :: ['tuple]*/
-    type* tuple = typeGetListElements(resultType);
-
-    int columns = typeGetTupleTypes(tuple).length;
+static void displayTable (value* result, type* resultType, vector(type*) tuple) {
+    int columns = tuple.length;
 
     /*Note: VLA*/
     size_t columnWidths[columns];
@@ -220,12 +217,12 @@ enum {
     displayListList_bracesOnOwnLineIfRecursing = true
 };
 
-void displayListList (value* result, type* resultType, int depth) {
+void displayListList (value* result, type* resultType, type* elementType, type* innerElementType, int depth) {
     vector(value*) elements = valueGetVector(result);
-    type* elementType = typeGetListElements(resultType);
 
     /*Is the element type *also* a list of lists?*/
-    bool recursing = typeIsList(typeGetListElements(elementType));
+    type* innerInnerElementType;
+    bool recursing = typeIsListOf(innerElementType, &innerInnerElementType);
 
     /*Put the braces on their own line, if the options say so*/
     bool bracesOnOwnLine =    displayListList_bracesOnOwnLine
@@ -244,7 +241,7 @@ void displayListList (value* result, type* resultType, int depth) {
             putnchar(' ', depth+1);
 
         if (recursing)
-            displayListList(element, elementType, depth+1);
+            displayListList(element, elementType, innerElementType, innerInnerElementType, depth+1);
 
         else
             valuePrint(element);
@@ -305,15 +302,16 @@ void displayResult (value* result, type* resultType) {
 
     /*Print the value and type*/
 
+    type *elements, *innerElements;
+    vector(type*) tuple;
+
     if (valueIsInvalid(result))
         displayRegular(result, resultType);
 
-    else if (typeIsList(resultType)) {
-        type* elements = typeGetListElements(resultType);
-
+    else if (typeIsListOf(resultType, &elements)) {
         /* [['a]] -- List of lists (and possibly recursive) */
-        if (typeIsList(elements))
-            displayListList(result, resultType, 0);
+        if (typeIsListOf(elements, &innerElements))
+            displayListList(result, resultType, elements, innerElements, 0);
 
         /*Display empty or singular iterables the normal way instead one of the following*/
         else if (valueGetVector(result).length <= 1)
@@ -324,8 +322,8 @@ void displayResult (value* result, type* resultType) {
             displayFileList(result, resultType);
 
         /* [('a, 'b, ...)] -- A table */
-        else if (typeIsKind(type_Tuple, elements))
-            displayTable(result, resultType);
+        else if (typeIsTupleOf(elements, &tuple))
+            displayTable(result, resultType, tuple);
 
         else
             displayRegular(result, resultType);
