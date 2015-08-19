@@ -1,40 +1,11 @@
 #include "type.h"
+#include "type-internal.h"
 
 #include <assert.h>
 #include <vector.h>
 #include <hashmap.h>
 
 #include "common.h"
-
-typedef struct type {
-    typeKind kind;
-
-    union {
-        /*Fn*/
-        struct {
-            type *from, *to;
-        };
-        /*List*/
-        type* elements;
-        /*Tuple*/
-        vector(type*) types;
-        /*Forall*/
-        struct {
-            vector(type*) typevars;
-            type* dt;
-        };
-    };
-
-    /*Not used by all types
-      Allocated in typeGetStr, if at all*/
-    char* str;
-} type;
-
-
-static bool typeKindIsntUnitary (typeKind kind) {
-    return    kind == type_Fn || kind == type_List || kind == type_Tuple
-           || kind == type_Forall;
-}
 
 /*==== Type ctors and dtors ====*/
 
