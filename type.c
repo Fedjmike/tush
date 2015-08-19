@@ -264,11 +264,11 @@ strCtx* strCtxFree (strCtx* ctx) {
     return ctx;
 }
 
-const char* typeGetStr (type* dt) {
+const char* typeGetStr (const type* dt) {
 	/*The context keeps track of typevars already given names
 	  and which names have been given.*/
     strCtx ctx = strCtxInit();
-    const char* str = typeGetStrImpl(&ctx, dt);
+    const char* str = typeGetStrImpl(&ctx, (type*) dt);
     strCtxFree(&ctx);
 
     return str;
@@ -276,25 +276,33 @@ const char* typeGetStr (type* dt) {
 
 /*==== Tests and operations ====*/
 
-static void seeThroughQuantifier (type** dt) {
+static void seeThroughQuantifier (const type** dt) {
     if ((*dt)->kind == type_Forall)
         *dt = (*dt)->dt;
-}
-
-bool typeIsInvalid (type* dt) {
-    seeThroughQuantifier(&dt);
-    return dt->kind == type_Invalid;
 }
 
 /*Returns whether the type is logically of a kind
   There may be indirection through quantifiers.
   Do not use this if you will access the structure of the type.*/
-bool typeIsKind (typeKind kind, type* dt) {
+bool typeIsKind (typeKind kind, const type* dt) {
     seeThroughQuantifier(&dt);
     return dt->kind == kind;
 }
 
-bool typeIsEqual (type* l, type* r) {
+bool typeIsInvalid (const type* dt) {
+    seeThroughQuantifier(&dt);
+    return dt->kind == type_Invalid;
+}
+
+bool typeIsFn (const type* dt) {
+    return typeIsKind(type_Fn, dt);
+}
+
+bool typeIsList (const type* dt) {
+    return typeIsKind(type_List, dt);
+}
+
+bool typeIsEqual (const type* l, const type* r) {
     assert(l);
     assert(r);
 
@@ -335,11 +343,7 @@ bool typeIsEqual (type* l, type* r) {
     }
 }
 
-bool typeIsFn (type* dt) {
-    return typeIsKind(type_Fn, dt);
-}
-
-bool typeAppliesToFn (type* arg, type* fn, type** result) {
+bool typeAppliesToFn (const type* arg, const type* fn, type** result) {
     assert(arg);
 
     bool applies = fn->kind == type_Fn && typeIsEqual(fn->from, arg);
@@ -359,11 +363,7 @@ bool typeUnitAppliesToFn (type* fn, type** result) {
     return applies;
 }
 
-bool typeIsList (type* dt) {
-    return typeIsKind(type_List, dt);
-}
-
-type* typeGetListElements (type* dt) {
+type* typeGetListElements (const type* dt) {
     seeThroughQuantifier(&dt);
     assert(dt->kind == type_List);
     return dt->elements;
