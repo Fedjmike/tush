@@ -36,7 +36,7 @@ static type* analyzeUnitLit (analyzerCtx* ctx, ast* node) {
 
 static type* analyzeIntLit (analyzerCtx* ctx, ast* node) {
     (void) node;
-    return typeUnitary(ctx->ts, type_Integer);
+    return typeUnitary(ctx->ts, type_Int);
 }
 
 static type* analyzeStrLit (analyzerCtx* ctx, ast* node) {

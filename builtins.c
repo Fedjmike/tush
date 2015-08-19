@@ -97,11 +97,11 @@ static void addBuiltin (sym* global, const char* name, type* dt, value* val) {
 
 void addBuiltins (typeSys* ts, sym* global) {
     addBuiltin(global, "size",
-               typeFnChain(2, ts, type_File, type_Integer),
+               typeFnChain(2, ts, type_File, type_Int),
                valueCreateFn(builtinSize));
 
     addBuiltin(global, "sum",
-               typeFn(ts, typeList(ts, typeInteger(ts)), typeInteger(ts)),
+               typeFn(ts, typeList(ts, typeInt(ts)), typeInt(ts)),
                valueCreateFn(builtinSum));
 
     {
@@ -131,8 +131,8 @@ void addBuiltins (typeSys* ts, sym* global) {
         addBuiltin(global, "sort",
                    /*[(Integer, 'a)] -> [(Integer, 'a)]*/
                    typeForall(ts, typevars,
-                       typeFn(ts, typeList(ts, typeTupleChain(2, ts, typeInteger(ts), A)),
-                                  typeList(ts, typeTupleChain(2, ts, typeInteger(ts), A)))),
+                       typeFn(ts, typeList(ts, typeTupleChain(2, ts, typeInt(ts), A)),
+                                  typeList(ts, typeTupleChain(2, ts, typeInt(ts), A)))),
                    valueCreateFn(builtinSort));
     }
 }

@@ -4,7 +4,7 @@
 
 typedef enum typeKind {
     type_Unit,
-    type_Integer, type_Number,
+    type_Int, type_Number,
     type_Str,
     type_File,
     type_Fn, type_List, type_Tuple,
@@ -34,7 +34,7 @@ typeSys* typesFree (typeSys* ts);
 
 type* typeUnitary (typeSys* ts, typeKind kind);
 
-type* typeInteger (typeSys* ts);
+type* typeInt (typeSys* ts);
 type* typeFile (typeSys* ts);
 type* typeFn (typeSys* ts, type* from, type* to);
 type* typeList (typeSys* ts, type* elements);

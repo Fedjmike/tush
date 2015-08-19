@@ -35,8 +35,8 @@ type* typeUnitary (typeSys* ts, typeKind kind) {
     return ts->unitaries[kind];
 }
 
-type* typeInteger (typeSys* ts) {
-    return typeUnitary(ts, type_Integer);
+type* typeInt (typeSys* ts) {
+    return typeUnitary(ts, type_Int);
 }
 
 type* typeFile (typeSys* ts) {
@@ -185,9 +185,9 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
 
     switch (dt->kind) {
     case type_Unit: return "()";
-    case type_Integer: return "Integer";
+    case type_Int: return "Int";
+    case type_Num: return "Num";
     case type_Str: return "Str";
-    case type_Number: return "Number";
     case type_File: return "File";
     case type_Invalid: return "<invalid>";
     case type_KindNo: return "<KindNo, not real>";

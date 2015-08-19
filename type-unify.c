@@ -185,9 +185,9 @@ bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
 type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
     switch (dt->kind) {
     case type_Unit:
-    case type_Integer:
+    case type_Int:
+    case type_Num:
     case type_Str:
-    case type_Number:
     case type_File:
     case type_Invalid:
         return (type*) dt;
