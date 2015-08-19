@@ -63,9 +63,7 @@ static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
     /*No elements => type is ['a] */
     if (node->children.length == 0) {
         type* A = typeVar(ctx->ts);
-
-        vector(type*) typevars = vectorInit(1, malloc);
-        vectorPush(&typevars, A);
+        vector(type*) typevars = vectorInitChain(1, malloc, A);
 
         return typeForall(ctx->ts, typevars, typeList(ctx->ts, A));
 

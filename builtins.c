@@ -108,13 +108,9 @@ void addBuiltins (typeSys* ts, sym* global) {
         type *A = typeVar(ts),
              *B = typeVar(ts);
 
-        vector(type*) typevars = vectorInit(2, malloc);
-        vectorPush(&typevars, A);
-        vectorPush(&typevars, B);
-
         addBuiltin(global, "zipf",
                    /*'a 'b => ('a -> 'b) -> 'a -> ('b, 'a)*/
-                   typeForall(ts, typevars,
+                   typeForall(ts, vectorInitChain(2, malloc, A, B),
                        typeFn(ts, typeFn(ts, A, B),
                        typeFn(ts, A,
                                   typeTupleChain(2, ts, B, A)))),
@@ -124,13 +120,9 @@ void addBuiltins (typeSys* ts, sym* global) {
     {
         type* A = typeVar(ts);
 
-        //todo forall chain
-        vector(type*) typevars = vectorInit(1, malloc);
-        vectorPush(&typevars, A);
-
         addBuiltin(global, "sort",
                    /*[(Integer, 'a)] -> [(Integer, 'a)]*/
-                   typeForall(ts, typevars,
+                   typeForall(ts, vectorInitChain(1, malloc, A),
                        typeFn(ts, typeList(ts, typeTupleChain(2, ts, typeInt(ts), A)),
                                   typeList(ts, typeTupleChain(2, ts, typeInt(ts), A)))),
                    valueCreateFn(builtinSort));
