@@ -4,7 +4,7 @@
 
 typedef enum typeKind {
     type_Unit,
-    type_Int, type_Number,
+    type_Int, type_Num, type_Bool,
     type_Str,
     type_File,
     type_Fn, type_List, type_Tuple,

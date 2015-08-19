@@ -39,6 +39,11 @@ static type* analyzeIntLit (analyzerCtx* ctx, ast* node) {
     return typeUnitary(ctx->ts, type_Int);
 }
 
+static type* analyzeBoolLit (analyzerCtx* ctx, ast* node) {
+    (void) node;
+    return typeUnitary(ctx->ts, type_Bool);
+}
+
 static type* analyzeStrLit (analyzerCtx* ctx, ast* node) {
     (void) node;
     return typeUnitary(ctx->ts, type_Str);
@@ -219,6 +224,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
         [astInvalid] = analyzeInvalid,
         [astUnitLit] = analyzeUnitLit,
         [astIntLit] = analyzeIntLit,
+        [astBoolLit] = analyzeBoolLit,
         [astStrLit] = analyzeStrLit,
         [astFileLit] = analyzeFileLit,
         [astGlobLit] = analyzeGlobLit,

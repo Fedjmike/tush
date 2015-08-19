@@ -187,6 +187,7 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
     case type_Unit:
     case type_Int:
     case type_Num:
+    case type_Bool:
     case type_Str:
     case type_File:
     case type_Invalid:

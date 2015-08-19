@@ -60,6 +60,12 @@ ast* astCreateIntLit (int64_t integer) {
     });
 }
 
+ast* astCreateBoolLit (bool truth) {
+    return astCreate(astBoolLit, (ast) {
+        .literal.truth = truth,
+    });
+}
+
 ast* astCreateStrLit (const char* str) {
     return astCreate(astStrLit, (ast) {
         .literal.str = strdup(str),
@@ -127,6 +133,7 @@ const char* astKindGetStr (astKind kind) {
     case astSymbol: return "Symbol";
     case astUnitLit: return "UnitLit";
     case astIntLit: return "IntLit";
+    case astBoolLit: return "BoolLit";
     case astStrLit: return "StrLit";
     case astFileLit: return "FileLit";
     case astGlobLit: return "GlobLit";
