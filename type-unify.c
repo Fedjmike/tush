@@ -11,7 +11,8 @@ typedef struct inference {
 } inference;
 
 typedef struct inferences {
-    intset(const type* typevar) bound;
+    //todo bound: intset or vector?
+    vector(const type* typevar) bound;
     vector(inference*) v;
 } inferences;
 
@@ -30,15 +31,14 @@ static void infDestroy (inference* inf) {
     free(inf);
 }
 
-inferences infsInit (stdalloc allocator) {
+inferences infsInit (vector(const type*) bound, stdalloc allocator) {
     return (inferences) {
-        .bound = intsetInit(16, allocator),
+        .bound = bound,
         .v = vectorInit(8, allocator)
     };
 }
 
 inferences* infsFree (inferences* infs) {
-    intsetFree(&infs->bound);
     vectorFreeObjs(&infs->v, (vectorDtor) infDestroy);
     return infs;
 }
@@ -84,9 +84,11 @@ static bool infsMerge (inferences* infs, inference* l, inference* r) {
 }
 
 bool inferEqual (inferences* infs, const type* l, const type* r) {
-    //todo
-    bool lIsBoundTypevar = true,
-         rIsBoundTypevar = true;
+    /*Only bound typevars may be assigned to*/
+    bool lIsBoundTypevar =    l->kind == type_Var
+                           && vectorFind(infs->bound, (void*) l) != -1,
+         rIsBoundTypevar =    r->kind == type_Var
+                           && vectorFind(infs->bound, (void*) r) != -1;
 
     if (lIsBoundTypevar && rIsBoundTypevar) {
         /*Do they already have inferences?*/
@@ -105,19 +107,26 @@ bool inferEqual (inferences* infs, const type* l, const type* r) {
         else
             infAddTypevar(infsAdd(infs, l, 0), r);
 
-    } else if (lIsBoundTypevar) {
-        inference* inf = infsLookup(infs, l);
-
-        if (inf)
-            return infAddClosed(inf, r); //p. conflict
-
-        else
-            infsAdd(infs, l, r);
-
     } else {
-        /*The right is the typevar.
-          Switch them around and have the previous case handle them.*/
-        return inferEqual(infs, r, l); //p. conflict
+        /*Switch the bound typevar (if any) into the left slot.*/
+        if (rIsBoundTypevar) {
+            swap(l, r);
+            swap(lIsBoundTypevar, rIsBoundTypevar);
+        }
+
+        if (lIsBoundTypevar) {
+            inference* inf = infsLookup(infs, l);
+
+            if (inf)
+                return infAddClosed(inf, r); //p. conflict
+
+            else
+                infsAdd(infs, l, r);
+
+        /*Two closed types, conflict
+          (or free typevars, which for this purpose are closed)*/
+        } else
+            return true;
     }
 
     return false;
@@ -126,15 +135,21 @@ bool inferEqual (inferences* infs, const type* l, const type* r) {
 
 bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
     if (l->kind == type_Var || r->kind == type_Var) {
-        //todo wtf??!
-        inferEqual(infs, l, r);
-        return (type*) l;
+        bool fail = inferEqual(infs, l, r);
+        return !fail;
 
-    } else if (l->kind != r->kind)
-        return 0;
+    } else if (l->kind == type_Forall) {
+        /*The typevars of this quantifier cannot be assigned to*/
+        return typeUnifies(ts, infs, l->dt, r);
+
+    } else if (r->kind == type_Forall) {
+        return typeUnifies(ts, infs, l, r->dt);
+
+    } else if (l->kind != r->kind) {
+        return false;
 
     /*Kinds equal*/
-    else {
+    } else {
         if (!typeKindIsntUnitary(l->kind))
             return l == r ? (type*) l : 0;
 
@@ -145,6 +160,20 @@ bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
 
         case type_List:
             return typeUnifies(ts, infs, l->elements, r->elements);
+
+        case type_Tuple:
+            if (l->types.length != r->types.length)
+                return false;
+
+            for (int i = 0; i < l->types.length; i++) {
+                type *ldt = vectorGet(l->types, i),
+                     *rdt = vectorGet(r->types, i);
+
+                if (!typeUnifies(ts, infs, ldt, rdt))
+                    return false;
+            }
+
+            return true;
 
         default:
             errprintf("Unhandled type, kind %d, %s\n", l->kind, typeGetStr(l));
@@ -197,6 +226,7 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
             return (type*) dt;
 
     } case type_Forall: {
+        //todo leave typevars with no closed
         return typeMakeSubs(ts, infs, dt->dt);
 
     } case type_KindNo:
@@ -212,14 +242,27 @@ type* unifyArgWithFn (typeSys* ts, const type* arg, const type* fn) {
     assert(fn->kind == type_Forall);
     assert(fn->dt->kind == type_Fn);
 
-    inferences infs = infsInit(malloc);
+    /*Only the typevars bound to the two arguments can be assigned to
+      in the unification process.*/
+
+    vector(type*) boundTypevars = fn->typevars;
+
+    if (arg->kind == type_Forall) {
+        boundTypevars = vectorInit(boundTypevars.length + arg->typevars.length, malloc);
+        vectorPushFromVector(&boundTypevars, fn->typevars);
+        vectorPushFromVector(&boundTypevars, arg->typevars);
+    }
+
+    inferences infs = infsInit(boundTypevars, malloc);
 
     /*Return the unified form of the function*/
     bool unifies = typeUnifies(ts, &infs, arg, fn->dt->from);
-
     type* specificFn = unifies ? typeMakeSubs(ts, &infs, fn) : 0;
 
     infsFree(&infs);
+
+    if (arg->kind == type_Forall)
+        vectorFree(&boundTypevars);
 
     return specificFn;
 }
