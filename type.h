@@ -8,6 +8,7 @@ typedef enum typeKind {
     type_Str,
     type_File,
     type_Fn, type_List, type_Tuple,
+    type_Var, type_Forall,
     type_Invalid,
     type_KindNo
 } typeKind;
@@ -39,6 +40,9 @@ type* typeFn (typeSys* ts, type* from, type* to);
 type* typeList (typeSys* ts, type* elements);
 type* typeTuple (typeSys* ts, vector(type*) types);
 
+type* typeVar (typeSys* ts);
+type* typeForall (typeSys* ts, vector(type*) typevars, type* dt);
+
 type* typeInvalid (typeSys* ts);
 
 /*A helper function for construction fn types.
@@ -50,21 +54,21 @@ type* typeTupleChain (int arity, typeSys* ts, ...);
 
 /*==== ====*/
 
-const char* typeGetStr (type* dt);
+const char* typeGetStr (const type* dt);
 
 /*==== Tests and getters ====*/
 
-bool typeIsInvalid (type* dt);
-bool typeIsKind (typeKind kind, type* dt);
+bool typeIsKind (typeKind kind, const type* dt);
+bool typeIsInvalid (const type* dt);
+bool typeIsFn (const type* dt);
 
-bool typeIsEqual (type* l, type* r);
+bool typeIsEqual (const type* l, const type* r);
 
 bool typeIsFn (type* dt);
-bool typeAppliesToFn (type* arg, type* fn);
-bool typeUnitAppliesToFn (type* fn);
-type* typeGetFnResult (type* fn);
+bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** result);
+bool typeUnitAppliesToFn (type* fn, type** result);
 
-bool typeIsList (type* dt);
-type* typeGetListElements (type* dt);
+bool typeIsList (const type* dt);
+type* typeGetListElements (const type* dt);
 
 vector(const type*) typeGetTupleTypes (type* dt);

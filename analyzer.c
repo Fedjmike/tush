@@ -55,20 +55,28 @@ static type* analyzeGlobLit (analyzerCtx* ctx, ast* node) {
 }
 
 static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
-    //todo 'a List
-    assert(node->children.length != 0);
+    /*No elements => type is ['a] */
+    if (node->children.length == 0) {
+        type* A = typeVar(ctx->ts);
 
-    type* elements;
+        vector(type*) typevars = vectorInit(1, malloc);
+        vectorPush(&typevars, A);
 
-    for_vector (ast* element, node->children, {
-        elements = analyzer(ctx, element);
+        return typeForall(ctx->ts, typevars, typeList(ctx->ts, A));
 
-        //todo check equality
-        //mode average if they differ
-        //todo lowest common interface ?
-    })
+    } else {
+        type* elements;
 
-    return typeList(ctx->ts, elements);
+        for_vector (ast* element, node->children, {
+            elements = analyzer(ctx, element);
+
+            //todo check equality
+            //mode average if they differ
+            //todo lowest common interface ?
+        })
+
+        return typeList(ctx->ts, elements);
+    }
 }
 
 static type* analyzeTupleLit (analyzerCtx* ctx, ast* node) {
@@ -115,8 +123,10 @@ static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
     for_vector (ast* argNode, node->children, {
         type* arg = analyzer(ctx, argNode);
 
-        if (typeAppliesToFn(arg, result))
-            result = typeGetFnResult(result);
+        type* callResult;
+
+        if (typeAppliesToFn(ctx->ts, arg, result, &callResult))
+            result = callResult;
 
         else {
             errorFnApp(ctx, arg, result);
@@ -130,17 +140,17 @@ static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
 /*---- Binary operators ----*/
 
 static type* analyzePipe (analyzerCtx* ctx, ast* node, type* arg, type* fn) {
-    type* result;
+    type *result, *callResult;
 
-    if (typeAppliesToFn(arg, fn))
-        result = typeGetFnResult(fn);
+    if (typeAppliesToFn(ctx->ts, arg, fn, &callResult))
+        result = callResult;
 
     /*If the parameter is a list, attempt to apply the function instead to
       all of the elements individually.*/
     else if (   typeIsList(arg)
-             && typeAppliesToFn(typeGetListElements(arg), fn)) {
+             && typeAppliesToFn(ctx->ts, typeGetListElements(arg), fn, &callResult)) {
         /*The result is a list of the results of all the calls*/
-        result = typeList(ctx->ts, typeGetFnResult(fn));
+        result = typeList(ctx->ts, callResult);
         node->listApp = true;
 
     } else {

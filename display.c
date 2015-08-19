@@ -292,12 +292,14 @@ void displayStr (value* result, type* resultType) {
 }
 
 void displayResult (value* result, type* resultType) {
+    type* callResult;
+
     /*If the result is () -> 'a ...*/
-    if (typeUnitAppliesToFn(resultType)) {
+    if (typeUnitAppliesToFn(resultType, &callResult)) {
         printf("(A value of %s has been automatically applied.)\n", typeGetStr(resultType));
 
         /*Apply unit to the result and display that instead*/
-        resultType = typeGetFnResult(resultType);
+        resultType = callResult;
         result = valueCall(result, valueCreateUnit());
     }
 

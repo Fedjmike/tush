@@ -1,33 +1,11 @@
 #include "type.h"
+#include "type-internal.h"
 
 #include <assert.h>
 #include <vector.h>
+#include <hashmap.h>
 
 #include "common.h"
-
-typedef struct type {
-    typeKind kind;
-
-    union {
-        /*Fn*/
-        struct {
-            type *from, *to;
-        };
-        /*List*/
-        type* elements;
-        /*Tuple*/
-        vector(type*) types;
-    };
-
-    /*Not used by all types
-      Allocated in typeGetStr, if at all*/
-    char* str;
-} type;
-
-
-static bool typeKindIsntUnitary (typeKind kind) {
-    return kind == type_Fn || kind == type_List || kind == type_Tuple;
-}
 
 /*==== Type ctors and dtors ====*/
 
@@ -65,28 +43,38 @@ type* typeFile (typeSys* ts) {
     return typeUnitary(ts, type_File);
 }
 
-type* typeFn (typeSys* ts, type* from, type* to) {
-    type* dt = typeCreate(type_Fn, (type) {
-        .from = from, .to = to
-    });
+static type* typeNonUnitary (typeSys* ts, typeKind kind, type init) {
+    type* dt = typeCreate(kind, init);
     vectorPush(&ts->others, dt);
     return dt;
+}
+
+type* typeFn (typeSys* ts, type* from, type* to) {
+    return typeNonUnitary(ts, type_Fn, (type) {
+        .from = from, .to = to
+    });
 }
 
 type* typeList (typeSys* ts, type* elements) {
-    type* dt = typeCreate(type_List, (type) {
+    return typeNonUnitary(ts, type_List, (type) {
         .elements = elements
     });
-    vectorPush(&ts->others, dt);
-    return dt;
 }
 
 type* typeTuple (typeSys* ts, vector(type*) types) {
-    type* dt = typeCreate(type_Tuple, (type) {
+    return typeNonUnitary(ts, type_Tuple, (type) {
         .types = types
     });
-    vectorPush(&ts->others, dt);
-    return dt;
+}
+
+type* typeVar (typeSys* ts) {
+    return typeNonUnitary(ts, type_Var, (type) {});
+}
+
+type* typeForall (typeSys* ts, vector(type*) typevars, type* dt) {
+    return typeNonUnitary(ts, type_Forall, (type) {
+        .typevars = typevars, .dt = dt
+    });
 }
 
 type* typeInvalid (typeSys* ts) {
@@ -157,7 +145,41 @@ type* typeTupleChain (int arity, typeSys* ts, ...) {
     return typeTuple(ts, types);
 }
 
-const char* typeGetStr (type* dt) {
+/*==== String representation ===*/
+
+typedef struct strCtx {
+    /*Use a vector because n is small?*/
+    intmap(type*, const char*) typevars;
+    int namesGiven;
+} strCtx;
+
+static const char* strNewTypevar (strCtx* ctx) {
+    static const char* strs[10] = {"'a", "'b", "'c", "'d", "'e", "'f", "'g", "'h", "'i", "'j"};
+
+    if (ctx->namesGiven >= 10) {
+        errprintf("Run out of static strings to allocate\n");
+        return "'";
+
+    } else
+        return strs[ctx->namesGiven++];
+}
+
+static const char* strMapTypevar (strCtx* ctx, const type* dt) {
+    if (mapNull(ctx->typevars))
+        ctx->typevars = intmapInit(32, malloc);
+
+    const char* str = intmapMap(&ctx->typevars, (intptr_t) dt);
+
+    /*Get a new string if the typevar isn't already mapped*/
+    if (!str) {
+        str = strNewTypevar(ctx);
+        intmapAdd(&ctx->typevars, (intptr_t) dt, (void*) str);
+    }
+
+    return str;
+}
+
+static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
     if (dt->str)
         return dt->str;
 
@@ -171,8 +193,8 @@ const char* typeGetStr (type* dt) {
     case type_KindNo: return "<KindNo, not real>";
 
     case type_Fn: {
-        const char *from = typeGetStr(dt->from),
-                   *to = typeGetStr(dt->to);
+        const char *from = typeGetStrImpl(ctx, dt->from),
+                   *to = typeGetStrImpl(ctx, dt->to);
 
         bool higherOrderFn = dt->from->kind == type_Fn;
 
@@ -182,7 +204,7 @@ const char* typeGetStr (type* dt) {
     }
 
     case type_List: {
-        const char* elements = typeGetStr(dt->elements);
+        const char* elements = typeGetStrImpl(ctx, dt->elements);
         dt->str = malloc(strlen(elements) + 2 + 1);
         sprintf(dt->str, "[%s]", elements);
         return dt->str;
@@ -194,7 +216,7 @@ const char* typeGetStr (type* dt) {
 
         /*Work out the length of all the subtypes and store their strings*/
         for_vector (type* dt, dt->types, {
-            const char* typeStr = typeGetStr(dt);
+            const char* typeStr = typeGetStrImpl(ctx, dt);
             length += strlen(typeStr) + 2;
             vectorPush(&typeStrs, typeStr);
         })
@@ -217,22 +239,70 @@ const char* typeGetStr (type* dt) {
 
         return dt->str;
     }
+
+    case type_Var:
+        return strMapTypevar(ctx, dt);
+
+    case type_Forall:
+        //todo add typevars to ensure order
+        return typeGetStrImpl(ctx, dt->dt);
     }
 
     return "<unhandled type kind>";
 }
 
-/*==== Tests and operations ====*/
-
-bool typeIsInvalid (type* dt) {
-    return dt->kind == type_Invalid;
+strCtx strCtxInit () {
+    return (strCtx) {
+        /*Avoid a malloc unless necessary*/
+        .typevars = {},
+        .namesGiven = 0
+    };
 }
 
-bool typeIsKind (typeKind kind, type* dt) {
+strCtx* strCtxFree (strCtx* ctx) {
+    intmapFree(&ctx->typevars);
+    return ctx;
+}
+
+const char* typeGetStr (const type* dt) {
+	/*The context keeps track of typevars already given names
+	  and which names have been given.*/
+    strCtx ctx = strCtxInit();
+    const char* str = typeGetStrImpl(&ctx, (type*) dt);
+    strCtxFree(&ctx);
+
+    return str;
+}
+
+/*==== Tests and operations ====*/
+
+static void seeThroughQuantifier (const type** dt) {
+    if ((*dt)->kind == type_Forall)
+        *dt = (*dt)->dt;
+}
+
+/*Returns whether the type is logically of a kind
+  There may be indirection through quantifiers.
+  Do not use this if you will access the structure of the type.*/
+bool typeIsKind (typeKind kind, const type* dt) {
+    seeThroughQuantifier(&dt);
     return dt->kind == kind;
 }
 
-bool typeIsEqual (type* l, type* r) {
+bool typeIsInvalid (const type* dt) {
+    seeThroughQuantifier(&dt);
+    return dt->kind == type_Invalid;
+}
+
+bool typeIsFn (const type* dt) {
+    return typeIsKind(type_Fn, dt);
+}
+
+bool typeIsList (const type* dt) {
+    return typeIsKind(type_List, dt);
+}
+
+bool typeIsEqual (const type* l, const type* r) {
     assert(l);
     assert(r);
 
@@ -273,34 +343,52 @@ bool typeIsEqual (type* l, type* r) {
     }
 }
 
-bool typeIsFn (type* dt) {
-    return dt->kind == type_Fn;
-}
-
-bool typeAppliesToFn (type* arg, type* fn) {
+bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** result) {
     assert(arg);
-    return fn->kind == type_Fn && typeIsEqual(fn->from, arg);
+
+    if (!typeIsFn(fn))
+        return false;
+
+    else if (fn->kind == type_Fn) {
+        bool applies = typeIsEqual(fn->from, arg);
+
+        if (applies && result)
+            *result = fn->to;
+
+        return applies;
+
+    /*The function is quantified, so find the types which satisfy this application*/
+    } else if (fn->kind == type_Forall && fn->dt->kind == type_Fn) {
+        type* unifiedFn = unifyArgWithFn(ts, arg, fn);
+
+        if (unifiedFn)
+            *result = unifiedFn->to;
+
+        return unifiedFn != 0;
+
+    } else {
+        errprintf("Unknown function representation, kind %d, %s\n", fn->kind, typeGetStr(fn));
+        *result = typeInvalid(ts);
+        return true;
+    }
 }
 
-bool typeUnitAppliesToFn (type* fn) {
-    return fn->kind == type_Fn && fn->from->kind == type_Unit;
+bool typeUnitAppliesToFn (type* fn, type** result) {
+    bool applies = fn->kind == type_Fn && fn->from->kind == type_Unit;
+
+    if (applies && result)
+        *result = fn->to;
+
+    return applies;
 }
 
-type* typeGetFnResult (type* fn) {
-    assert(fn->kind == type_Fn);
-    return fn->to;
-}
-
-bool typeIsList (type* dt) {
-    return dt->kind == type_List;
-}
-
-type* typeGetListElements (type* dt) {
-    assert(typeIsList(dt));
+type* typeGetListElements (const type* dt) {
+    seeThroughQuantifier(&dt);
+    assert(dt->kind == type_List);
     return dt->elements;
 }
 
 vector(const type*) typeGetTupleTypes (type* dt) {
-    assert(typeIsKind(type_Tuple, dt));
+    assert(dt->kind = type_Tuple);
     return dt->types;
 }
