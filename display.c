@@ -195,6 +195,24 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
 
     enum {gap = 2};
 
+    /*Display the tuple types as headings*/
+
+    for_vector_indexed (col, type* dt, tuple, {
+        putnchar(' ', gap);
+        size_t width = printf("%s", typeGetStr(dt));
+        size_t padding = columnWidths[col] - width;
+        putnchar(' ', padding);
+    })
+
+    putchar('\n');
+    putnchar(' ', gap);
+
+    for (int col = 0; col < columns; col++)
+        putnchar('-', columnWidths[col]);
+
+    putnchar('-', columns-1);
+    putchar('\n');
+
     /*Print it*/
 
     for_vector (value* inner, valueGetVector(result), {
