@@ -343,15 +343,34 @@ bool typeIsEqual (const type* l, const type* r) {
     }
 }
 
-bool typeAppliesToFn (const type* arg, const type* fn, type** result) {
+bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** result) {
     assert(arg);
 
-    bool applies = fn->kind == type_Fn && typeIsEqual(fn->from, arg);
+    if (!typeIsFn(fn))
+        return false;
 
-    if (applies && result)
-        *result = fn->to;
+    else if (fn->kind == type_Fn) {
+        bool applies = typeIsEqual(fn->from, arg);
 
-    return applies;
+        if (applies && result)
+            *result = fn->to;
+
+        return applies;
+
+    /*The function is quantified, so find the types which satisfy this application*/
+    } else if (fn->kind == type_Forall && fn->dt->kind == type_Fn) {
+        type* unifiedFn = unifyArgWithFn(ts, arg, fn);
+
+        if (unifiedFn)
+            *result = unifiedFn->to;
+
+        return unifiedFn != 0;
+
+    } else {
+        errprintf("Unknown function representation, kind %d, %s\n", fn->kind, typeGetStr(fn));
+        *result = typeInvalid(ts);
+        return true;
+    }
 }
 
 bool typeUnitAppliesToFn (type* fn, type** result) {

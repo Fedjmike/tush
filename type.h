@@ -65,7 +65,7 @@ bool typeIsFn (const type* dt);
 bool typeIsEqual (const type* l, const type* r);
 
 bool typeIsFn (type* dt);
-bool typeAppliesToFn (const type* arg, const type* fn, type** result);
+bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** result);
 bool typeUnitAppliesToFn (type* fn, type** result);
 
 bool typeIsList (const type* dt);
