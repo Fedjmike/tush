@@ -27,6 +27,8 @@
 #include "runner.h"
 #include "display.h"
 
+_Atomic unsigned int internalerrors = 0;
+
 /*==== Compiler ====*/
 
 typedef struct compilerCtx {
@@ -81,18 +83,20 @@ typedef struct goshResult {
 } goshResult;
 
 goshResult gosh (compilerCtx* ctx, const char* str, bool display) {
+    errctx internalerrors = errcount();
     int errors = 0;
+
     ast* tree = compile(ctx, str, &errors);
 
     value* result = 0;
     type* dt = tree->dt;
 
-    if (errors == 0) {
+    if (errors == 0 && no_errors_recently(internalerrors)) {
         /*Run the AST*/
         envCtx env = {};
         result = run(&env, tree);
 
-        if (display)
+        if (display && no_errors_recently(internalerrors))
             displayResult(result, dt);
     }
 
