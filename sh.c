@@ -1,5 +1,7 @@
 /*For fmemopen*/
 #define _XOPEN_SOURCE 700
+/*For asprintf*/
+#define _GNU_SOURCE
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -128,8 +130,6 @@ void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
     free(wdir_contr);
 }
 
-char* historyFilename;
-
 void replCD (compilerCtx* compiler, const char* input) {
     goshResult result = gosh(compiler, input, false);
 
@@ -151,8 +151,8 @@ void replCD (compilerCtx* compiler, const char* input) {
 void repl (compilerCtx* compiler) {
     const char* homedir = getHomeDir();
 
-    historyFilename = malloc(strlen(homedir) + 15);
-    sprintf(historyFilename, "%s/.gosh_history", homedir);
+    char* historyFilename;
+    asprintf(&historyFilename, "%s/.gosh_history", homedir);
 
     read_history(historyFilename);
 
