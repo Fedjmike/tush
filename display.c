@@ -345,6 +345,10 @@ void displayResult (value* result, type* resultType) {
     } else if (typeIsKind(type_Str, resultType)) {
         displayStr(result, resultType);
 
+    } else if (typeIsKind(type_Unit, resultType)) {
+        /*Don't display unit results
+          These occur from statements like `let`*/
+
     } else {
         displayRegular(result, resultType);
 
