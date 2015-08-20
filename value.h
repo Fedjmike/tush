@@ -53,7 +53,7 @@ int valueGetWidthOfStr (const value* v);
 int valuePrint (const value* v);
 
 int64_t valueGetInt (const value* num);
-const char* valueGetStr (const value* str, size_t* length);
+const char* valueGetStr (const value* str, size_t* length_out);
 
 value* valueCall (const value* fn, const value* arg);
 

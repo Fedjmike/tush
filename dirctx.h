@@ -2,6 +2,8 @@
 
 #include <vector.h>
 
+#include "paths.h"
+
 typedef struct dirCtx {
     vector(char*) searchPaths;
     /*This is for UI purposes and shouldn't be used to construct

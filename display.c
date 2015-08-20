@@ -175,7 +175,7 @@ static void displayFileList (value* result, type* resultType) {
 }
 
 /*Display a tuple list as a table
-  (because they are tuples, the result is square*/
+  (because they are tuples, the result is square)*/
 static void displayTable (value* result, type* resultType, vector(type*) tuple) {
     int columns = tuple.length;
 
