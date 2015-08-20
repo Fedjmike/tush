@@ -38,7 +38,7 @@ Dependencies: [Boehm garbage collector](https://github.com/ivmai/bdwgc/), [GNU R
 Development
 -----------
 
-See the [todo list](/todo.txt).
+See [developing.md](/developing.md) and the [todo list](/todo.txt).
 
 License
 -------
