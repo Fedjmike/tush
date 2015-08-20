@@ -105,6 +105,15 @@ static type* analyzeSymbol (analyzerCtx* ctx, ast* node) {
     }
 }
 
+static void errorClassicUnixApp (analyzerCtx* ctx, type* arg) {
+    if (typeIsInvalid(arg))
+        ;
+
+    else
+        error(ctx)("Unix invokation (stdin -> stdout) requires string arguments, given %s\n",
+                   typeGetStr(arg));
+}
+
 static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
     if (typeIsInvalid(fn))
         ;
@@ -122,20 +131,39 @@ static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
 static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
     type* result = analyzer(ctx, node->r);
 
-    /*Successively apply each argument to the previous result*/
-    for_vector (ast* argNode, node->children, {
-        type* arg = analyzer(ctx, argNode);
+    /*A classic Unix program invocation*/
+    if (typeIsKind(type_File, result)) {
+        node->unix = true;
 
-        type* callResult;
+        for_vector (ast* argNode, node->children, {
+            type* arg = analyzer(ctx, argNode);
 
-        if (typeAppliesToFn(ctx->ts, arg, result, &callResult))
-            result = callResult;
+            if (   !typeIsKind(type_Str, arg)
+                && !typeIsKind(type_File, arg))
+                errorClassicUnixApp(ctx, arg);
 
-        else {
-            errorFnApp(ctx, arg, result);
-            result = typeInvalid(ctx->ts);
-        }
-    })
+            //todo is str
+            //or serializable?
+        })
+
+        return typeUnitary(ctx->ts, type_Str);
+
+    } else {
+        /*Successively apply each argument to the previous result*/
+        for_vector (ast* argNode, node->children, {
+            type* arg = analyzer(ctx, argNode);
+
+            type* callResult;
+
+            if (typeAppliesToFn(ctx->ts, arg, result, &callResult))
+                result = callResult;
+
+            else {
+                errorFnApp(ctx, arg, result);
+                result = typeInvalid(ctx->ts);
+            }
+        })
+    }
 
     return result;
 }

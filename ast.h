@@ -46,6 +46,8 @@ typedef struct ast {
         sym* symbol;
         /*BOP[o=Pipe]*/
         bool listApp;
+        /*FnApp*/
+        bool unix;
     };
     //todo combine bools into a flags field
 } ast;

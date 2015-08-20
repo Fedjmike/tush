@@ -5,6 +5,7 @@
 
 #include "sym.h"
 #include "ast.h"
+#include "type.h"
 #include "value.h"
 
 #include "builtins.h"
@@ -75,13 +76,60 @@ static value* runSymbol (envCtx* env, const ast* node) {
     return val ? val : valueCreateInvalid();
 }
 
-static value* runFnApp (envCtx* env, const ast* node) {
-    value* result = run(env, node->r);
+static value* runClassicUnixApp (envCtx* env, const ast* node, const char* program) {
+    /*Create a vector of the (string) args,
+      bookended by the program name and a null-terminator.*/
+
+    vector(const char*) args = vectorInit(node->children.length + 2, malloc);
+
+    vectorPush(&args, program);
 
     for_vector (ast* argNode, node->children, {
         value* arg = run(env, argNode);
-        result = valueCall(result, arg);
+
+        /*Structured data must be lowered to strings*/
+
+        const char* str;
+
+        if (typeIsKind(type_File, argNode->dt))
+            str = valueGetFilename(arg);
+
+        else if (typeIsKind(type_Str, argNode->dt))
+            str = valueGetStr(arg, 0);
+
+        else {
+            errprintf("Unhandled type kind, %s\n", typeGetStr(argNode->dt));
+            str = "";
+        }
+
+        vectorPush(&args, str);
     })
+
+    vectorPush(&args, 0);
+
+    /*Run the program*/
+    FILE* programOutput = pinvoke(program, (char**) args.buffer);
+    vectorFree(&args);
+
+    /*Read the pipe*/
+    assert(programOutput);
+    char* output = readall(programOutput, GC_malloc, GC_realloc);
+
+    return valueCreateStr(output);
+}
+
+static value* runFnApp (envCtx* env, const ast* node) {
+    value* result = run(env, node->r);
+
+    if (node->unix)
+        result = runClassicUnixApp(env, node, valueGetFilename(result));
+
+    else {
+        for_vector (ast* argNode, node->children, {
+            value* arg = run(env, argNode);
+            result = valueCall(result, arg);
+        })
+    }
 
     return result;
 }
