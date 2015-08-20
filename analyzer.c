@@ -215,6 +215,16 @@ static type* analyzeBOP (analyzerCtx* ctx, ast* node) {
 
 /*---- ----*/
 
+static type* analyzeLet (analyzerCtx* ctx, ast* node) {
+    type* init = analyzer(ctx, node->r);
+
+    node->symbol->dt = init;
+
+    return typeUnitary(ctx->ts, type_Unit);
+}
+
+/*---- ----*/
+
 static type* analyzer (analyzerCtx* ctx, ast* node) {
     typedef type* (*handler_t)(analyzerCtx*, ast*);
 
@@ -228,6 +238,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
         [astGlobLit] = analyzeGlobLit,
         [astListLit] = analyzeListLit,
         [astTupleLit] = analyzeTupleLit,
+        [astLet] = analyzeLet,
         [astSymbol] = analyzeSymbol,
         [astFnApp] = analyzeFnApp,
         [astBOP] = analyzeBOP

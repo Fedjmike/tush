@@ -7,6 +7,7 @@
 typedef enum astKind {
     astBOP, astFnApp, astSymbol,
     astUnitLit, astIntLit, astBoolLit, astStrLit, astFileLit, astGlobLit, astListLit, astTupleLit,
+    astLet,
     astInvalid,
     astKindNo
 } astKind;
@@ -41,7 +42,7 @@ typedef struct ast {
             char* str;
         } literal;
 
-        /*Symbol*/
+        /*Symbol Let*/
         sym* symbol;
         /*BOP[o=Pipe]*/
         bool listApp;
@@ -61,6 +62,8 @@ ast* astCreateFileLit (const char* str);
 ast* astCreateGlobLit (const char* str);
 ast* astCreateListLit (vector(ast*) elements);
 ast* astCreateTupleLit (vector(ast*) elements);
+
+ast* astCreateLet (sym* symbol, ast* init);
 
 ast* astCreateInvalid (void);
 

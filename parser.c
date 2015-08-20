@@ -244,8 +244,43 @@ static ast* parseExpr (parserCtx* ctx) {
     return parseBOP(ctx, 0);
 }
 
+static ast* parseLet (parserCtx* ctx) {
+    match(ctx, "let");
+
+    sym* symbol = 0;
+
+    if (see_kind(ctx, tokenNormal)) {
+        /*Name collision*/
+        if (symLookup(ctx->scope, ctx->current.buffer))
+            /*Error, but use the given name anyway*/
+            error(ctx)("Symbol named '%s' already declared\n", ctx->current.buffer);
+
+        symbol = symAdd(ctx->scope, ctx->current.buffer);
+        accept(ctx);
+
+    } else
+        expected(ctx, "variable name");
+
+    match(ctx, "=");
+
+    ast* init = parseExpr(ctx);
+
+    return astCreateLet(symbol, init);
+}
+
+/**
+ * Statement = Let | Expr
+ */
+static ast* parseStatement (parserCtx* ctx) {
+    if (see(ctx, "let"))
+        return parseLet(ctx);
+
+    else
+        return parseExpr(ctx);
+}
+
 static ast* parseS (parserCtx* ctx) {
-    ast* node = parseExpr(ctx);
+    ast* node = parseStatement(ctx);
 
     if (see_kind(ctx, tokenEOF))
         accept(ctx);

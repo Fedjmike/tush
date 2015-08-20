@@ -139,6 +139,16 @@ static value* runBOP (envCtx* env, const ast* node) {
 
 /*---- ----*/
 
+static value* runLet (envCtx* env, const ast* node) {
+    const value* init = run(env, node->r);
+
+    node->symbol->val = (value*) init;
+
+    return valueCreateUnit();
+}
+
+/*---- ----*/
+
 value* run (envCtx* env, const ast* node) {
     typedef value* (*handler_t)(envCtx*, const ast*);
 
@@ -154,6 +164,7 @@ value* run (envCtx* env, const ast* node) {
         [astFileLit] = runFileLit,
         [astGlobLit] = runGlobLit,
         [astListLit] = runListLit,
+        [astLet] = runLet,
         [astTupleLit] = runTupleLit
     };
 
