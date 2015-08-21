@@ -202,9 +202,6 @@ value* run (envCtx* env, const ast* node) {
 
     static handler_t table[astKindNo] = {
         [astInvalid] = runInvalid,
-        [astBOP] = runBOP,
-        [astFnApp] = runFnApp,
-        [astSymbol] = runSymbol,
         [astUnitLit] = runUnitLit,
         [astIntLit] = runIntLit,
         [astBoolLit] = runBoolLit,
@@ -212,8 +209,11 @@ value* run (envCtx* env, const ast* node) {
         [astFileLit] = runFileLit,
         [astGlobLit] = runGlobLit,
         [astListLit] = runListLit,
-        [astLet] = runLet,
-        [astTupleLit] = runTupleLit
+        [astTupleLit] = runTupleLit,
+        [astSymbol] = runSymbol,
+        [astFnApp] = runFnApp,
+        [astBOP] = runBOP,
+        [astLet] = runLet
     };
 
     handler_t handler;

@@ -266,10 +266,10 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
         [astGlobLit] = analyzeGlobLit,
         [astListLit] = analyzeListLit,
         [astTupleLit] = analyzeTupleLit,
-        [astLet] = analyzeLet,
         [astSymbol] = analyzeSymbol,
         [astFnApp] = analyzeFnApp,
-        [astBOP] = analyzeBOP
+        [astBOP] = analyzeBOP,
+        [astLet] = analyzeLet
     };
 
     if (!node) {
