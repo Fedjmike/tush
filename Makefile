@@ -10,11 +10,11 @@ all: sh
 obj/:
 	@mkdir -p obj
 
-obj/%.o: src/%.c obj/ $(HEADERS)
+obj/%.o: src/%.c $(HEADERS)
 	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo " [CC] $@"
 
-sh: $(OBJECTS)
+sh: obj/ $(OBJECTS)
 	@$(CC) $(LDFLAGS) $(OBJECTS) -o $@
 	@echo " [LD] $@"
 	@du -h $@
@@ -24,6 +24,6 @@ test: sh
 	valgrind -q --leak-check=full --suppressions=boehm-gc.supp ./sh
 
 clean:
-	rm -f *.o sh{,.exe}
+	rm -f obj/*.o sh sh.exe
 
 .PHONY: all test clean
