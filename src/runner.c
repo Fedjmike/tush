@@ -108,7 +108,7 @@ static value* runClassicUnixApp (envCtx* env, const ast* node, const char* progr
     vectorPush(&args, 0);
 
     /*Run the program*/
-    FILE* programOutput = pinvoke(program, (char**) args.buffer);
+    FILE* programOutput = invokePiped(args.buffer);
     vectorFree(&args);
 
     /*Read the pipe*/
