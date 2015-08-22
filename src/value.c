@@ -143,13 +143,12 @@ int valuePrintImpl (const value* v, printf_t printf) {
     case valueVector: {
         int length = printf("[");
 
-        for (int i = 0; i < v->vec.length; i++) {
+        for_vector_indexed (i, value* element, v->vec, {
             if (i != 0)
                 length += printf(", ");
 
-            value* element = vectorGet(v->vec, i);
             length += valuePrintImpl(element, printf);
-        }
+        })
 
         return length += printf("]");
     }
