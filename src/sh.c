@@ -57,7 +57,8 @@ ast* compile (compilerCtx* ctx, const char* str, int* errors) {
         *errors += result.errors;
     }
 
-    printAST(tree);
+    if (false)
+    	printAST(tree);
 
     return tree;
 }
