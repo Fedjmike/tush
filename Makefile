@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -std=c11 -Werror -Wall -Wextra -I../libkiss -g
-LDFLAGS = -lgc -lreadline $(wildcard ../libkiss/*.o)
+LDFLAGS = -lgc -lreadline -L../libkiss -lkiss
 
 HEADERS = $(wildcard src/*.h)
 OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c))
@@ -15,7 +15,7 @@ obj/%.o: src/%.c $(HEADERS)
 	@echo " [CC] $@"
 
 sh: obj/ $(OBJECTS)
-	@$(CC) $(LDFLAGS) $(OBJECTS) -o $@
+	@$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 	@echo " [LD] $@"
 	@du -h $@
 	@echo
