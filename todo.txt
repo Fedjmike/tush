@@ -1,5 +1,7 @@
 [-] Type system
-    [ ] forall qualifier
+    [x] forall qualifier
+    [-] Unification instead of typeIsEqual
+        [ ] Operators that expect matching operands e.g. ++
     [ ] Typeclasses/traits
     [ ] Maybe
     [ ] 'a File
@@ -8,24 +10,37 @@
         [ ] 'a File
 
 [-] Language
+    [-] Values
+        [x] Integer
+        [x] Number
+        [x] Str
+        [ ] Lambda
+        [ ] Bracketed operators
+        [ ] (String) format
+        [ ] Regex
+        [ ] Option (as in flags)
+        -----
+        [x] Tuple
+        [x] List
+        [ ] Records
+        [ ] Dictionary
+        -----
+        [-] File
+            [ ] Fix paths
+                - Root spelled '-'
+                - Home directories, '~'
+        [ ] Directory (trailing /)
+        [ ] FileListing (like ls -l)
+        [-] Glob
+            [x] *
+            [ ] **
+            [-] []
+            [ ] {}
+        [ ] URL
+    [ ] Access to:
+        [ ] Environment variables
+        [ ] History
     [-] Expressions
-        [-] Literals
-            [x] Integer
-            [ ] Number
-            [ ] Lambda
-            [x] Str
-            [-] File
-            [-] Glob
-                [x] *
-                [-] []
-                [ ] {}
-            [x] Tuple
-            [-] List
-            [ ] (String) format?
-            [ ] Directory (trailing /)
-            [ ] Regex
-            [ ] Option (as in flags)
-            [ ] Operators bracketed as functions
         [ ] Files
             [ ] /
             [ ] |>
@@ -34,11 +49,13 @@
             [-] Application
             [-] Pipe op
                 - Right associative composition
+                [ ] filter |?
+                [ ] reduce
+                [ ] zipf |:
             [x] Explicit fn
             [ ] Named (optional?) arguments
             [-] Implicit conversions
-                [ ] Path -> File
-                fmap over:
+                - fmap over:
                 [x] Lists, ['a]
                 [ ] Maybe, 'a?
                 [ ] Generalize to all?
@@ -49,35 +66,40 @@
             [ ] Formatting
         [-] Iterables
             [x] List concat
+            [ ] Slices
         [ ] Comparison
         [ ] Boolean
         [ ] Branching
     [ ] Statements
-        [ ] Decl/assignment
+        [-] Decl/assignment
         [ ] Functions
             [ ] Options
             [ ] Dependency functions
         [ ] if, while, for, switch
         [ ] Working directory control
             into <dir>: {}
+            mkdir <dir>: {}
+        [ ] Transactions (on the fs)
     [ ] Error handling
     [ ] Macros
     [ ] Modules
 
 [-] Library
-    [x] size :: File -> Integer
+    [x] size :: File -> Int
         - Size
         - Exceptions? Return Maybe?
-    [x] sum :: [Integer] -> Integer
+    [x] sum :: [Int] -> Int
         - Adapt for Number
-    [x] zipf :: (File -> Integer) -> File -> (Integer, File)
+    [x] zipf :: (File -> Int) -> File -> (Int, File)
         - Make polymorphic
 
 [-] Interfacing with legacy Unix
 
 [ ] C API
 
-[ ] Concurrent IO
+[ ] Unicode
+    [ ] In the lexer
+    [ ] Other places e.g. strlen -> strwidth
 
 [ ] Diagnostics
     [ ] Position information
@@ -87,24 +109,47 @@
         [ ] Fn-app: refer to specific args
 
 [-] UI
+    [ ] Interactivity
+        [ ] Completion
+        [ ] Syntax highlighting
+        [ ] Interactive command construction, extensible
+        [ ] Job control
+        [ ] History available as an iterable
+    [ ] Display
+        [-] Value printing
+            [-] Highlighting
+            [ ] Escape strings
+            [ ] Long string truncation
     [-] Prompt
-    [ ] Completion
-    [ ] Syntax highlighting
-    [-] Output highlighting
-    [-] Value printing
-    [ ] Job control
+    [ ] Progress indicator
+
+[ ] Backend
+    [ ] JIT
+    [ ] Compilation to POSIX shell
 
 ---------
 
 [-] Gather todos
-[ ] Minimize asserts
+[ ] Minimize asserts !!!!
 [ ] Multithreaded Boehm leaks (currently suppressed)
 [ ] Pull bool fns from loops
-[ ] "Optimizations the compiler can't make"
-[ ] hsearch and tsearch for hashmap
 [ ] Document the purpose of each module
 
-== Structures
+== Containers
+
+[ ] Add a fixed size array type
+
+vector:
+[ ] auto stored buffer hybrid?
+
+hashmap:
+[ ] Simplify impl.
+[ ] tsearch and tsearch?
+[ ] Args of const map* -> map
+[ ] Change XXXAdd to XXXSet and make an XXXAdd that doesn't overwrite values
+
+== Language structures
+
 
 [ ] No {ast,sym}::children by default, allocate on need
 [ ] Value printing must depend on the type
@@ -114,6 +159,7 @@ type:
 [ ] And for lists. Then generalize for any parametric type.
 [ ] Create type str in the ctor?
 [-] Type equality
+[ ] Higher-kinded type printing
 
 ast:
 [ ] Make AST::children a const_vector (combined length and size fields)
@@ -131,13 +177,14 @@ value:
 == Passes
 
 Lexer:
-[ ] Unicode
 [ ] Make the lexer create a vector of tokens which persist, own their buffers
 [ ] Put location info in tokens
 [ ] Lexer op classes
+[ ] Keyword / op trie
 
 Analyzer:
 [x] Each analyzer routine returns type, handler assigns
+[ ] ListLit: check element equality
 
 Runner:
 [ ] Optimization for calling n-ary valueFns (creating curried values)

@@ -21,8 +21,6 @@ typedef enum opKind {
     opMultiply, opDivide, opModulo
 } opKind;
 
-//todo different ast malloc depending on # of children
-
 /*Owns all members and children except the symbol*/
 typedef struct ast {
     astKind kind;

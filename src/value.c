@@ -31,7 +31,7 @@ typedef struct value {
         /*Int*/
         int64_t integer;
         /*Vector*/
-        vector(value*) vec;
+        vector(value*) vec; //todo array(value*)
     };
 } value;
 
@@ -121,6 +121,7 @@ bool valueIsInvalid (const value* v) {
 }
 
 int valuePrintImpl (const value* v, printf_t printf) {
+    //todo TYPE
     switch (v->kind) {
     case valueUnit:
         return printf("()");
@@ -129,6 +130,7 @@ int valuePrintImpl (const value* v, printf_t printf) {
         return printf("%ld", v->integer);
 
     case valueStr:
+        //todo escape
         return printf("\"%s\"", v->str);
 
     case valueFn:

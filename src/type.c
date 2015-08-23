@@ -244,6 +244,7 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
     case type_Forall:
         //todo add typevars to ensure order
         return typeGetStrImpl(ctx, dt->dt);
+        //todo "forall a, b." if higher kinded
     }
 
     return "<unhandled type kind>";
@@ -336,7 +337,7 @@ bool typeIsEqual (const type* l, const type* r) {
         default:
             errprintf("Unhandled type kind, %s\n", typeGetStr(l));
             return false;
-            //todo
+            //todo other kinds
         }
     }
 }

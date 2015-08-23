@@ -143,6 +143,7 @@ static void displayFile (const char* filename) {
 
 static void displayRegular (value* result, type* resultType) {
     valuePrint(result);
+    //todo if multiline result, type on new line
     printf(" :: %s\n", typeGetStr(resultType));
 }
 
@@ -335,6 +336,7 @@ void displayResult (value* result, type* resultType) {
         else if (typeIsKind(type_File, elements))
             displayFileList(result, resultType);
 
+        //todo check 'a 'b ... are simple (value and type)
         /* [('a, 'b, ...)] -- A table */
         else if (typeIsTupleOf(elements, &tuple))
             displayTable(result, resultType, tuple);
