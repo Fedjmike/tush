@@ -8,6 +8,7 @@
 #include "type.h"
 #include "value.h"
 
+#include "invoke.h"
 #include "builtins.h"
 
 static value* runInvalid (envCtx* env, const ast* node) {
@@ -108,7 +109,7 @@ static value* runClassicUnixApp (envCtx* env, const ast* node, const char* progr
     vectorPush(&args, 0);
 
     /*Run the program*/
-    FILE* programOutput = invokePiped(args.buffer);
+    FILE* programOutput = invokePiped((char**) args.buffer);
     vectorFree(&args);
 
     /*Read the pipe*/

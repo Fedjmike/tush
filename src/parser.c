@@ -40,6 +40,9 @@ static ast* parsePath (parserCtx* ctx) {
 
     free(segments);
 
+    /*To be implemented*/
+    (void) modifier;
+
     return (glob ? astCreateGlobLit : astCreateFileLit)(ctx->current.buffer);
 }
 
