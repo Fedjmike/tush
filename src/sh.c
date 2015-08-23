@@ -149,6 +149,19 @@ void replCD (compilerCtx* compiler, const char* input) {
         printf("Unable to enter directory \"%s\"\n", newWD);
 }
 
+void replAST (compilerCtx* compiler, const char* input) {
+    int errors = 0;
+    ast* tree = compile(compiler, input, &errors);
+
+    if (!errors) {
+        if (tree)
+            printAST(tree);
+
+        else
+            errprintf("Null AST tree generated\n");
+    }
+}
+
 void repl (compilerCtx* compiler) {
     const char* homedir = getHomeDir();
 
@@ -178,6 +191,9 @@ void repl (compilerCtx* compiler) {
 
         if (!strncmp(input, ":cd ", 4))
             replCD(compiler, input+4);
+
+        else if (!strncmp(input, ":ast ", 5))
+            replAST(compiler, input+5);
 
         else
             gosh(compiler, input, true);
