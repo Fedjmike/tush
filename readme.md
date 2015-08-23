@@ -29,11 +29,18 @@ The language design has lots of open questions. Among them, how to:
 Building
 --------
 
-```
-make
-```
-
 Dependencies: [Boehm garbage collector](https://github.com/ivmai/bdwgc/), [GNU Readline](http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html), [libkiss](https://github.com/Fedjmike/libkiss)
+
+```
+sudo apt-get install libreadline-dev libgc-dev
+
+git clone https://github.com/Fedjmike/libkiss
+cd libkiss; make; cd -
+
+git clone https://github.com/Fedjmike/tush
+cd tush
+make && sudo make install
+```
 
 Development
 -----------

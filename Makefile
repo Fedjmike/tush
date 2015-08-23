@@ -5,7 +5,10 @@ LDFLAGS = -lgc -lreadline -L../libkiss -lkiss
 HEADERS = $(wildcard src/*.h)
 OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c))
 
+INSTALLPATH = /usr/local/bin/tush
+
 all: sh
+install: $(INSTALLPATH)
 
 obj/:
 	@mkdir -p obj
@@ -26,4 +29,10 @@ test: sh
 clean:
 	rm -f obj/*.o sh sh.exe
 
-.PHONY: all test clean
+$(INSTALLPATH): sh
+	cp sh $(INSTALLPATH)
+
+uninstall:
+	rm -f $(INSTALLPATH)
+
+.PHONY: all test clean install uninstall
