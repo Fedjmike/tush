@@ -74,7 +74,7 @@
                 <li>An <span title="Haskell, basically">expressive type system</span>. Parametric polymorphism, algebraic types and typeclasses. Immutable data.</li>
                 <li>Programs are functions. Command line arguments and pipes are unified as parameters.</li>
                 <li>Files, globs and <span title="regices?">regexes</span> are first-class features with syntax for literals and path construction operators.</li>
-                <li>Lists, tuples and dictionaries, with handling operations inspired by relational algebra.</li>
+                <li>Lists, tuples, records and dictionaries, with handling operations inspired by relational algebra.</li>
                 <li>A new set of coreutils taking advantage of these facilities.</li>
                 <li>A full scripting language with sane control flow, pattern matching and macros.</li>
             </ul>
@@ -86,7 +86,7 @@
                 <li>Shell libraries: <a href="https://plumbum.readthedocs.org/">Plumbum</a> (Python), <a href="https://github.com/chrisdone/hell">Hell</a> (Haskell), <a href="http://lihaoyi.github.io/Ammonite">Ammonite</a> (Scala) &ndash; &ldquo;The verbose&rdquo;</li>
                 <li><a href="https://github.com/elves/elvish">Elvish</a>, <a href="https://github.com/michaelmacinnis/oh">oh</a>, <a href="https://github.com/nfomon/shok">shok</a> &ndash; &ldquo;The not radical enough&rdquo;</li>
                 <!--Powershell - The wrong company! (:P)
-                <!--Perl shell, Scheme shell-->
+                <!--Perl as a shell, Scheme shell-->
             </ul>
             
             <p>(To be written.)</p>
@@ -101,7 +101,7 @@ chmod +x tush
 sudo mv tush /usr/local/bin</code></pre>
             
             
-            <p>The source code is hosted on <a href="http://github.com/Fedjmike/tush">GitHub</a>, released under the GPL. Call <kbd>make</kbd> to build it. Caveat: you won't actually be able to because it relies on a bunch of libraries.</p>
+            <p>The source code is hosted on <a href="http://github.com/Fedjmike/tush">GitHub</a>, released under the GPL. The readme has some build instructions.</p>
         </section>
         <section>
             <h1 class="content-head">Development</h1>
@@ -112,25 +112,27 @@ sudo mv tush /usr/local/bin</code></pre>
             <ul class="tight">
                 <li>Files, globs, strings, integers, lists and tuples.</li>
                 <li>Function application, list concatenation.</li>
+                <li>Basic polymorphism.</li>
                 <li>Some builtins: <code>size</code>, <code>cat</code>, <code>lc</code> (line count), <code>sum</code>, <code>zipf</code>.</li>
                 <li>Output display for type names, files and directories, file lists, tuple lists (a.k.a. tables) and nested lists.</li>
                 <li>A readline based REPL.</li>
             </ul>
             
             <h2 class="content-head">Future</h2>
-            <p>On the immediate horizon is polymorphism, and program invocation. The latter will start with classic Unix programs taking and returning strings.</p>
+            <p>On the immediate horizon is program invocation. There is some basic support for classic Unix programs.</p>
             <p>Beyond the language itself, Tush will have:</p>
             <ul class="tight">
                 <li>A C API for writing native Tush programs.</li>
                 <li>Better interactive features. Syntax highlighting, intelligent completion, job control. See: <a href="http://fishshell.com/">Fish</a>, <a href="https://github.com/mooz/percol">Percol</a>.</li>
                 <li>Support for BSD, OS X and Windows.</li>
+                <li>Compilation to portable, POSIX shell code.</li>
                 <li>JIT compilation?</li>
             </ul>
         </section>
     </div>
     
     <footer class="ribbon">
-        Last updated 15/08/2015.
+        Last updated 23/08/2015.
     </footer>
     
     <script type="text/javascript">
