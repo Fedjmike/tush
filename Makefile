@@ -1,4 +1,4 @@
-CC = gcc
+CC = clang
 CFLAGS = -std=c11 -Werror -Wall -Wextra -I../libkiss -g
 LDFLAGS = -lgc -lreadline -L../libkiss -lkiss
 
