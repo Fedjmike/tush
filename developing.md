@@ -22,7 +22,7 @@ Modules which compiler implement passes:
 
 ---
 
-Internal data structures:
+Language data structures:
 
 `token.h` / struct `token`: A single token.
 
@@ -36,13 +36,19 @@ Internal data structures:
 
 ---
 
+Functions for:
+
+`paths.[ch]`: Handling paths. For example: getting an absolute path, performing tilde contraction (`/home/user/<...>` to `~/<...>`) and others.
+
+`invoke.[ch]`: Invoking external programs.
+
+`terminal.[ch]`:  Controlling to the terminal output.
+
+---
+
 Miscellaneous:
 
-`builtins.[ch]`: Some built-in functions available from the terminal.
-
-`paths.[ch]`: Functions for dealing with paths. For example: getting an absolute path, performing tilde contraction (`/home/user/<...>` to `~/<...>`) and others.
-
-`terminal.[ch]`:  Functions for controlling to the terminal output.
+`builtins.[ch]`: Some built-in Tush functions.
 
 `dirctx.h`: A structure, `dirCtx`, which tracks the context the shell is currently in: search paths and the working directory.
 
