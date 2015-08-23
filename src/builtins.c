@@ -60,9 +60,7 @@ static value* builtinZipf (const value* fn, const value* arg) {
     const value *first = valueCall(fn, arg),
                 *second = arg;
 
-    vector(const value*) vec = vectorInit(2, malloc);
-    vectorPushFromArray(&vec, (void**) (const value*[]) {first, second}, 2, sizeof(value*));
-    return valueCreateVector(vec);
+    return valueCreateVector(vectorInitChain(2, malloc, first, second));
 }
 
 static value* builtinZipfCurried (const value* fn) {
