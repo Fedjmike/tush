@@ -39,6 +39,18 @@ static void printer (printerCtx* ctx, const ast* node) {
     ctx->depth++;
 
     switch (node->kind) {
+    case astUnitLit:
+        printer_outf(ctx)("unit: ()\n");
+        break;
+
+    case astIntLit:
+        printer_outf(ctx)("int: %d\n", node->literal.integer);
+        break;
+
+    case astBoolLit:
+        printer_outf(ctx)("bool: %s\n", node->literal.truth ? "true" : "false");
+        break;
+
     case astStrLit:
         printer_outf(ctx)("\"%s\"\n", node->literal.str);
         break;
@@ -47,14 +59,26 @@ static void printer (printerCtx* ctx, const ast* node) {
         printer_outf(ctx)("file: %s\n", node->literal.str);
         break;
 
-    case astSymbol:
-        printer_outf(ctx)("\"%s\"\n",   !node->symbol ? "<no symbol attached>"
-                                      : !node->symbol->name ? "<unnamed symbol>"
-                                      : node->symbol->name);
+    case astGlobLit:
+        printer_outf(ctx)("glob: %s\n", node->literal.str);
         break;
 
-    default:
+    case astSymbol:
+    case astLet:
+        printer_outf(ctx)("symbol: %s\n",   !node->symbol ? "<no symbol attached>"
+                                          : !node->symbol->name ? "<unnamed symbol>"
+                                          : node->symbol->name);
         break;
+
+    case astListLit:
+    case astTupleLit:
+    case astFnApp:
+    case astBOP:
+    case astInvalid:
+        break;
+
+    case astKindNo:
+        errprintf("Dummy AST kind, KindNo, found in the wild\n");
     }
 
     printChildren(ctx, node);
