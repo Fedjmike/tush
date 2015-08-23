@@ -33,24 +33,3 @@ static inline bool no_errors_recently (errctx errors) {
 }
 
 #define errprintf(...) errprintf__(__FILE__, __func__, __LINE__, __VA_ARGS__)
-
-/*==== ====*/
-
-typedef void* (*stdalloc)(size_t);
-
-static inline void* malloci (size_t size, void* src) {
-    void* obj = malloc(size);
-    memcpy(obj, src, size);
-    return obj;
-}
-
-/*strcat, resizing the buffer if need be*/
-static inline char* strrecat (char* dest, size_t* size, const char* src) {
-    size_t length = strlen(src) + strlen(dest) + 1;
-    if (length > *size) {
-        *size = length*2;
-        dest = realloc(dest, *size);
-    }
-
-    return strcat(dest, src);
-}
