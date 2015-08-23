@@ -14,6 +14,8 @@ typedef struct value {
     valueKind kind;
 
     union {
+        /*Int*/
+        int64_t integer;
         /*Str*/
         struct {
             char* str;
@@ -28,8 +30,6 @@ typedef struct value {
         };
         /*File*/
         char* filename;
-        /*Int*/
-        int64_t integer;
         /*Vector*/
         vector(value*) vec; //todo array(value*)
     };
@@ -114,7 +114,7 @@ const char* valueKindGetStr (valueKind kind) {
     return "<unhandled value kind>";
 }
 
-/*==== Operations on values ====*/
+/*==== (Kind generic) Operations ====*/
 
 bool valueIsInvalid (const value* v) {
     return v->kind == valueInvalid;
@@ -170,6 +170,8 @@ int valueGetWidthOfStr (const value* v) {
 int valuePrint (const value* v) {
     return valuePrintImpl(v, printf);
 }
+
+/*==== Kind specific operations ====*/
 
 int64_t valueGetInt (const value* num) {
     assert(num->kind == valueInt);

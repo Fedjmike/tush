@@ -31,17 +31,19 @@ typedef struct valueIter {
 
 typedef value* (*simpleClosureFn)(const void* env, const value* arg);
 
+value* valueCreateInvalid (void);
 value* valueCreateUnit (void);
 value* valueCreateInt (int integer);
 value* valueCreateStr (char* str);
 value* valueCreateFn (value* (*fnptr)(const value*));
+value* valueCreateFile (const char* filename);
+
 /*Takes ownership of the environment, which must be GC allocated*/
 value* valueCreateSimpleClosure (const void* env, simpleClosureFn fnptr);
-value* valueCreateFile (const char* filename);
+
 /*Takes ownership of the vector and its elements. Therefore, they must
   have been allocated using the garbage collector.*/
 value* valueCreateVector (vector(value*) elements);
-value* valueCreateInvalid (void);
 
 /*==== (Kind generic) Operations ====*/
 
@@ -51,6 +53,8 @@ bool valueIsInvalid (const value* v);
   valuePrint actually prints it.*/
 int valueGetWidthOfStr (const value* v);
 int valuePrint (const value* v);
+
+/*==== Kind specific operations ====*/
 
 int64_t valueGetInt (const value* num);
 const char* valueGetStr (const value* str, size_t* length_out);
