@@ -27,6 +27,8 @@ static lexerCtx* lexerDestroy (lexerCtx* ctx);
 static bool lexerEOF (lexerCtx* ctx);
 static token lexerNext (lexerCtx* ctx);
 
+static int lexerPos (lexerCtx* ctx);
+
 /*==== Inline implementations ====*/
 
 hashmap(tokenKind) lexerKeywords;
@@ -54,6 +56,10 @@ inline static lexerCtx lexerInit (const char* str) {
 inline static lexerCtx* lexerDestroy (lexerCtx* ctx) {
     free(ctx->buffer);
     return ctx;
+}
+
+inline static int lexerPos (lexerCtx* ctx) {
+    return ctx->pos;
 }
 
 inline static char lexerCurrent (lexerCtx* ctx) {

@@ -55,7 +55,7 @@ inline static parserCtx* parserFree (parserCtx* ctx) {
 
 inline static printf_t* error (parserCtx* ctx) {
     ctx->errors++;
-    printf("error: ");
+    printf("%d: error: ", lexerPos(ctx->lexer));
     return printf;
 }
 
