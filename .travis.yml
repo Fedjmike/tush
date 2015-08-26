@@ -14,9 +14,10 @@ addons:
         - libreadline-dev
         - libgc-dev
 before_install:
-    - cd ..
+    - pushd ..
     - git clone http://github.com/Fedjmike/libkiss
     - cd libkiss
     - make
+    - popd
 script:
     - make --keep-going all
