@@ -87,8 +87,7 @@ static void displayDirectory (const char* dirname) {
 
     for (struct dirent* entry; (entry = readdir(dir));) {
 		vectorPush(&filenames, entry->d_name);
-        //todo width
-        size_t namelen = strlen(entry->d_name);
+        size_t namelen = strwidth(entry->d_name);
 
         if (largest < namelen)
             largest = namelen;
@@ -159,8 +158,7 @@ static void displayFileList (value* result, type* resultType) {
     size_t columnWidth = 0;
 
     for_vector (const char* name, names, {
-        //todo strlen -> str actual column width
-        size_t namelen = strlen(name);
+        size_t namelen = strwidth(name);
 
         if (columnWidth < namelen)
             columnWidth = namelen;
