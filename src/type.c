@@ -21,6 +21,9 @@ static void typeDestroy (type* dt) {
     if (dt->kind == type_Tuple)
         vectorFree(&dt->types);
 
+    else if (dt->kind == type_Forall)
+        vectorFree(&dt->typevars);
+
     free(dt->str);
     free(dt);
 }
