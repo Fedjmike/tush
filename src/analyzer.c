@@ -29,6 +29,40 @@ static type* analyzeInvalid (analyzerCtx* ctx, ast* node) {
     return typeInvalid(ctx->ts);
 }
 
+static type* analyzeFnLit (analyzerCtx* ctx, ast* node) {
+    type* result;
+
+    /*Type the arg patterns*/
+
+    vector(type*) typevars = vectorInit(2, malloc);
+
+    for_vector_indexed (i, ast* pattern, node->children, {
+        /*Nothing we can say about the arg for now*/
+        type* typevar = typeVar(ctx->ts);
+        vectorPush(&typevars, typevar);
+
+        pattern->symbol->dt = typevar;
+        pattern->dt = pattern->symbol->dt;
+
+        if (i == 0)
+            result = pattern->dt;
+
+        else
+            result = typeFn(ctx->ts, result, pattern->dt);
+    })
+
+    /*Function body*/
+    result = typeFn(ctx->ts, result, analyzer(ctx, node->r));
+
+    if (typevars.length != 0)
+        return typeForall(ctx->ts, typevars, result);
+
+    else {
+        vectorFree(&typevars);
+        return result;
+    }
+}
+
 static type* analyzeTupleLit (analyzerCtx* ctx, ast* node) {
     assert(node->children.length >= 2);
 
@@ -278,6 +312,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
 
     static handler_t table[astKindNo] = {
         [astInvalid] = analyzeInvalid,
+        [astFnLit] = analyzeFnLit,
         [astTupleLit] = analyzeTupleLit,
         [astListLit] = analyzeListLit,
         [astUnitLit] = analyzeUnitLit,

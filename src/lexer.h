@@ -210,7 +210,7 @@ inline static token lexerNext (lexerCtx* ctx) {
     case '[': case ']':
     case '{': case '}':
     case ',': case '`':
-    case '!':
+    case '!': case '\\':
         tok.kind = tokenOp;
         lexerEat(ctx);
     }
@@ -239,7 +239,8 @@ static inline void lexerKeywordsInit (void) {
         "==", "!=", "<", "<=", ">", ">=",
         /*No *, would override globs (todo)*/
         "+", "-", "++",
-        "/", "%"
+        "/", "%",
+        "->"
     };
 
     static const char* kws[] = {

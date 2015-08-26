@@ -96,6 +96,12 @@ ast* astCreateTupleLit (vector(ast*) elements) {
     });
 }
 
+ast* astCreateFnLit (vector(ast*) args, ast* expr) {
+    return astCreate(astFnLit, (ast) {
+        .children = args, .r = expr
+    });
+}
+
 ast* astCreateLet (sym* symbol, ast* init) {
     return astCreate(astLet, (ast) {
         .symbol = symbol, .r = init
@@ -145,6 +151,7 @@ const char* astKindGetStr (astKind kind) {
     case astGlobLit: return "GlobLit";
     case astListLit: return "ListLit";
     case astTupleLit: return "TupleLit";
+    case astFnLit: return "FnLit";
     case astLet: return "Let";
     case astInvalid: return "Invalid";
     case astKindNo: return "<KindNo; not real>";

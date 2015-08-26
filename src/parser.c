@@ -11,6 +11,55 @@
 static ast* parseExpr (parserCtx* ctx);
 
 /**
+ * Pattern = <Name>
+ */
+static ast* parserPattern (parserCtx* ctx) {
+    ast* node;
+
+    //todo accept only [\w\d-]
+
+    if (see_kind(ctx, tokenNormal)) {
+        sym* symbol = symAdd(ctx->scope, ctx->current.buffer);
+        accept(ctx);
+
+        node = astCreateSymbol(symbol);
+
+    } else {
+        expected(ctx, "function argument");
+        node = astCreateInvalid();
+    }
+
+    return node;
+}
+
+/**
+ * FnLit = "\" [{ Pattern }] "->" Expr
+ */
+static ast* parseFnLit (parserCtx* ctx) {
+    match(ctx, "\\");
+
+    /*Enter a new scope*/
+    sym* oldscope = push_scope(ctx, symAddScope(ctx->scope));
+
+    /*Arg patterns*/
+
+    vector(ast*) args = vectorInit(2, malloc);
+
+    while (!see(ctx, "->"))
+        vectorPush(&args, parserPattern(ctx));
+
+    /*Body*/
+
+    match(ctx, "->");
+    ast* expr = parseExpr(ctx);
+
+    /*Pop scope*/
+    ctx->scope = oldscope;
+
+    return astCreateFnLit(args, expr);
+}
+
+/**
  * Path = <PathLit> | <GlobLit>
  *
  * A glob literal is a path with a wildcard somewhere in it.
@@ -53,7 +102,7 @@ static bool isPathToken (const char* str) {
 /**
  * Atom =   ( "(" [ Expr [{ "," Expr }] ] ")" )
  *        | ( "[" [{ Expr }] "]" )
- *        | Path | <Str> | <Symbol>
+ *        | FnLit | Path | <Str> | <Symbol>
  */
 static ast* parseAtom (parserCtx* ctx) {
     ast* node;
@@ -91,6 +140,9 @@ static ast* parseAtom (parserCtx* ctx) {
         node = astCreateListLit(nodes);
 
         match(ctx, "]");
+
+    } else if (see(ctx, "\\")) {
+        node = parseFnLit(ctx);
 
     } else if (see(ctx, "true") || see(ctx, "false")) {
         node = astCreateBoolLit(see(ctx, "true"));

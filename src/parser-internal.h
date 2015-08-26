@@ -36,6 +36,8 @@ static void expected (parserCtx* ctx, const char* expected);
 static void match (parserCtx* ctx, const char* look);
 static bool try_match (parserCtx* ctx, const char* look);
 
+static sym* push_scope (parserCtx* ctx, sym* newscope);
+
 /*==== Inline implementations ====*/
 
 inline static parserCtx parserInit (sym* global, lexerCtx* lexer) {
@@ -104,4 +106,10 @@ inline static bool try_match (parserCtx* ctx, const char* look) {
 
     } else
         return false;
+}
+
+inline static sym* push_scope (parserCtx* ctx, sym* newscope) {
+    sym* oldscope = ctx->scope;
+    ctx->scope = newscope;
+    return oldscope;
 }

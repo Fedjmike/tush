@@ -72,6 +72,7 @@ static void printer (printerCtx* ctx, const ast* node) {
 
     case astListLit:
     case astTupleLit:
+    case astFnLit:
     case astFnApp:
     case astBOP:
     case astInvalid:
