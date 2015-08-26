@@ -223,7 +223,7 @@ void repl (compilerCtx* compiler) {
         char* input = readline(prompt.str);
 
         /*Skip empty strings*/
-        if (input[0] == 0)
+        if (!input || input[0] == 0)
             continue;
 
         else if (!strcmp(input, ":exit"))
