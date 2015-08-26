@@ -153,13 +153,12 @@ void replAST (compilerCtx* compiler, const char* input) {
     int errors = 0;
     ast* tree = compile(compiler, input, &errors);
 
-    if (!errors) {
-        if (tree)
-            printAST(tree);
+    if (tree)
+        printAST(tree);
 
-        else
-            errprintf("Null AST tree generated\n");
-    }
+    else if (errors == 0)
+        errprintf("Null AST tree generated\n");
+}
 }
 
 void repl (compilerCtx* compiler) {
