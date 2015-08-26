@@ -15,13 +15,13 @@ Design
 - An expressive type system. Parametric polymorphism, algebraic types and typeclasses. Immutable data.
 - Programs are functions. Command line arguments and pipes are unified as parameters.
 - Files, globs and regexes are first-class features with syntax for literals and path construction operators.
-- Lists, tuples and dictionaries, with handling operations inspired by relational algebra.
+- Lists, tuples, records and dictionaries, with handling operations inspired by relational algebra.
 - A new set of coreutils taking advantage of these facilities.
 - A full scripting language with sane control flow, pattern matching and macros.
 
 The language design has lots of open questions. Among them, how to:
 
-- Handle errors — exceptions, Maybe monad, other possibilites?
+- Handle errors — exceptions, Maybe monad, error codes, other possibilites?
 - Dynamically type files — existential types?
 - Create a language that can be seamlessly used interactively, but also for safe scripting, for programming in the large.
 - Disambiguate the multiply operator (`*`) from a wildcard.

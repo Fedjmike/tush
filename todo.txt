@@ -1,13 +1,15 @@
 [-] Type system
-    [x] forall qualifier
-    [-] Unification instead of typeIsEqual
-        [ ] Operators that expect matching operands e.g. ++
-    [ ] Typeclasses/traits
     [ ] Maybe
     [ ] 'a File
     [ ] "See through" types that act as an instance of their parameter
         [ ] () -> 'a
         [ ] 'a File
+    [x] forall qualifier
+    [-] Unification instead of typeIsEqual
+        [ ] Operators that expect matching operands e.g. ++
+    [ ] Row polymorphism
+        - ('a | 'as) matches (A, B, C) for 'a = A and 'as = (B, C)
+    [ ] Typeclasses/traits
 
 [-] Language
     [-] Values
@@ -29,6 +31,8 @@
             [ ] Fix paths
                 - Root spelled '-'
                 - Home directories, '~'
+            [ ] Quoted names
+            [ ] Escapes?
         [ ] Directory (trailing /)
         [ ] FileListing (like ls -l)
         [-] Glob
@@ -123,6 +127,8 @@
     [-] Prompt
     [ ] Progress indicator
 
+[ ] Pipeable, composable GUI
+    
 [ ] Backend
     [ ] JIT
     [ ] Compilation to POSIX shell
@@ -132,6 +138,7 @@
 [-] Gather todos
 [ ] Minimize asserts !!!!
 [ ] Multithreaded Boehm leaks (currently suppressed)
+[ ] Uses of realloc (others?) in stdalloc taking fns
 [ ] Pull bool fns from loops
 [ ] Document the purpose of each module
 
