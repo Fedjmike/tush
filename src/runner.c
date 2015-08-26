@@ -16,6 +16,26 @@ static value* runInvalid (envCtx* env, const ast* node) {
     return valueCreateInvalid();
 }
 
+static value* runListLit (envCtx* env, const ast* node) {
+    vector(value*) result = vectorInit(node->children.length, GC_malloc);
+
+    for_vector (ast* element, node->children, {
+        vectorPush(&result, run(env, element));
+    })
+
+    return valueCreateVector(result);
+}
+
+static value* runTupleLit (envCtx* env, const ast* node) {
+    vector(value*) result = vectorInit(node->children.length, GC_malloc);
+
+    for_vector (ast* element, node->children, {
+        vectorPush(&result, run(env, element));
+    })
+
+    return valueCreateVector(result);
+}
+
 static value* runUnitLit (envCtx* env, const ast* node) {
     (void) env, (void) node;
     return valueCreateUnit();
@@ -49,26 +69,6 @@ static value* runGlobLit (envCtx* env, const ast* node) {
     (void) env;
 
     return builtinExpandGlob(node->literal.str, valueCreateUnit());
-}
-
-static value* runListLit (envCtx* env, const ast* node) {
-    vector(value*) result = vectorInit(node->children.length, GC_malloc);
-
-    for_vector (ast* element, node->children, {
-        vectorPush(&result, run(env, element));
-    })
-
-    return valueCreateVector(result);
-}
-
-static value* runTupleLit (envCtx* env, const ast* node) {
-    vector(value*) result = vectorInit(node->children.length, GC_malloc);
-
-    for_vector (ast* element, node->children, {
-        vectorPush(&result, run(env, element));
-    })
-
-    return valueCreateVector(result);
 }
 
 static value* runSymbol (envCtx* env, const ast* node) {
@@ -232,14 +232,14 @@ value* run (envCtx* env, const ast* node) {
 
     static handler_t table[astKindNo] = {
         [astInvalid] = runInvalid,
+        [astTupleLit] = runTupleLit,
+        [astListLit] = runListLit,
         [astUnitLit] = runUnitLit,
         [astIntLit] = runIntLit,
         [astBoolLit] = runBoolLit,
         [astStrLit] = runStrLit,
         [astFileLit] = runFileLit,
         [astGlobLit] = runGlobLit,
-        [astListLit] = runListLit,
-        [astTupleLit] = runTupleLit,
         [astSymbol] = runSymbol,
         [astFnApp] = runFnApp,
         [astBOP] = runBOP,

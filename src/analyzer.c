@@ -29,6 +29,41 @@ static type* analyzeInvalid (analyzerCtx* ctx, ast* node) {
     return typeInvalid(ctx->ts);
 }
 
+static type* analyzeTupleLit (analyzerCtx* ctx, ast* node) {
+    assert(node->children.length >= 2);
+
+    vector(type*) elements = vectorInit(node->children.length, malloc);
+
+    for_vector (ast* element, node->children, {
+        vectorPush(&elements, analyzer(ctx, element));
+    })
+
+    return typeTuple(ctx->ts, elements);
+}
+
+static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
+    /*No elements => type is ['a] */
+    if (node->children.length == 0) {
+        type* A = typeVar(ctx->ts);
+        vector(type*) typevars = vectorInitChain(1, malloc, A);
+
+        return typeForall(ctx->ts, typevars, typeList(ctx->ts, A));
+
+    } else {
+        type* elements;
+
+        for_vector (ast* element, node->children, {
+            elements = analyzer(ctx, element);
+
+            //todo check equality
+            //mode average if they differ
+            //todo lowest common interface ?
+        })
+
+        return typeList(ctx->ts, elements);
+    }
+}
+
 static type* analyzeUnitLit (analyzerCtx* ctx, ast* node) {
     (void) node;
     return typeUnitary(ctx->ts, type_Unit);
@@ -57,41 +92,6 @@ static type* analyzeFileLit (analyzerCtx* ctx, ast* node) {
 static type* analyzeGlobLit (analyzerCtx* ctx, ast* node) {
     (void) node;
     return typeList(ctx->ts, typeFile(ctx->ts));
-}
-
-static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
-    /*No elements => type is ['a] */
-    if (node->children.length == 0) {
-        type* A = typeVar(ctx->ts);
-        vector(type*) typevars = vectorInitChain(1, malloc, A);
-
-        return typeForall(ctx->ts, typevars, typeList(ctx->ts, A));
-
-    } else {
-        type* elements;
-
-        for_vector (ast* element, node->children, {
-            elements = analyzer(ctx, element);
-
-            //todo check equality
-            //mode average if they differ
-            //todo lowest common interface ?
-        })
-
-        return typeList(ctx->ts, elements);
-    }
-}
-
-static type* analyzeTupleLit (analyzerCtx* ctx, ast* node) {
-    assert(node->children.length >= 2);
-
-    vector(type*) elements = vectorInit(node->children.length, malloc);
-
-    for_vector (ast* element, node->children, {
-        vectorPush(&elements, analyzer(ctx, element));
-    })
-
-    return typeTuple(ctx->ts, elements);
 }
 
 static type* analyzeSymbol (analyzerCtx* ctx, ast* node) {
@@ -278,14 +278,14 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
 
     static handler_t table[astKindNo] = {
         [astInvalid] = analyzeInvalid,
+        [astTupleLit] = analyzeTupleLit,
+        [astListLit] = analyzeListLit,
         [astUnitLit] = analyzeUnitLit,
         [astIntLit] = analyzeIntLit,
         [astBoolLit] = analyzeBoolLit,
         [astStrLit] = analyzeStrLit,
         [astFileLit] = analyzeFileLit,
         [astGlobLit] = analyzeGlobLit,
-        [astListLit] = analyzeListLit,
-        [astTupleLit] = analyzeTupleLit,
         [astSymbol] = analyzeSymbol,
         [astFnApp] = analyzeFnApp,
         [astBOP] = analyzeBOP,
