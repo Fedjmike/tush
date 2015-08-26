@@ -158,6 +158,8 @@ void replAST (compilerCtx* compiler, const char* input) {
 
     else if (errors == 0)
         errprintf("Null AST tree generated\n");
+
+    astDestroy(tree);
 }
 
 typedef struct replCommand {
