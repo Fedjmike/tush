@@ -128,6 +128,25 @@ static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
         error(ctx)("type %s does not apply to function %s\n", typeGetStr(arg), typeGetStr(fn));
 }
 
+static bool isUnixBasicSerializable (type* dt) {
+    return    typeIsKind(type_Str, dt)
+           || typeIsKind(type_File, dt);
+}
+
+static bool isUnixSerializable (type* dt) {
+    type* elements;
+
+    if (isUnixBasicSerializable(dt))
+        return true;
+
+    else if (   typeIsListOf(dt, &elements)
+             && isUnixBasicSerializable(elements))
+        return true;
+
+    else
+        return false;
+}
+
 static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
     type* result = analyzer(ctx, node->r);
 
@@ -138,8 +157,7 @@ static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
         for_vector (ast* argNode, node->children, {
             type* arg = analyzer(ctx, argNode);
 
-            if (   !typeIsKind(type_Str, arg)
-                && !typeIsKind(type_File, arg))
+            if (!isUnixSerializable(arg))
                 errorClassicUnixApp(ctx, arg);
 
             //todo is str

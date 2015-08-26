@@ -77,6 +77,46 @@ static value* runSymbol (envCtx* env, const ast* node) {
     return val ? val : valueCreateInvalid();
 }
 
+bool unixSerialize (vector(const char*)* args, value* v, type* dt) {
+    const char* str;
+
+    type* elements;
+
+    //todo quoting
+
+    if (typeIsKind(type_File, dt))
+        str = valueGetFilename(v);
+
+    else if (typeIsKind(type_Str, dt))
+        str = valueGetStr(v);
+
+    /*A list appears as a sequence of args*/
+    else if (typeIsListOf(dt, &elements)) {
+        vector(value*) vec = valueGetVector(v);
+
+        /*Allocate more space for the elements early since we know how
+          many there will be.*/
+        vectorResize(args, args->capacity + vec.length);
+
+        const char* (*getter)(const value*) =   typeIsKind(type_Str, elements)
+                                              ? valueGetStr : valueGetFilename;
+
+        for_vector (value* element, vec, {
+            vectorPush(args, getter(element));
+        })
+
+        return false;
+
+    } else {
+        errprintf("Unhandled type kind, %s\n", typeGetStr(dt));
+        return true;
+    }
+
+    /*Add the serialized string
+      (for args of a single string, lists return early)*/
+    vectorPush(args, str);
+    return false;
+}
 static value* runClassicUnixApp (envCtx* env, const ast* node, const char* program) {
     /*Create a vector of the (string) args,
       bookended by the program name and a null-terminator.*/
@@ -89,21 +129,10 @@ static value* runClassicUnixApp (envCtx* env, const ast* node, const char* progr
         value* arg = run(env, argNode);
 
         /*Structured data must be lowered to strings*/
+        bool fail = unixSerialize(&args, arg, argNode->dt);
 
-        const char* str;
-
-        if (typeIsKind(type_File, argNode->dt))
-            str = valueGetFilename(arg);
-
-        else if (typeIsKind(type_Str, argNode->dt))
-            str = valueGetStr(arg);
-
-        else {
-            errprintf("Unhandled type kind, %s\n", typeGetStr(argNode->dt));
-            str = "";
-        }
-
-        vectorPush(&args, str);
+        if (fail)
+            return valueCreateInvalid();
     })
 
     vectorPush(&args, 0);
