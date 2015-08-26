@@ -128,7 +128,9 @@ static ast* parseAtom (parserCtx* ctx) {
 
 static bool waiting_for_delim (parserCtx* ctx) {
     bool seeLowPrecOp =    see_kind(ctx, tokenOp)
-                        && !(see(ctx, "(") || see(ctx, "["));
+                        && !see(ctx, "(")
+                        && !see(ctx, "[")
+                        && !see(ctx, "!");
 
     return waiting(ctx) && !seeLowPrecOp;
 }
@@ -147,37 +149,39 @@ static ast* parseFnApp (parserCtx* ctx) {
     vector(ast*) nodes = vectorInit(3, malloc);
 
     /*Require at least one expr*/
-    if (!see(ctx, "`"))
+    if (!see(ctx, "!"))
         vectorPush(&nodes, parseAtom(ctx));
 
     while (waiting_for_delim(ctx)) {
-        if (try_match(ctx, "`")) {
+        if (try_match(ctx, "!")) {
             if (fn) {
-                error(ctx)("Multiple explicit functions in backticks: '%s'\n", ctx->current.buffer);
+                error(ctx)("Multiple explicit functions: '%s'\n", ctx->current.buffer);
                 vectorPush(&nodes, fn);
             }
 
             fn = parseAtom(ctx);
-            match(ctx, "`");
 
         } else
             vectorPush(&nodes, parseAtom(ctx));
     }
 
-    if (nodes.length == 1) {
+    if (fn)
+        return astCreateFnApp(nodes, fn);
+
+    else if (nodes.length == 0) {
+        /*Shouldn't happen due to the way it parses*/
+        errprintf("FnApp took no AST nodes");
+        return astCreateInvalid();
+
+    } else if (nodes.length == 1) {
+        /*No application*/
         ast* node = vectorPop(&nodes);
         vectorFree(&nodes);
         return node;
 
-    } else if (nodes.length == 0 && fn) {
-        error(ctx)("No arguments provided to backtick-marked function");
-        return fn;
-
     } else {
-        /*If not explicitly marked in backticks, the last expr was the fn*/
-        if (!fn)
-            fn = vectorPop(&nodes);
-
+    	/*The last node is the fn*/
+        fn = vectorPop(&nodes);
         return astCreateFnApp(nodes, fn);
     }
 }

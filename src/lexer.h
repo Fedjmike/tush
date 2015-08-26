@@ -209,6 +209,7 @@ inline static token lexerNext (lexerCtx* ctx) {
     case '[': case ']':
     case '{': case '}':
     case ',': case '`':
+    case '!':
         tok.kind = tokenOp;
         lexerEat(ctx);
     }
