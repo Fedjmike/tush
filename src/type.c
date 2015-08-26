@@ -106,7 +106,7 @@ typeSys* typesFree (typeSys* ts) {
 /*==== ====*/
 
 type* typeFnChain (int kindNo, typeSys* ts, ...) {
-    type* result;
+    type* result = typeUnitary(ts, type_Unit);
 
     va_list args;
     va_start(args, ts);
