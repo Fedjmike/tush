@@ -10,9 +10,9 @@
 bool invokeSyncronously (char** argv) {
     const char* program = argv[0];
 
-    int childID;
+    pid_t child;
 
-    switch ((childID = fork())) {
+    switch ((child = fork())) {
     case -1:
         errprintf("Failed to start a new process\n");
         return true;
@@ -28,7 +28,7 @@ bool invokeSyncronously (char** argv) {
     /*Parent (the shell)*/
     default: {
         int status;
-        wait(&status);
+        waitpid(child, &status, 0);
         //todo return status?
     }}
 
