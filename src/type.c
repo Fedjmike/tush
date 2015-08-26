@@ -1,3 +1,6 @@
+/*For asprintf*/
+#define _GNU_SOURCE
+
 #include "type.h"
 #include "type-internal.h"
 
@@ -202,15 +205,13 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
 
         bool higherOrderFn = dt->from->kind == type_Fn;
 
-        dt->str = malloc((higherOrderFn ? 2 : 0) + strlen(from) + 4 + strlen(to) + 1);
-        sprintf(dt->str, higherOrderFn ? "(%s) -> %s" : "%s -> %s", from, to);
+        assert(asprintf(&dt->str, higherOrderFn ? "(%s) -> %s" : "%s -> %s", from, to));
         return dt->str;
     }
 
     case type_List: {
         const char* elements = typeGetStrImpl(ctx, dt->elements);
-        dt->str = malloc(strlen(elements) + 2 + 1);
-        sprintf(dt->str, "[%s]", elements);
+        assert(asprintf(&dt->str, "[%s]", elements));
         return dt->str;
     }
 
