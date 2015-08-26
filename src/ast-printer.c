@@ -44,7 +44,7 @@ static void printer (printerCtx* ctx, const ast* node) {
         break;
 
     case astIntLit:
-        printer_outf(ctx)("int: %d\n", node->literal.integer);
+        printer_outf(ctx)("int: %ld\n", node->literal.integer);
         break;
 
     case astBoolLit:
