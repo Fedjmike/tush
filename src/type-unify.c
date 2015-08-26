@@ -5,6 +5,10 @@
 #include "type.h"
 #include "type-internal.h"
 
+enum {
+    typeUnifyNoisy = false
+}
+
 typedef struct inference {
     vector(const type*) typevars;
     const type* closed;
@@ -84,6 +88,9 @@ static bool infsMerge (inferences* infs, inference* l, inference* r) {
 }
 
 bool inferEqual (inferences* infs, const type* l, const type* r) {
+    if (typeUnifyNoisy)
+        printf("%s = %s\n", typeGetStr(l), typeGetStr(r));
+
     /*Only bound typevars may be assigned to*/
     bool lIsBoundTypevar =    l->kind == type_Var
                            && vectorFind(infs->bound, (void*) l) != -1,
@@ -134,6 +141,9 @@ bool inferEqual (inferences* infs, const type* l, const type* r) {
 
 
 bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
+    if (typeUnifyNoisy)
+        printf("unifying %s with %s\n", typeGetStr(l), typeGetStr(r));
+
     if (l->kind == type_Var || r->kind == type_Var) {
         bool fail = inferEqual(infs, l, r);
         return !fail;

@@ -8,7 +8,8 @@
 #include "token.h"
 
 enum {
-    lexerDefaultBufSize = 128
+    lexerDefaultBufSize = 128,
+    lexerNoisy = false
 };
 
 typedef struct lexerCtx {
@@ -223,6 +224,9 @@ inline static token lexerNext (lexerCtx* ctx) {
         if (newkind)
             tok.kind = newkind;
     }
+
+    if (lexerNoisy)
+    	printf("%s %s\n", tok.buffer, tok.kind == tokenOp ? "op" : "other");
 
     return tok;
 };
