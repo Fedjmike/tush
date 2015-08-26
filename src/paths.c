@@ -15,6 +15,7 @@
 
 char* pathGetAbsolute (const char* path, stdalloc allocator) {
     char* absolute = allocator(PATH_MAX+1);
+    //todo realpath accesses the fs (symlinks etc) - use something else
     bool success = realpath(path, absolute);
 
     if (success)

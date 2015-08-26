@@ -21,7 +21,7 @@ value* builtinExpandGlob (const char* pattern, value* arg) {
 
         /*Turn the matches into a vector*/
         for (unsigned int n = 0; n < matches.gl_pathc; n++)
-            vectorPush(&results, valueCreateStr(matches.gl_pathv[n]));
+            vectorPush(&results, valueCreateFile(matches.gl_pathv[n]));
     }
 
     globfree(&matches);

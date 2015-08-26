@@ -1,3 +1,5 @@
+typedef struct dirCtx dirCtx;
+
 typedef struct type type;
 typedef struct typeSys typeSys;
 typedef struct sym sym;

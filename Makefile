@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -std=c11 -Werror -Wall -Wextra -I../libkiss -g
+CFLAGS = -std=c11 -O3 -Werror -Wall -Wextra -I../libkiss -g
 LDFLAGS = -lgc -lreadline -L../libkiss -lkiss
 
 HEADERS = $(wildcard src/*.h)
