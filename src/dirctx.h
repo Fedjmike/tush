@@ -1,7 +1,9 @@
 #pragma once
 
+#include <unistd.h>
 #include <vector.h>
 
+#include "common.h"
 #include "paths.h"
 
 typedef struct dirCtx {
@@ -17,6 +19,8 @@ static dirCtx dirsInit (vector(char*) searchPaths, char* workingDir);
 static dirCtx* dirsFree (dirCtx* dirs);
 
 static bool dirsChangeWD (dirCtx* dirs, const char* newWD);
+
+static char* dirsSearch (dirCtx* dirs, const char* str, stdalloc allocator);
 
 /*==== Inline implementations ====*/
 
@@ -57,4 +61,26 @@ inline static bool dirsChangeWD (dirCtx* dirs, const char* newWD) {
     }
 
     return error;
+}
+
+inline static char* dirsSearch (dirCtx* dirs, const char* str, stdalloc allocator) {
+    enum {bufsize = 512};
+    char* fullpath = allocator(bufsize);
+
+    for_vector (const char* dir, dirs->searchPaths, {
+        int printed = snprintf(fullpath, bufsize, "%s/%s", dir, str);
+
+        if (printed == bufsize) {
+            //todo realloc
+            errprintf("Search path '%s' too long\n", dir);
+            continue;
+        }
+
+        bool fail = access(fullpath, F_OK);
+
+        if (!fail)
+            return fullpath;
+    })
+
+    return 0;
 }
