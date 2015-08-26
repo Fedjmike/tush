@@ -159,6 +159,48 @@ void replAST (compilerCtx* compiler, const char* input) {
     else if (errors == 0)
         errprintf("Null AST tree generated\n");
 }
+
+typedef struct replCommand {
+    const char* name;
+    size_t length;
+    void (*handler)(compilerCtx* compiler, const char* input);
+} replCommand;
+
+static replCommand commands[] = {
+    {"cd", strlen("cd"), replCD},
+    {"ast", strlen("ast"), replAST}
+};
+
+void replCmd (compilerCtx* compiler, const char* input) {
+    char* firstSpace = strchr(input, ' ');
+    size_t cmdLength = firstSpace ? (size_t)(firstSpace - input) : strlen(input);
+
+    if (cmdLength == 0) {
+        printf("No command name given\n");
+        return;
+    }
+
+    /*Look through all the commands...*/
+    for (unsigned int i = 0; i < sizeof(commands) / sizeof(*commands); i++) {
+        replCommand cmd = commands[i];
+
+        /*... for one of the same length*/
+        if (cmdLength != cmd.length)
+            continue;
+
+        /*... where the name matches*/
+        bool nameMatches = !strncmp(input, cmd.name, cmd.length);
+
+        if (nameMatches) {
+            cmd.handler(compiler, input + cmd.length + 1);
+            return;
+        }
+    }
+
+    printf("No command named ':");
+    /*Using printf precisions, %.*s, would convert the length to int*/
+    fwrite(input, sizeof(*input), cmdLength, stdout);
+    printf("'\n");
 }
 
 void repl (compilerCtx* compiler) {
@@ -188,11 +230,8 @@ void repl (compilerCtx* compiler) {
         add_history(input);
         write_history(historyFilename);
 
-        if (!strncmp(input, ":cd ", 4))
-            replCD(compiler, input+4);
-
-        else if (!strncmp(input, ":ast ", 5))
-            replAST(compiler, input+5);
+        if (input[0] == ':')
+            replCmd(compiler, input+1);
 
         else
             gosh(compiler, input, true);
