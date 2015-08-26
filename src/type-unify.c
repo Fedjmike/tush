@@ -7,7 +7,7 @@
 
 enum {
     typeUnifyNoisy = false
-}
+};
 
 typedef struct inference {
     vector(const type*) typevars;
