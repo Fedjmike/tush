@@ -286,7 +286,7 @@ void displayListList (value* result, type* resultType, type* elementType, type* 
 
 void displayStr (value* result, type* resultType) {
     size_t length;
-    const char* str = valueGetStr(result, &length);
+    const char* str = valueGetStrWithLength(result, &length);
 
     /*Special handling for multiline strings
        - Check for final EOL and warn if missing

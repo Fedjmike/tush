@@ -57,7 +57,8 @@ int valuePrint (const value* v);
 /*==== Kind specific operations ====*/
 
 int64_t valueGetInt (const value* num);
-const char* valueGetStr (const value* str, size_t* length_out);
+const char* valueGetStr (const value* str);
+const char* valueGetStrWithLength (const value* str, size_t* length_out);
 
 value* valueCall (const value* fn, const value* arg);
 

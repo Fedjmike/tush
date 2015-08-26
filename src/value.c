@@ -178,13 +178,21 @@ int64_t valueGetInt (const value* num) {
     return num->integer;
 }
 
-const char* valueGetStr (const value* str, size_t* length) {
+static const char* valueGetStrImpl (const value* str, size_t* length) {
     assert(str->kind == valueStr);
 
     if (length)
         *length = str->strlen;
 
     return str->str;
+}
+
+const char* valueGetStr (const value* str) {
+    return valueGetStrImpl(str, 0);
+}
+
+const char* valueGetStrWithLength (const value* str, size_t* length) {
+    return valueGetStrImpl(str, length);
 }
 
 value* valueCall (const value* fn, const value* arg) {

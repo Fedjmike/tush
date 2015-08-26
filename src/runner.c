@@ -96,7 +96,7 @@ static value* runClassicUnixApp (envCtx* env, const ast* node, const char* progr
             str = valueGetFilename(arg);
 
         else if (typeIsKind(type_Str, argNode->dt))
-            str = valueGetStr(arg, 0);
+            str = valueGetStr(arg);
 
         else {
             errprintf("Unhandled type kind, %s\n", typeGetStr(argNode->dt));
