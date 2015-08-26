@@ -230,14 +230,16 @@ static void errorConcatMismatch (analyzerCtx* ctx, type* left, type* right) {
 static type* analyzeConcat (analyzerCtx* ctx, ast* node, type* left, type* right) {
     (void) node;
 
+    type* result;
+
     if (!typeIsList(left))
         errorConcatIsntList(ctx, true, left);
 
     if (!typeIsList(right))
         errorConcatIsntList(ctx, false, right);
 
-    if (typeIsEqual(left, right))
-        return left; //arbitrary
+    if (typeCanUnify(ctx->ts, left, right, &result))
+        return result;
 
     else {
         errorConcatMismatch(ctx, left, right);

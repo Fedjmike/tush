@@ -77,3 +77,5 @@ bool typeUnitAppliesToFn (const type* fn, type** result);
 
 bool typeIsListOf (const type* dt, type** elements);
 bool typeIsTupleOf (const type* dt, vector(const type*)* types);
+
+bool typeCanUnify (typeSys* ts, const type* l, const type* r, type** result);

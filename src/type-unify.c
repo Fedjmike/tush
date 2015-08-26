@@ -258,16 +258,13 @@ type* unifyArgWithFn (typeSys* ts, const type* arg, const type* fn) {
 
     vector(type*) boundTypevars = fn->typevars;
 
-    if (arg->kind == type_Forall) {
-        boundTypevars = vectorInit(boundTypevars.length + arg->typevars.length, malloc);
-        vectorPushFromVector(&boundTypevars, fn->typevars);
-        vectorPushFromVector(&boundTypevars, arg->typevars);
-    }
-
-    inferences infs = infsInit(boundTypevars, malloc);
+    if (arg->kind == type_Forall)
+        boundTypevars = vectorsJoin(2, malloc, fn->typevars, arg->typevars);
 
     /*Return the unified form of the function*/
+    inferences infs = infsInit(boundTypevars, malloc);
     bool unifies = typeUnifies(ts, &infs, arg, fn->dt->from);
+
     type* specificFn = unifies ? typeMakeSubs(ts, &infs, fn) : 0;
 
     infsFree(&infs);
@@ -276,4 +273,31 @@ type* unifyArgWithFn (typeSys* ts, const type* arg, const type* fn) {
         vectorFree(&boundTypevars);
 
     return specificFn;
+}
+
+type* unifyMatching (typeSys* ts, const type* l, const type* r) {
+    vector(type*) boundTypevars;
+
+    if (l->kind == type_Forall) {
+        if (r->kind == type_Forall)
+            boundTypevars = vectorsJoin(2, malloc, l->typevars, r->typevars);
+
+        else
+            boundTypevars = vectorDup(l->typevars, malloc);
+
+    } else if (r->kind == type_Forall)
+        boundTypevars = vectorDup(r->typevars, malloc);
+
+    else
+        return typeIsEqual(l, r) ? (type*) l : 0;
+
+    inferences infs = infsInit(boundTypevars, malloc);
+    bool unifies = typeUnifies(ts, &infs, l, r);
+
+    type* specific = unifies ? typeMakeSubs(ts, &infs, l) : 0;
+
+    infsFree(&infs);
+    vectorFree(&boundTypevars);
+
+    return specific;
 }

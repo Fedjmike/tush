@@ -407,3 +407,8 @@ bool typeIsTupleOf (const type* dt, vector(const type*)* types) {
     } else
         return false;
 }
+
+bool typeCanUnify (typeSys* ts, const type* l, const type* r, type** result) {
+    *result = unifyMatching(ts, l, r);
+    return *result != 0;
+}

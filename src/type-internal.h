@@ -34,3 +34,4 @@ static inline bool typeKindIsntUnitary (typeKind kind) {
 /*==== Unification ====*/
 
 type* unifyArgWithFn (typeSys* ts, const type* arg, const type* fn);
+type* unifyMatching (typeSys* ts, const type* l, const type* r);
