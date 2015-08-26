@@ -216,14 +216,14 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
     }
 
     case type_Tuple: {
-        vector(const char*) typeStrs = vectorInit(dt->types.length, malloc);
+        /*Note: VLA*/
+        const char* typeStrs[dt->types.length];
         int length = 0;
 
         /*Work out the length of all the subtypes and store their strings*/
-        for_vector (type* dt, dt->types, {
-            const char* typeStr = typeGetStrImpl(ctx, dt);
-            length += strlen(typeStr) + 2;
-            vectorPush(&typeStrs, typeStr);
+        for_vector_indexed (i, type* dt, dt->types, {
+            typeStrs[i] = typeGetStrImpl(ctx, dt);
+            length += strlen(typeStrs[i]) + 2;
         })
 
         /*Print the subtypes in parentheses, with comma separators*/
@@ -233,11 +233,9 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
         strcpy(dt->str, "(");
 
         size_t pos = 1;
-        pos += strcatwith(dt->str+pos, typeStrs.length, (char**) typeStrs.buffer, ", ");
+        pos += strcatwith(dt->str+pos, dt->types.length, (char**) typeStrs, ", ");
 
         strcpy(dt->str+pos, ")");
-
-        vectorFree(&typeStrs);
 
         return dt->str;
     }
