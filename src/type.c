@@ -244,11 +244,23 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
     case type_Var:
         return strMapTypevar(ctx, dt);
 
-    case type_Forall:
-        //todo add typevars to ensure order
-        return typeGetStrImpl(ctx, dt->dt);
-        //todo "forall a, b." if higher kinded
-    }
+    case type_Forall: {
+        //todo not "forall a, b." if kind 0
+
+        /*Note: VLA*/
+        const char* typevarStrs[dt->typevars.length];
+        
+        for_vector_indexed (i, type* typevar, dt->typevars, {
+            typevarStrs[i] = strMapTypevar(ctx, typevar);
+        })
+
+        const char* dtStr = typeGetStrImpl(ctx, dt->dt);
+        char* typevarStr = strjoinwith(dt->typevars.length, (char**) typevarStrs, ", ", malloc);
+
+        assert(asprintf(&dt->str, "forall %s. %s", typevarStr, dtStr));
+        free(typevarStr);
+        return dt->str;
+    }}
 
     return "<unhandled type kind>";
 }
