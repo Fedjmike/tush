@@ -222,12 +222,14 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
         return typeTuple(ts, types);
 
     } case type_Var: {
+        /*Look for something to substitute the typevar for*/
         inference* inf = infsLookup(infs, dt);
 
         if (inf) {
             if (inf->closed)
                 return (type*) inf->closed;
 
+            /*If there isn't a closed type, unify them all to the *first* typevar*/
             else {
                 assert(inf->typevars.length >= 1);
                 return vectorGet(inf->typevars, 0);
@@ -237,8 +239,36 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
             return (type*) dt;
 
     } case type_Forall: {
-        //todo leave typevars with no closed
-        return typeMakeSubs(ts, infs, dt->dt);
+        type* substDT = typeMakeSubs(ts, infs, dt->dt);
+
+        /*Note: VLA*/
+        type* typevars[dt->typevars.length];
+        int typevarsLeft = 0;
+
+        /*Work out which typevars are still quantified over*/
+
+        for_vector (type* typevar, dt->typevars, {
+            inference* inf = infsLookup(infs, typevar);
+
+            /*This typevar has been substituted if:
+               - there is a closed type assigned,
+               - or it isn't the first in its inference
+                 (see the handling for type_Vars)*/
+            if (inf && (inf->closed || typevar != vectorGet(inf->typevars, 0)))
+                ;
+
+            else
+                typevars[typevarsLeft++] = typevar;
+        })
+
+        /*If there are any left then create a new forall*/
+        if (typevarsLeft != 0) {
+            vector(type*) typevarVec = vectorInit(typevarsLeft, malloc);
+            vectorPushFromArray(&typevarVec, (void**) typevars, typevarsLeft, sizeof(type*));
+            return typeForall(ts, typevarVec, substDT);
+
+        } else
+            return substDT;
 
     } case type_KindNo:
         errprintf("Dummy type kind 'KindNo' found in the wild\n");
