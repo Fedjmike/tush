@@ -13,11 +13,17 @@ static void symAddChild(sym* parent, sym* child) {
     child->parent = parent;
 }
 
-static sym* symCreate (const char* name) {
-    return malloci(sizeof(sym), &(sym) {
-        .children = vectorInit(4, malloc),
-        .name = strdup(name)
-    });
+static sym* symCreate (symKind kind, const char* name, sym init) {
+    sym* symbol = malloci(sizeof(sym), &init);
+    symbol->kind = kind;
+    symbol->name = strdup(name);
+    return symbol;
+}
+
+static sym* symCreateParented (symKind kind, sym* parent, const char* name, sym init) {
+    sym* symbol = symCreate(kind, name, init);
+    symAddChild(parent, symbol);
+    return symbol;
 }
 
 static void symDestroy (sym* symbol) {
@@ -26,18 +32,24 @@ static void symDestroy (sym* symbol) {
     free(symbol);
 }
 
+sym* symAdd (sym* parent, const char* name) {
+    return symCreateParented(symNormal, parent, name, (sym) {});
+}
+
+sym* symAddScope (sym* parent) {
+    return symCreateParented(symScope, parent, "<scope>", (sym) {
+        .children = vectorInit(10, malloc)
+    });
+}
+
 sym* symInit (void) {
-    return symCreate("<global namespace>");
+    return symCreate(symScope, "<global scope>", (sym) {
+        .children = vectorInit(50, malloc)
+    });
 }
 
 void symEnd (sym* global) {
     symDestroy(global);
-}
-
-sym* symAdd (sym* parent, const char* name) {
-    sym* symbol = symCreate(name);
-    symAddChild(parent, symbol);
-    return symbol;
 }
 
 sym* symLookup (sym* scope, const char* name) {
@@ -45,6 +57,9 @@ sym* symLookup (sym* scope, const char* name) {
         if (!strcmp(name, symbol->name))
             return symbol;
     })
+
+    if (scope->parent)
+        return symLookup(scope->parent, name);
 
     return 0;
 }
