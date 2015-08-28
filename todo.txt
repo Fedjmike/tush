@@ -7,6 +7,7 @@
     [x] forall qualifier
     [-] Unification instead of typeIsEqual
         [ ] Operators that expect matching operands e.g. ++
+    [ ] Allow (A -> forall b. b) to unify with (forall b. A -> b) -- and others?
     [ ] Row polymorphism
         - ('a | 'as) matches (A, B, C) for 'a = A and 'as = (B, C)
     [ ] Typeclasses/traits
@@ -16,7 +17,8 @@
         [x] Integer
         [x] Number
         [x] Str
-        [ ] Lambda
+        [-] Lambda
+            [ ] Arg type inference
         [ ] Bracketed operators
         [ ] (String) format
         [ ] Regex
@@ -45,6 +47,10 @@
         [ ] Environment variables
         [ ] History
     [-] Expressions
+        [ ] Arithmetic, + - * / %
+        [ ] Comparison, == != < <= > >=
+        [ ] Boolean, && || !
+        [ ] Branching, if switch
         [ ] Files
             [ ] /
             [ ] |>
@@ -64,18 +70,20 @@
                 [ ] Maybe, 'a?
                 [ ] Generalize to all?
             [ ] Options
-        [ ] Arithmetic
         [ ] String
-            [ ] Concat
             [ ] Formatting
         [-] Iterables
-            [x] List concat
-            [ ] Slices
-        [ ] Comparison
-        [ ] Boolean
-        [ ] Branching
+            [-] Concat, ++
+                [ ] Strings
+            [ ] Slices?
+            [ ] Member-of
+        [ ] Containers
+            [ ] Lookup, :
     [ ] Statements
         [-] Decl/assignment
+            [ ] Expression level let
+            [ ] A helpful error message to distinguish them
+            [ ] Self reference error
         [ ] Functions
             [ ] Options
             [ ] Dependency functions
@@ -118,7 +126,7 @@
         [ ] Syntax highlighting
         [ ] Interactive command construction, extensible
         [ ] Job control
-        [ ] History available as an iterable
+        [ ] Concurrent histories
     [ ] Display
         [-] Value printing
             [-] Highlighting
@@ -157,7 +165,6 @@ hashmap:
 
 == Language structures
 
-
 [ ] No {ast,sym}::children by default, allocate on need
 [ ] Value printing must depend on the type
 
@@ -171,6 +178,8 @@ type:
 ast:
 [ ] Make AST::children a const_vector (combined length and size fields)
 [ ] Pooled allocator for AST
+    - Substitute for malloc/free in debug
+    - Custom allocators dangerous?
 [ ] Unpackers for the AST (and others?)
 [x] opKind -> str
 [ ] Add a field to the AST, a reference to relevant token
@@ -182,6 +191,11 @@ value:
 [x] valueInvalid
 
 == Passes
+
+[ ] For all AST passes (inc. ast-printer) create an "action table" which the parser can run directly without even creating an AST.
+    - For most cases (all?) an AST is not actually needed.
+    - Parser routines will return an "action result".
+    - The runner actions will need to call the analyzer actions before themselves
 
 Lexer:
 [ ] Make the lexer create a vector of tokens which persist, own their buffers
