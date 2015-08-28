@@ -122,7 +122,8 @@ ast* astCreateInvalid (void) {
 }
 
 ast* astDup (const ast* original, stdalloc allocator) {
-    ast* node = malloci(sizeof(ast), original);
+    ast* node = allocator(sizeof(ast));
+    *node = *original;
 
     if (original->l)
         node->l = astDup(original->l, allocator);
@@ -142,14 +143,21 @@ ast* astDup (const ast* original, stdalloc allocator) {
     case astStrLit:
     case astFileLit:
     case astGlobLit:
-        if (original->literal.str)
-            node->literal.str = strdup(original->literal.str);
+        if (original->literal.str) {
+            size_t length = strlen(original->literal.str)+1;
+            node->literal.str = allocator(length);
+            memcpy(node->literal.str, original->literal.str, length);
+        }
+
+        break;
 
     case astFnLit:
         if (original->captured) {
-            node->captured = malloc(sizeof(vector));
+            node->captured = allocator(sizeof(vector));
             *node->captured = vectorDup(*original->captured, allocator);
         }
+
+        break;
 
     default:
         ;
