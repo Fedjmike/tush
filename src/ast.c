@@ -51,10 +51,9 @@ ast* astCreateFnApp (vector(ast*) args, ast* fn) {
     });
 }
 
-ast* astCreateSymbol (sym* symbol, bool captured) {
+ast* astCreateSymbol (sym* symbol) {
     return astCreate(astSymbol, (ast) {
-        .symbol = symbol,
-        .flags = captured ? astCaptured : astNoFlags
+        .symbol = symbol
     });
 }
 
@@ -217,7 +216,6 @@ const char* astKindGetStr (astKind kind) {
 const char* astFlagGetStr (astFlags flag) {
     switch (flag) {
     case astNoFlags: return "NoFlags";
-    case astCaptured: return "Captured";
     case astUnixInvocation: return "UnixInvocation";
     case astListApplication: return "ListApplication";
     }

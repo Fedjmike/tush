@@ -15,8 +15,6 @@ typedef enum astKind {
 
 typedef enum astFlags {
     astNoFlags = 0,
-    /*Symbol*/
-    astCaptured,
     /*FnApp*/
     astUnixInvocation,
     /*BOP[o=Pipe]*/
@@ -61,7 +59,7 @@ typedef struct ast {
 
 ast* astCreateBOP (ast* l, ast* r, opKind op);
 ast* astCreateFnApp (vector(ast*) args, ast* fn);
-ast* astCreateSymbol (sym* symbol, bool captured);
+ast* astCreateSymbol (sym* symbol);
 
 ast* astCreateUnitLit (void);
 ast* astCreateIntLit (int64_t integer);

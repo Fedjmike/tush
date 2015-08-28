@@ -22,7 +22,7 @@ static ast* parserPattern (parserCtx* ctx) {
         sym* symbol = symAdd(ctx->scope, ctx->current.buffer);
         accept(ctx);
 
-        node = astCreateSymbol(symbol, false);
+        node = astCreateSymbol(symbol);
 
     } else {
         expected(ctx, "function argument");
@@ -65,18 +65,18 @@ static ast* parseFnLit (parserCtx* ctx) {
  * Symbol = <QualifiedName>
  */
 static ast* parseSymbol (parserCtx* ctx, sym* symbol) {
-    bool captured = false;
+    bool capturing = false;
 
-    parserFnCtx* fn = innermost_fn(ctx);
+    /*Find the first (outermost) fn that needs to capture this value,
+      then add it to the capture list for that and all further fns.*/
+    for_vector (parserFnCtx* fn, ctx->fns, {
+        if (capturing || !symIsInside(symbol, fn->scope)) {
+            capturing = true;
+            vectorPush(fn->captured, symbol);
+        }
+    })
 
-    /*If the symbol isn't in the scope of the innermost function
-      then its value must be captured*/
-    if (fn && !symIsInside(symbol, fn->scope)) {
-        captured = true;
-        vectorPush(fn->captured, symbol);
-    }
-
-    return astCreateSymbol(symbol, captured);
+    return astCreateSymbol(symbol);
 }
 
 /**
