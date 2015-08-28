@@ -52,14 +52,36 @@ void symEnd (sym* global) {
     symDestroy(global);
 }
 
-sym* symLookup (sym* scope, const char* name) {
-    for_vector (sym* symbol, scope->children, {
+const char* symGetName (const sym* symbol) {
+    return   !symbol ? "<no symbol attached>"
+           : !symbol->name ? "<unnamed symbol>"
+           : symbol->name;
+}
+
+sym* symLookup (const sym* scope, const char* name) {
+    for (int i = scope->children.length; i; i--) {
+        sym* symbol = vectorGet(scope->children, i-1);
+
         if (!strcmp(name, symbol->name))
             return symbol;
-    })
+    }
 
     if (scope->parent)
         return symLookup(scope->parent, name);
 
     return 0;
+}
+
+bool symIsInside (const sym* look, const sym* scope) {
+    if (look->parent == scope)
+        return true;
+
+    for_vector (sym* child, scope->children, {
+        if (child->kind == symScope) {
+            if (symIsInside(look, child))
+                return true;
+        }
+    })
+
+    return false;
 }

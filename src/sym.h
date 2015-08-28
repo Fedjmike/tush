@@ -29,5 +29,13 @@ void symEnd (sym* global);
 sym* symAdd (sym* parent, const char* name);
 sym* symAddScope (sym* parent);
 
-/*Returns null on failure*/
-sym* symLookup (sym* scope, const char* name);
+/*Guaranteed to return at least something descriptive*/
+const char* symGetName (const sym* symbol);
+
+/*Looks for a symbol visible from a scope, therefore searching the
+  recursively up the parents scopes. Returns null on failure.*/
+sym* symLookup (const sym* scope, const char* name);
+
+/*Checks whether a symbol is inside this scope or any scopes also
+  contained in this scope.*/
+bool symIsInside (const sym* look, const sym* scope);

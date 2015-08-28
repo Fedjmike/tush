@@ -65,9 +65,7 @@ static void printer (printerCtx* ctx, const ast* node) {
 
     case astSymbol:
     case astLet:
-        printer_outf(ctx)("symbol: %s\n",   !node->symbol ? "<no symbol attached>"
-                                          : !node->symbol->name ? "<unnamed symbol>"
-                                          : node->symbol->name);
+        printer_outf(ctx)("symbol: %s\n", symGetName(node->symbol));
         break;
 
     case astListLit:
