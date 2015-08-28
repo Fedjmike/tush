@@ -111,7 +111,7 @@ sudo mv tush /usr/local/bin</code></pre>
             <p>Implemented so far:</p>
             <ul class="tight">
                 <li>Files, globs, strings, integers, lists and tuples.</li>
-                <li>Function application, list concatenation.</li>
+                <li>Lambdas, function application, list concatenation, <code>let</code>.</li>
                 <li>Basic polymorphism.</li>
                 <li>Some builtins: <code>size</code>, <code>cat</code>, <code>lc</code> (line count), <code>sum</code>, <code>zipf</code>.</li>
                 <li>Output display for type names, files and directories, file lists, tuple lists (a.k.a. tables) and nested lists.</li>
@@ -119,20 +119,20 @@ sudo mv tush /usr/local/bin</code></pre>
             </ul>
             
             <h2 class="content-head">Future</h2>
-            <p>On the immediate horizon is program invocation. There is some basic support for classic Unix programs.</p>
+            <p>On the immediate horizon is global type inference and program invocation. There is some basic support for asynchronous (pipeless) program invocation.</p>
             <p>Beyond the language itself, Tush will have:</p>
             <ul class="tight">
                 <li>A C API for writing native Tush programs.</li>
                 <li>Better interactive features. Syntax highlighting, intelligent completion, job control. See: <a href="http://fishshell.com/">Fish</a>, <a href="https://github.com/mooz/percol">Percol</a>.</li>
                 <li>Support for BSD, OS X and Windows.</li>
-                <li>Compilation to portable, POSIX shell code.</li>
+                <li>Compilation to portable POSIX shell code.</li>
                 <li>JIT compilation?</li>
             </ul>
         </section>
     </div>
     
     <footer class="ribbon">
-        Last updated 23/08/2015.
+        Last updated 28/08/2015.
     </footer>
     
     <script type="text/javascript">
