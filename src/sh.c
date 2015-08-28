@@ -167,6 +167,16 @@ void replAST (compilerCtx* compiler, const char* input) {
     astDestroy(tree);
 }
 
+void replType (compilerCtx* compiler, const char* input) {
+    int errors = 0;
+    ast* tree = compile(compiler, input, &errors);
+
+    if (tree && !errors)
+        puts(typeGetStr(tree->dt));
+
+    astDestroy(tree);
+}
+
 typedef struct replCommand {
     const char* name;
     size_t length;
@@ -175,7 +185,8 @@ typedef struct replCommand {
 
 static replCommand commands[] = {
     {"cd", strlen("cd"), replCD},
-    {"ast", strlen("ast"), replAST}
+    {"ast", strlen("ast"), replAST},
+    {"type", strlen("type"), replType}
 };
 
 void replCmd (compilerCtx* compiler, const char* input) {
