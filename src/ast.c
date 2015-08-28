@@ -121,6 +121,43 @@ ast* astCreateInvalid (void) {
     return astCreate(astInvalid, (ast) {});
 }
 
+ast* astDup (const ast* original, stdalloc allocator) {
+    ast* node = malloci(sizeof(ast), original);
+
+    if (original->l)
+        node->l = astDup(original->l, allocator);
+
+    if (original->r)
+        node->r = astDup(original->r, allocator);
+
+    if (!vectorNull(original->children)) {
+        node->children = vectorInit(original->children.length, allocator);
+
+        for_vector (ast* child, original->children, {
+            vectorPush(&node->children, astDup(child, allocator));
+        })
+    }
+
+    switch (node->kind) {
+    case astStrLit:
+    case astFileLit:
+    case astGlobLit:
+        if (original->literal.str)
+            node->literal.str = strdup(original->literal.str);
+
+    case astFnLit:
+        if (original->captured) {
+            node->captured = malloc(sizeof(vector));
+            *node->captured = vectorDup(*original->captured, allocator);
+        }
+
+    default:
+        ;
+    }
+
+    return node;
+}
+
 /*==== ====*/
 
 const char* opKindGetStr (opKind kind) {

@@ -79,6 +79,9 @@ ast* astCreateInvalid (void);
 
 void astDestroy (ast* node);
 
+/*Duplicate an entire AST tree, including all owned objects*/
+ast* astDup (const ast* tree, stdalloc allocator);
+
 const char* opKindGetStr (opKind kind);
 const char* astKindGetStr (astKind kind);
 const char* astFlagGetStr (astFlags flag);
