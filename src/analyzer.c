@@ -145,7 +145,7 @@ static void errorClassicUnixApp (analyzerCtx* ctx, type* arg) {
         ;
 
     else
-        error(ctx)("Unix invokation (stdin -> stdout) requires string arguments, given %s\n",
+        error(ctx)("Unix invocation (stdin -> stdout) requires string arguments, given %s\n",
                    typeGetStr(arg));
 }
 
