@@ -91,6 +91,11 @@ goshResult gosh (compilerCtx* ctx, const char* str, bool display) {
 
     ast* tree = compile(ctx, str, &errors);
 
+    if (!tree) {
+        errprintf("Null AST tree generated\n");
+        return (goshResult) {};
+    }
+
     value* result = 0;
     type* dt = tree->dt;
 
@@ -155,9 +160,6 @@ void replAST (compilerCtx* compiler, const char* input) {
 
     if (tree)
         printAST(tree);
-
-    else if (errors == 0)
-        errprintf("Null AST tree generated\n");
 
     astDestroy(tree);
 }
