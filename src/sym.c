@@ -59,12 +59,11 @@ const char* symGetName (const sym* symbol) {
 }
 
 sym* symLookup (const sym* scope, const char* name) {
-    for (int i = scope->children.length; i; i--) {
-        sym* symbol = vectorGet(scope->children, i-1);
-
+    /*Look backwards, for the most recent definition*/
+    for_vector_reverse (sym* symbol, scope->children, {
         if (!strcmp(name, symbol->name))
             return symbol;
-    }
+    })
 
     if (scope->parent)
         return symLookup(scope->parent, name);

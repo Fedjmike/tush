@@ -33,7 +33,9 @@ sym* symAddScope (sym* parent);
 const char* symGetName (const sym* symbol);
 
 /*Looks for a symbol visible from a scope, therefore searching the
-  recursively up the parents scopes. Returns null on failure.*/
+  recursively up the parents scopes.
+    - Returns null on failure.
+    - Returns the most recent definition of that name.*/
 sym* symLookup (const sym* scope, const char* name);
 
 /*Checks whether a symbol is inside this scope or any scopes also

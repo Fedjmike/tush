@@ -332,11 +332,7 @@ static ast* parseLet (parserCtx* ctx) {
     sym* symbol = 0;
 
     if (see_kind(ctx, tokenNormal)) {
-        /*Name collision*/
-        if (symLookup(ctx->scope, ctx->current.buffer))
-            /*Error, but use the given name anyway*/
-            error(ctx)("Symbol named '%s' already declared\n", ctx->current.buffer);
-
+    	/*Shadow any previous definitions*/
         symbol = symAdd(ctx->scope, ctx->current.buffer);
         accept(ctx);
 
