@@ -359,34 +359,49 @@ bool typeIsEqual (const type* l, const type* r) {
 
 /*==== Operations ====*/
 
+static type* fnGetTo (const type* fn) {
+    //todo preconditions()
+    assert(typeIsFn(fn));
+
+    switch (fn->kind) {
+    case type_Fn:
+        return fn->to;
+
+    case type_Forall:
+        return fnGetTo(fn->dt);
+
+    default:
+        errprintf("Unhandled function kind, %s\n", typeGetStr(fn));
+        return 0;
+    }
+}
+
 bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** result) {
     assert(arg);
+
+    bool applies;
 
     if (!typeIsFn(fn))
         return false;
 
     else if (fn->kind == type_Fn) {
-        bool applies = typeIsEqual(fn->from, arg);
-
-        if (applies && result)
-            *result = fn->to;
-
-        return applies;
+        applies = typeIsEqual(fn->from, arg);
 
     /*The function is quantified, so find the types which satisfy this application*/
     } else if (fn->kind == type_Forall && fn->dt->kind == type_Fn) {
-        type* unifiedFn = unifyArgWithFn(ts, arg, fn);
-
-        if (unifiedFn)
-            *result = unifiedFn->to;
-
-        return unifiedFn != 0;
+        fn = unifyArgWithFn(ts, arg, fn);
+		applies = fn != 0;
 
     } else {
         errprintf("Unknown function representation, kind %d, %s\n", fn->kind, typeGetStr(fn));
         *result = typeInvalid(ts);
         return true;
     }
+
+    if (applies && result)
+        *result = fnGetTo(fn);
+
+    return applies;
 }
 
 bool typeUnitAppliesToFn (const type* fn, type** result) {
