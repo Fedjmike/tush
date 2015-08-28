@@ -1,4 +1,4 @@
-Tush
+Tush [![Build Status](https://travis-ci.org/Fedjmike/tush.svg?branch=master)](https://travis-ci.org/Fedjmike/tush)
 ====
 
 Tush is a modern, statically typed shell and scripting language. It is a major departure from classic Unix shells that were centred around string manipulation and substitution.
@@ -21,8 +21,8 @@ Design
 
 The language design has lots of open questions. Among them, how to:
 
-- Handle errors — exceptions, Maybe monad, error codes, other possibilites?
-- Dynamically type files — existential types?
+- Handle errors â€” exceptions, Maybe monad, error codes, other possibilites?
+- Dynamically type files â€” existential types?
 - Create a language that can be seamlessly used interactively, but also for safe scripting, for programming in the large.
 - Disambiguate the multiply operator (`*`) from a wildcard.
 
