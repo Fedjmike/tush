@@ -1,18 +1,31 @@
 #include <stdio.h>
 
+#include <vector.h>
+
 #include "forward.h"
 #include "token.h"
+#include "sym.h"
 #include "lexer.h"
 
 enum {
     parserNoisy = false
 };
 
+typedef struct parserFnCtx {
+    sym* scope;
+    /*Symbols captured by this function, to be put in a closure environment.
+      Free variables, e.g. y in \x -> x + y*/
+    vector(sym*)* captured;
+} parserFnCtx;
+
 typedef struct parserCtx {
     /*The global symbol table*/
     sym* global;
     /*The current scope*/
     sym* scope;
+
+    /*A stack of functions, representing the lexical context*/
+    vector(parserFnCtx*) fns;
 
     lexerCtx* lexer;
     token current;
@@ -22,6 +35,10 @@ typedef struct parserCtx {
 
 static parserCtx parserInit (sym* global, lexerCtx* lexer);
 static parserCtx* parserFree (parserCtx* ctx);
+
+static void enter_fn (parserCtx* ctx, sym* newscope, vector(sym*)* captured);
+static void exit_fn (parserCtx* ctx);
+static parserFnCtx* innermost_fn (parserCtx* ctx);
 
 static printf_t* error (parserCtx* ctx);
 
@@ -36,14 +53,13 @@ static void expected (parserCtx* ctx, const char* expected);
 static void match (parserCtx* ctx, const char* look);
 static bool try_match (parserCtx* ctx, const char* look);
 
-static sym* push_scope (parserCtx* ctx, sym* newscope);
-
 /*==== Inline implementations ====*/
 
 inline static parserCtx parserInit (sym* global, lexerCtx* lexer) {
     return (parserCtx) {
         .global = global,
         .scope = global,
+        .fns = vectorInit(10, malloc),
         .lexer = lexer,
         .current = lexerNext(lexer),
         .errors = 0
@@ -51,8 +67,29 @@ inline static parserCtx parserInit (sym* global, lexerCtx* lexer) {
 }
 
 inline static parserCtx* parserFree (parserCtx* ctx) {
-    /*Nothing to clean up*/
+    /*There shouldn't be any unfinished fn scopes left when this is called*/
+    assert(ctx->fns.length == 0);
+    vectorFreeObjs(&ctx->fns, free);
     return ctx;
+}
+
+inline static void enter_fn (parserCtx* ctx, sym* newscope, vector(sym*)* captured) {
+    vectorPush(&ctx->fns, malloci(sizeof(parserFnCtx), &(parserFnCtx) {
+        .scope = newscope,
+        .captured = captured
+    }));
+    ctx->scope = newscope;
+}
+
+inline static void exit_fn (parserCtx* ctx) {
+    /*Assumption: the previous scope is the current scope's parent
+      (note: it is not the previous fn's scope, there may be `let`s)*/
+    free(vectorPop(&ctx->fns));
+    ctx->scope = ctx->scope->parent;
+}
+
+inline static parserFnCtx* innermost_fn (parserCtx* ctx) {
+    return vectorTop(ctx->fns);
 }
 
 inline static printf_t* error (parserCtx* ctx) {
@@ -106,10 +143,4 @@ inline static bool try_match (parserCtx* ctx, const char* look) {
 
     } else
         return false;
-}
-
-inline static sym* push_scope (parserCtx* ctx, sym* newscope) {
-    sym* oldscope = ctx->scope;
-    ctx->scope = newscope;
-    return oldscope;
 }

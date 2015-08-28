@@ -22,7 +22,7 @@ static ast* parserPattern (parserCtx* ctx) {
         sym* symbol = symAdd(ctx->scope, ctx->current.buffer);
         accept(ctx);
 
-        node = astCreateSymbol(symbol);
+        node = astCreateSymbol(symbol, false);
 
     } else {
         expected(ctx, "function argument");
@@ -38,8 +38,10 @@ static ast* parserPattern (parserCtx* ctx) {
 static ast* parseFnLit (parserCtx* ctx) {
     match(ctx, "\\");
 
-    /*Enter a new scope*/
-    sym* oldscope = push_scope(ctx, symAddScope(ctx->scope));
+    vector(sym*) captured = vectorInit(8, malloc);
+
+    /*Enter a new lexical scope and function context*/
+    enter_fn(ctx, symAddScope(ctx->scope), &captured);
 
     /*Arg patterns*/
 
@@ -53,10 +55,28 @@ static ast* parseFnLit (parserCtx* ctx) {
     match(ctx, "->");
     ast* expr = parseExpr(ctx);
 
-    /*Pop scope*/
-    ctx->scope = oldscope;
+    /*Restore the previous scope*/
+    exit_fn(ctx);
 
-    return astCreateFnLit(args, expr);
+    return astCreateFnLit(args, expr, captured);
+}
+
+/**
+ * Symbol = <QualifiedName>
+ */
+static ast* parseSymbol (parserCtx* ctx, sym* symbol) {
+    bool captured = false;
+
+    parserFnCtx* fn = innermost_fn(ctx);
+
+    /*If the symbol isn't in the scope of the innermost function
+      then its value must be captured*/
+    if (fn && !symIsInside(symbol, fn->scope)) {
+        captured = true;
+        vectorPush(fn->captured, symbol);
+    }
+
+    return astCreateSymbol(symbol, captured);
 }
 
 /**
@@ -102,7 +122,7 @@ static bool isPathToken (const char* str) {
 /**
  * Atom =   ( "(" [ Expr [{ "," Expr }] ] ")" )
  *        | ( "[" [{ Expr }] "]" )
- *        | FnLit | Path | <Str> | <Symbol>
+ *        | FnLit | Path | <Str> | Symbol
  */
 static ast* parseAtom (parserCtx* ctx) {
     ast* node;
@@ -163,7 +183,7 @@ static ast* parseAtom (parserCtx* ctx) {
             node = parsePath(ctx);
 
         else if ((symbol = symLookup(ctx->scope, ctx->current.buffer)))
-            node = astCreateSymbol(symbol);
+            node = parseSymbol(ctx, symbol);
 
         else
             node = astCreateFileLit(ctx->current.buffer);

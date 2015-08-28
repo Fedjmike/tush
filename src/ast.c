@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <stdlib.h>
+#include <vector.h>
 
 #include "common.h"
 
@@ -26,6 +27,12 @@ void astDestroy (ast* node) {
         || node->kind == astGlobLit)
         free(node->literal.str);
 
+    if (node->kind == astFnLit && node->captured) {
+        vectorFree(node->captured);
+        /*Stored indirectly*/
+        free(node->captured);
+    }
+
     free(node);
 }
 
@@ -44,9 +51,10 @@ ast* astCreateFnApp (vector(ast*) args, ast* fn) {
     });
 }
 
-ast* astCreateSymbol (sym* symbol) {
+ast* astCreateSymbol (sym* symbol, bool captured) {
     return astCreate(astSymbol, (ast) {
         .symbol = symbol,
+        .flags = captured ? astCaptured : astNoFlags
     });
 }
 
@@ -96,9 +104,10 @@ ast* astCreateTupleLit (vector(ast*) elements) {
     });
 }
 
-ast* astCreateFnLit (vector(ast*) args, ast* expr) {
+ast* astCreateFnLit (vector(ast*) args, ast* expr, vector(sym*) captured) {
     return astCreate(astFnLit, (ast) {
-        .children = args, .r = expr
+        .children = args, .r = expr,
+        .captured = malloci(sizeof(vector), &captured)
     });
 }
 

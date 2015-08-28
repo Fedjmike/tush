@@ -65,6 +65,13 @@ static void printer (printerCtx* ctx, const ast* node) {
         printer_outf(ctx)("glob: %s\n", node->literal.str);
         break;
 
+    case astFnLit:
+        for_vector (sym* capture, *node->captured, {
+            printer_outf(ctx)("capture: %s\n", symGetName(capture));
+        })
+
+        break;
+
     case astSymbol:
     case astLet:
         printer_outf(ctx)("symbol: %s\n", symGetName(node->symbol));
@@ -72,7 +79,6 @@ static void printer (printerCtx* ctx, const ast* node) {
 
     case astListLit:
     case astTupleLit:
-    case astFnLit:
     case astFnApp:
     case astBOP:
     case astInvalid:
