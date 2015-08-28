@@ -203,7 +203,7 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
         const char *from = typeGetStrImpl(ctx, dt->from),
                    *to = typeGetStrImpl(ctx, dt->to);
 
-        bool higherOrderFn = dt->from->kind == type_Fn;
+        bool higherOrderFn = typeIsFn(dt->from);
 
         assert(asprintf(&dt->str, higherOrderFn ? "(%s) -> %s" : "%s -> %s", from, to));
         return dt->str;
@@ -304,8 +304,7 @@ bool typeIsKind (typeKind kind, const type* dt) {
 }
 
 bool typeIsInvalid (const type* dt) {
-    seeThroughQuantifier(&dt);
-    return dt->kind == type_Invalid;
+    return typeIsKind(type_Invalid, dt);
 }
 
 bool typeIsFn (const type* dt) {

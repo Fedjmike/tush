@@ -74,7 +74,13 @@ static value* runGlobLit (envCtx* env, const ast* node) {
 static value* runSymbol (envCtx* env, const ast* node) {
     (void) env;
     value* val = node->symbol->val;
-    return val ? val : valueCreateInvalid();
+
+    if (!val) {
+        errprintf("%s has no value\n", symGetName(node->symbol));
+        return valueCreateInvalid();
+    }
+
+    return val;
 }
 
 bool unixSerialize (vector(const char*)* args, value* v, type* dt) {
