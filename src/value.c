@@ -5,9 +5,13 @@
 #include <gc/gc.h>
 #include <common.h>
 
+#include "sym.h"
+#include "runner.h"
+
 typedef enum valueKind {
     valueInvalid, valueUnit, valueInt, valueStr,
-    valueFn, valueSimpleClosure, valueFile, valueVector
+    valueFn, valueSimpleClosure, valueASTClosure,
+    valueFile, valueVector
 } valueKind;
 
 typedef struct value {
@@ -27,6 +31,12 @@ typedef struct value {
         struct {
             value* (*simpleClosure)(const void* env, const value*);
             const void* simpleEnv;
+        };
+        /*ASTClosure*/
+        struct {
+            const vector(sym*)* argSymbols;
+            const vector(value*)* argValues;
+            ast* body;
         };
         /*File*/
         char* filename;
@@ -76,6 +86,14 @@ value* valueCreateSimpleClosure (const void* env, simpleClosureFn fnptr) {
     });
 }
 
+value* valueCreateASTClosure (vector(sym*) argSymbols, vector(value*) argValues, ast* body) {
+    return valueCreate(valueASTClosure, (value) {
+        .argSymbols = malloci(sizeof(vector), &argSymbols),
+        .argValues = malloci(sizeof(vector), &argValues),
+        .body = body
+    });
+}
+
 value* valueCreateFile (const char* filename) {
     return valueCreate(valueFile, (value) {
         .filename = GC_STRDUP(filename)
@@ -105,6 +123,7 @@ const char* valueKindGetStr (valueKind kind) {
     case valueStr: return "Str";
     case valueFn: return "Fn";
     case valueSimpleClosure: return "SimpleClosure";
+    case valueASTClosure: return "ASTClosure";
     case valueFile: return "File";
     case valueInt: return "Int";
     case valueVector: return "Vector";
@@ -138,6 +157,9 @@ int valuePrintImpl (const value* v, printf_t printf) {
 
     case valueSimpleClosure:
         return printf("<fn at %p with env. %p>", v->simpleClosure, v->simpleEnv);
+
+    case valueASTClosure:
+        return printf("<AST of fn at %p with %p>", v->body, v->argValues);
 
     case valueFile:
         return printf("%s", v->filename);
@@ -203,7 +225,30 @@ value* valueCall (const value* fn, const value* arg) {
     case valueSimpleClosure:
         return fn->simpleClosure(fn->simpleEnv, arg);
 
-    default:
+    case valueASTClosure: {
+        /*Create a copy of the values vector with the new arg*/
+        vector(value*) argValues = vectorInit(fn->argSymbols->length, GC_malloc);
+        vectorPushFromVector(&argValues, *fn->argValues);
+        vectorPush(&argValues, arg);
+
+        /*More args to come, store in another closure*/
+        if (argValues.length < fn->argSymbols->length)
+            return valueCreateASTClosure(*fn->argSymbols, argValues, fn->body);
+
+        /*Enough, run the body with this environment*/
+        else {
+            if (argValues.length > fn->argSymbols->length)
+                errprintf("ASTClosure given too many args\n");
+
+            envCtx env = {
+                .symbols = *fn->argSymbols,
+                .values = argValues
+            };
+
+            return run(&env, fn->body);
+        }
+
+    } default:
         errprintf("Unhandled value kind, %s\n", valueKindGetStr(fn->kind));
         return valueCreateInvalid();
     }

@@ -11,9 +11,63 @@
 #include "invoke.h"
 #include "builtins.h"
 
+static value* getSymbolValue (envCtx* env, sym* symbol) {
+    /*Look it up in the symbol environment
+      if running with one (because we're in a lambda)*/
+    if (!vectorNull(env->symbols)) {
+        int index = vectorFind(env->symbols, symbol);
+        assert(index != -1);
+        value* result = vectorGet(env->values, index);
+        assert(result);
+        return result;
+
+    /*Otherwise we can just access the global value*/
+    } else {
+        value* val = symbol->val;
+
+        if (!val) {
+            errprintf("%s has no value\n", symGetName(symbol));
+            return valueCreateInvalid();
+        }
+
+        return val;
+    }
+
+}
+
 static value* runInvalid (envCtx* env, const ast* node) {
     (void) env, (void) node;
     return valueCreateInvalid();
+}
+
+static value* runFnLit (envCtx* env, const ast* node) {
+    /*Actual args = captures + explicit args*/
+    int argNo = node->captured->length + node->children.length;
+
+    /*These two vectors form a simple map from symbol to value, hence
+      their elements must correspond.*/
+    vector(sym*) argSymbols = vectorInit(argNo, GC_malloc);
+    vector(value*) argValues = vectorInit(argNo, GC_malloc);
+
+    /*Fill the symbols vector with the captured symbols and arg symbols*/
+
+    vectorPushFromVector(&argSymbols, *node->captured);
+
+    for_vector (ast* arg, node->children, {
+        assert(arg->symbol);
+        vectorPush(&argSymbols, arg->symbol);
+    })
+
+    /*Capture the necessary symbols*/
+
+    for_vector (sym* capture, *node->captured, {
+        vectorPush(&argValues, getSymbolValue(env, capture));
+    })
+
+    /*Duplicate the body*/
+    ast* body = astDup(node->r, GC_malloc);
+
+    return valueCreateASTClosure(argSymbols, argValues, body);
 }
 
 static value* runTupleLit (envCtx* env, const ast* node) {
@@ -72,15 +126,7 @@ static value* runGlobLit (envCtx* env, const ast* node) {
 }
 
 static value* runSymbol (envCtx* env, const ast* node) {
-    (void) env;
-    value* val = node->symbol->val;
-
-    if (!val) {
-        errprintf("%s has no value\n", symGetName(node->symbol));
-        return valueCreateInvalid();
-    }
-
-    return val;
+    return getSymbolValue(env, node->symbol);
 }
 
 bool unixSerialize (vector(const char*)* args, value* v, type* dt) {
@@ -244,6 +290,7 @@ value* run (envCtx* env, const ast* node) {
 
     static handler_t table[astKindNo] = {
         [astInvalid] = runInvalid,
+        [astFnLit] = runFnLit,
         [astTupleLit] = runTupleLit,
         [astListLit] = runListLit,
         [astUnitLit] = runUnitLit,

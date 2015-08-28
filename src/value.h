@@ -31,6 +31,8 @@ typedef struct valueIter {
 
 typedef value* (*simpleClosureFn)(const void* env, const value* arg);
 
+/*All objects given to these creators must be GC allocated*/
+
 value* valueCreateInvalid (void);
 value* valueCreateUnit (void);
 value* valueCreateInt (int integer);
@@ -38,11 +40,16 @@ value* valueCreateStr (char* str);
 value* valueCreateFn (value* (*fnptr)(const value*));
 value* valueCreateFile (const char* filename);
 
-/*Takes ownership of the environment, which must be GC allocated*/
 value* valueCreateSimpleClosure (const void* env, simpleClosureFn fnptr);
 
-/*Takes ownership of the vector and its elements. Therefore, they must
-  have been allocated using the garbage collector.*/
+/*Represents a closure by an expression (AST tree) plus arguments to it.
+    - These args come in the form of two vectors, a simple map from symbol
+      to value, hence their elements must correspond.
+    - argSymbols contains first the captured symbols, then the args.
+    - The expression can be evaluated once argValues is filled with all
+      the corresponding elements.*/
+value* valueCreateASTClosure (vector(sym*) argSymbols, vector(value*) argValues, ast* body);
+
 value* valueCreateVector (vector(value*) elements);
 
 /*==== (Kind generic) Operations ====*/
