@@ -13,6 +13,14 @@ typedef enum astKind {
     astKindNo
 } astKind;
 
+typedef enum astFlags {
+    astNoFlags = 0,
+    /*FnApp*/
+    astUnixInvocation,
+    /*BOP[o=Pipe]*/
+    astListApplication,
+} astFlags;
+
 typedef enum opKind {
     opNull = 0,
     opPipe, opWrite,
@@ -25,6 +33,7 @@ typedef enum opKind {
 /*Owns all members and children except the symbol*/
 typedef struct ast {
     astKind kind;
+    astFlags flags;
 
     vector(ast*) children;
     ast *l, *r;
@@ -43,12 +52,7 @@ typedef struct ast {
 
         /*Symbol Let*/
         sym* symbol;
-        /*BOP[o=Pipe]*/
-        bool listApp;
-        /*FnApp*/
-        bool unix;
     };
-    //todo combine bools into a flags field
 } ast;
 
 ast* astCreateBOP (ast* l, ast* r, opKind op);

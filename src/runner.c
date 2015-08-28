@@ -151,7 +151,7 @@ static value* runClassicUnixApp (envCtx* env, const ast* node, const char* progr
 static value* runFnApp (envCtx* env, const ast* node) {
     value* result = run(env, node->r);
 
-    if (node->unix)
+    if (node->flags & astUnixInvocation)
         result = runClassicUnixApp(env, node, valueGetFilename(result));
 
     else {
@@ -170,7 +170,7 @@ static value* runPipe (envCtx* env, const ast* node, const value* arg, const val
     (void) env;
 
     /*Implicit map*/
-    if (node->listApp) {
+    if (node->flags & astListApplication) {
         valueIter iter;
         /*Fails if the arg isn't an iterable value*/
         assert(valueGetIterator(arg, &iter));

@@ -186,7 +186,7 @@ static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
 
     /*A classic Unix program invocation*/
     if (typeIsKind(type_File, result)) {
-        node->unix = true;
+        node->flags |= astUnixInvocation;
 
         for_vector (ast* argNode, node->children, {
             type* arg = analyzer(ctx, argNode);
@@ -234,7 +234,7 @@ static type* analyzePipe (analyzerCtx* ctx, ast* node, type* arg, type* fn) {
              && typeAppliesToFn(ctx->ts, elements, fn, &callResult)) {
         /*The result is a list of the results of all the calls*/
         result = typeList(ctx->ts, callResult);
-        node->listApp = true;
+        node->flags |= astListApplication;
 
     } else {
         errorFnApp(ctx, arg, fn);
