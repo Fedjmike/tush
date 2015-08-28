@@ -358,7 +358,7 @@ bool typeIsEqual (const type* l, const type* r) {
 
 /*==== Operations ====*/
 
-static type* fnGetTo (const type* fn) {
+static type* fnGetTo (typeSys* ts, const type* fn) {
     //todo preconditions()
     assert(typeIsFn(fn));
 
@@ -367,7 +367,8 @@ static type* fnGetTo (const type* fn) {
         return fn->to;
 
     case type_Forall:
-        return fnGetTo(fn->dt);
+        //todo: not all typevar will appear in the result, remove them
+        return typeForall(ts, fn->typevars, fnGetTo(ts, fn->dt));
 
     default:
         errprintf("Unhandled function kind, %s\n", typeGetStr(fn));
@@ -398,7 +399,7 @@ bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** resul
     }
 
     if (applies && result)
-        *result = fnGetTo(fn);
+        *result = fnGetTo(ts, fn);
 
     return applies;
 }
