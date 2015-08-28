@@ -323,6 +323,9 @@ static ast* parseExpr (parserCtx* ctx) {
     return parseBOP(ctx, 0);
 }
 
+/**
+ * Let = "let" <Name> "=" Expr
+ */
 static ast* parseLet (parserCtx* ctx) {
     match(ctx, "let");
 

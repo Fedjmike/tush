@@ -98,6 +98,8 @@ inline static printf_t* error (parserCtx* ctx) {
     return printf;
 }
 
+/*---- Simple interfaces to the lexer ----*/
+
 inline static bool see (parserCtx* ctx, const char* look) {
     return !strcmp(ctx->current.buffer, look);
 }

@@ -16,7 +16,7 @@ static value* runInvalid (envCtx* env, const ast* node) {
     return valueCreateInvalid();
 }
 
-static value* runListLit (envCtx* env, const ast* node) {
+static value* runTupleLit (envCtx* env, const ast* node) {
     vector(value*) result = vectorInit(node->children.length, GC_malloc);
 
     for_vector (ast* element, node->children, {
@@ -26,7 +26,7 @@ static value* runListLit (envCtx* env, const ast* node) {
     return valueCreateVector(result);
 }
 
-static value* runTupleLit (envCtx* env, const ast* node) {
+static value* runListLit (envCtx* env, const ast* node) {
     vector(value*) result = vectorInit(node->children.length, GC_malloc);
 
     for_vector (ast* element, node->children, {
@@ -104,6 +104,12 @@ bool unixSerialize (vector(const char*)* args, value* v, type* dt) {
         for_vector (value* element, vec, {
             vectorPush(args, getter(element));
         })
+
+        /*todo: Currently a zero size array serializes to no new args,
+                which means the program doesn't notice it. This can cause
+                programs to read indefinitely from stdin. Bad! Give empty
+                string?
+                Try !wc *.nonexistent */
 
         return false;
 

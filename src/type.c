@@ -248,7 +248,7 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
 
         /*Note: VLA*/
         const char* typevarStrs[dt->typevars.length];
-        
+
         for_vector_indexed (i, type* typevar, dt->typevars, {
             typevarStrs[i] = strMapTypevar(ctx, typevar);
         })
@@ -256,7 +256,8 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
         const char* dtStr = typeGetStrImpl(ctx, dt->dt);
         char* typevarStr = strjoinwith(dt->typevars.length, (char**) typevarStrs, ", ", malloc);
 
-        assert(asprintf(&dt->str, "forall %s. %s", typevarStr, dtStr));
+        //todo brackets necessary?
+        assert(asprintf(&dt->str, "(forall %s. %s)", typevarStr, dtStr));
         free(typevarStr);
         return dt->str;
     }}

@@ -116,9 +116,9 @@ inline static tokenKind lexerWord (lexerCtx* ctx) {
     case '{': case '}':
     case '(': case ')':
     case '"': case '\'':
+    case '`': case ',':
     case '\n': case '\r':
     case '\t': case ' ':
-    case '`': case ',':
         return tokenIntLit;
     }
 
@@ -167,9 +167,9 @@ inline static tokenKind lexerWord (lexerCtx* ctx) {
         break;
         case '(': case ')':
         case '"': case '\'':
+        case '`':
         case '\n': case '\r':
         case '\t': case ' ':
-        case '`':
             exit = true;
         }
     } while (!exit && !lexerEOF(ctx));
