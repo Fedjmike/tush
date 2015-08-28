@@ -77,3 +77,4 @@ void astDestroy (ast* node);
 
 const char* opKindGetStr (opKind kind);
 const char* astKindGetStr (astKind kind);
+const char* astFlagGetStr (astFlags flag);

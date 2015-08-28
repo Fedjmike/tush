@@ -35,7 +35,9 @@ static void printLR (printerCtx* ctx, const ast* node) {
 }
 
 static void printer (printerCtx* ctx, const ast* node) {
-    printer_outf(ctx)("+ %s\n", astKindGetStr(node->kind));
+    printer_outf(ctx)(node->flags ? "+ %s   %s\n" : "+ %s\n",
+                      astKindGetStr(node->kind),
+                      astFlagGetStr(node->flags));
     ctx->depth++;
 
     switch (node->kind) {
