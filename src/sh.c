@@ -41,6 +41,10 @@ typedef struct compilerCtx {
 } compilerCtx;
 
 ast* compile (compilerCtx* ctx, const char* str, int* errors) {
+    /*Store the error count ourselves if given a null ptr*/
+    if (!errors)
+        errors = &(int) {0};
+
     /*Turn the string into an AST*/
     ast* tree; {
         lexerCtx lexer = lexerInit(str);
@@ -155,8 +159,7 @@ void replCD (compilerCtx* compiler, const char* input) {
 }
 
 void replAST (compilerCtx* compiler, const char* input) {
-    int errors = 0;
-    ast* tree = compile(compiler, input, &errors);
+    ast* tree = compile(compiler, input, 0);
 
     if (tree)
         printAST(tree);
