@@ -1,7 +1,5 @@
 #include "analyzer.h"
 
-#include <assert.h>
-
 #include "common.h"
 #include "type.h"
 #include "sym.h"
@@ -65,7 +63,7 @@ static type* analyzeFnLit (analyzerCtx* ctx, ast* node) {
 }
 
 static type* analyzeTupleLit (analyzerCtx* ctx, ast* node) {
-    assert(node->children.length >= 2);
+    precond(node->children.length >= 2);
 
     vector(type*) elements = vectorInit(node->children.length, malloc);
 

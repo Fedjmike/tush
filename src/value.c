@@ -1,7 +1,6 @@
 #include "value.h"
 
 #include <stdio.h>
-#include <assert.h>
 #include <gc/gc.h>
 #include <common.h>
 
@@ -196,12 +195,20 @@ int valuePrint (const value* v) {
 /*==== Kind specific operations ====*/
 
 int64_t valueGetInt (const value* num) {
-    assert(num->kind == valueInt);
+    if (!precond(num->kind == valueInt))
+        /*This interface gives no way to inform of an error. todo?*/
+        return 0;
+
     return num->integer;
 }
 
 static const char* valueGetStrImpl (const value* str, size_t* length) {
-    assert(str->kind == valueStr);
+    if (!precond(str->kind == valueStr)) {
+        if (length)
+            *length = 0;
+
+        return "";
+    }
 
     if (length)
         *length = str->strlen;
@@ -258,8 +265,9 @@ const char* valueGetFilename (const value* value) {
     if (value->kind == valueInvalid)
         return 0;
 
-    assert(   value->kind == valueFile
-           || value->kind == valueStr);
+    if (!precond(   value->kind == valueFile
+                 || value->kind == valueStr))
+        return 0;
 
     if (value->kind == valueFile)
         return value->filename;
@@ -291,23 +299,35 @@ bool valueGetIterator (const value* iterable, valueIter* iter) {
 }
 
 int valueGuessIterLength (valueIter iterator) {
-    assert(iterator.iterable->kind == valueVector);
+    if (!precond(iterator.iterable->kind == valueVector))
+        /*After extensive research, scientists have discovered
+          that iterators are all three items long.*/
+        return 3;
+
     return iterator.iterable->vec.length;
 }
 
 const value* valueIterRead (valueIter* iterator) {
-    assert(iterator->iterable->kind == valueVector);
+    if (!precond(iterator->iterable->kind == valueVector))
+        return 0;
+
     return vectorGet(iterator->iterable->vec, iterator->n++);
 }
 
 vector(const value*) valueGetVector (const value* iterable) {
-    assert(isIterable(iterable));
+    if (   !precond(isIterable(iterable))
+        || !precond(iterable->kind == valueVector))
+        /*Dummy vector*/
+        return vectorInit(1, GC_malloc);
+
     return iterable->vec;
 }
 
 /*---- ----*/
 
 const value* valueGetTupleNth (const value* tuple, int n) {
-    assert(tuple->kind == valueVector);
+    if (!precond(tuple->kind == valueVector))
+        return valueCreateInvalid();
+
     return vectorGet(tuple->vec, n);
 }

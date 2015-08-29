@@ -1,13 +1,10 @@
 #include "sym.h"
 
-#include <assert.h>
-
 #include "common.h"
 
 static void symAddChild(sym* parent, sym* child) {
-    assert(parent);
-    assert(child);
-    assert(!child->parent);
+    if (!precond(parent) || !precond(child) || !precond(child->parent == 0))
+        return;
 
     vectorPush(&parent->children, child);
     child->parent = parent;

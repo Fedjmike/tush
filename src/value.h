@@ -69,6 +69,8 @@ const char* valueGetStrWithLength (const value* str, size_t* length_out);
 
 value* valueCall (const value* fn, const value* arg);
 
+//todo can fail
+//fallback param?
 const char* valueGetFilename (const value* file);
 
 bool valueGetIterator (const value* iterable, valueIter* iter_out);

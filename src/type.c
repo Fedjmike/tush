@@ -4,7 +4,6 @@
 #include "type.h"
 #include "type-internal.h"
 
-#include <assert.h>
 #include <vector.h>
 #include <hashmap.h>
 
@@ -13,7 +12,7 @@
 /*==== Type ctors and dtors ====*/
 
 static type* typeCreate (typeKind kind, type init) {
-    assert(kind != type_KindNo);
+    precond(kind != type_KindNo);
 
     type* dt = malloci(sizeof(type), &init);
     dt->kind = kind;
@@ -32,7 +31,7 @@ static void typeDestroy (type* dt) {
 }
 
 type* typeUnitary (typeSys* ts, typeKind kind) {
-    assert(!typeKindIsntUnitary(kind));
+    precond(!typeKindIsntUnitary(kind));
 
     /*Only allocate one struct per unitary type*/
     if (!ts->unitaries[kind])
@@ -116,8 +115,6 @@ type* typeFnChain (int kindNo, typeSys* ts, ...) {
 
     for (int i = 0; i < kindNo; i++) {
         typeKind kind = va_arg(args, int);
-        assert(!typeKindIsntUnitary(kind));
-
         type* dt = typeUnitary(ts, kind);
 
         /*On the first iteration the result is just the unitary type
@@ -205,13 +202,22 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
 
         bool higherOrderFn = typeIsFn(dt->from);
 
-        assert(asprintf(&dt->str, higherOrderFn ? "(%s) -> %s" : "%s -> %s", from, to));
+        bool allocSuccess = 0 != asprintf(&dt->str, higherOrderFn ? "(%s) -> %s" : "%s -> %s", from, to);
+
+        if (!precond(allocSuccess))
+            return " -> ";
+
         return dt->str;
     }
 
     case type_List: {
         const char* elements = typeGetStrImpl(ctx, dt->elements);
-        assert(asprintf(&dt->str, "[%s]", elements));
+
+        bool allocSuccess = 0 != asprintf(&dt->str, "[%s]", elements);
+
+        if (!precond(allocSuccess))
+            return "[ ]";
+
         return dt->str;
     }
 
@@ -257,8 +263,14 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
         char* typevarStr = strjoinwith(dt->typevars.length, (char**) typevarStrs, ", ", malloc);
 
         //todo brackets necessary?
-        assert(asprintf(&dt->str, "(forall %s. %s)", typevarStr, dtStr));
+        bool allocSuccess = 0 != asprintf(&dt->str, "(forall %s. %s)", typevarStr, dtStr);
         free(typevarStr);
+
+        if (!precond(allocSuccess))
+            /*Could return dtStr, but best not to give valid /looking/
+              output if it isn't actually valid.*/
+            return "(forall . )";
+
         return dt->str;
     }}
 
@@ -316,8 +328,8 @@ bool typeIsList (const type* dt) {
 }
 
 bool typeIsEqual (const type* l, const type* r) {
-    assert(l);
-    assert(r);
+    if (!precond(l) || !precond(r))
+        return false;
 
     if (l == r)
         return true;
@@ -359,8 +371,8 @@ bool typeIsEqual (const type* l, const type* r) {
 /*==== Operations ====*/
 
 static type* fnGetTo (typeSys* ts, const type* fn) {
-    //todo preconditions()
-    assert(typeIsFn(fn));
+    if (!precond(typeIsFn(fn)))
+        return 0;
 
     switch (fn->kind) {
     case type_Fn:
@@ -377,7 +389,8 @@ static type* fnGetTo (typeSys* ts, const type* fn) {
 }
 
 bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** result) {
-    assert(arg);
+    if (!precond(arg) || !precond(fn))
+        return false;
 
     bool applies;
 

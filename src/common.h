@@ -34,3 +34,6 @@ static inline bool no_errors_recently (errctx errors) {
 }
 
 #define errprintf(...) errprintf__(__FILE__, __func__, __LINE__, __VA_ARGS__)
+
+#define precond(cond) \
+    ((cond) ? true : (errprintf("Precondition '%s' is false\n", #cond), false))

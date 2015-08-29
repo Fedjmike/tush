@@ -231,7 +231,9 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
 
             /*If there isn't a closed type, unify them all to the *first* typevar*/
             else {
-                assert(inf->typevars.length >= 1);
+                if (!precond(inf->typevars.length >= 1))
+                    return (type*) dt;
+
                 return vectorGet(inf->typevars, 0);
             }
 
@@ -280,8 +282,9 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
 }
 
 type* unifyArgWithFn (typeSys* ts, const type* arg, const type* fn) {
-    assert(fn->kind == type_Forall);
-    assert(fn->dt->kind == type_Fn);
+    if (   !precond(fn->kind == type_Forall)
+        || !precond(fn->dt->kind == type_Fn))
+        return 0;
 
     /*Only the typevars bound to the two arguments can be assigned to
       in the unification process.*/

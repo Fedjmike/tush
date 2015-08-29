@@ -68,7 +68,7 @@ inline static parserCtx parserInit (sym* global, lexerCtx* lexer) {
 
 inline static parserCtx* parserFree (parserCtx* ctx) {
     /*There shouldn't be any unfinished fn scopes left when this is called*/
-    assert(ctx->fns.length == 0);
+    precond(ctx->fns.length == 0);
     vectorFreeObjs(&ctx->fns, free);
     return ctx;
 }

@@ -225,7 +225,12 @@ void repl (compilerCtx* compiler) {
     const char* homedir = getHomeDir();
 
     char* historyFilename;
-    asprintf(&historyFilename, "%s/.gosh_history", homedir);
+    bool historyStaticStr = false;
+
+    if (!precond(asprintf(&historyFilename, "%s/.gosh_history", homedir))) {
+        historyFilename = "./.gosh_history";
+        historyStaticStr = true;
+    }
 
     read_history(historyFilename);
 
@@ -256,7 +261,9 @@ void repl (compilerCtx* compiler) {
     }
 
     free(prompt.str);
-    free(historyFilename);
+
+    if (!historyStaticStr)
+        free(historyFilename);
 }
 
 /*==== ====*/

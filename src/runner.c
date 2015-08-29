@@ -1,6 +1,5 @@
 #include "runner.h"
 
-#include <assert.h>
 #include <gc/gc.h>
 
 #include "sym.h"
@@ -16,9 +15,13 @@ static value* getSymbolValue (envCtx* env, sym* symbol) {
       if running with one (because we're in a lambda)*/
     if (!vectorNull(env->symbols)) {
         int index = vectorFind(env->symbols, symbol);
-        assert(index != -1);
+
+        if (!precond(index != -1))
+            return 0;
+
         value* result = vectorGet(env->values, index);
-        assert(result);
+
+        precond(result);
         return result;
 
     /*Otherwise we can just access the global value*/
@@ -54,7 +57,9 @@ static value* runFnLit (envCtx* env, const ast* node) {
     vectorPushFromVector(&argSymbols, *node->captured);
 
     for_vector (ast* arg, node->children, {
-        assert(arg->symbol);
+        if (!precond(arg->symbol))
+            continue;
+
         vectorPush(&argSymbols, arg->symbol);
     })
 
@@ -199,8 +204,10 @@ static value* runClassicUnixApp (envCtx* env, const ast* node, const char* progr
     FILE* programOutput = invokePiped((char**) args.buffer);
     vectorFree(&args);
 
+    if (!precond(programOutput))
+        return valueCreateInvalid();
+
     /*Read the pipe*/
-    assert(programOutput);
     char* output = readall(programOutput, GC_malloc, GC_realloc);
 
     return valueCreateStr(output);
@@ -231,7 +238,8 @@ static value* runPipe (envCtx* env, const ast* node, const value* arg, const val
     if (node->flags & astListApplication) {
         valueIter iter;
         /*Fails if the arg isn't an iterable value*/
-        assert(valueGetIterator(arg, &iter));
+        if (!precond(valueGetIterator(arg, &iter)))
+            return valueCreateInvalid();
 
         vector(value*) results = vectorInit(valueGuessIterLength(iter), GC_malloc);
 

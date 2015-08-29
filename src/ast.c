@@ -1,13 +1,12 @@
 #include "ast.h"
 
-#include <assert.h>
 #include <stdlib.h>
 #include <vector.h>
 
 #include "common.h"
 
 static ast* astCreate (astKind kind, ast init) {
-    assert(kind != astKindNo);
+    precond(kind != astKindNo);
 
     ast* node = malloci(sizeof(*node), &init);
     node->kind = kind;
