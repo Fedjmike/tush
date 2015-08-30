@@ -9,6 +9,7 @@
 #include "sym.h"
 
 value* builtinExpandGlob (const char* pattern, value* arg) {
+    /*arg is ()*/
     (void) arg;
 
     vector(char*) results = {};

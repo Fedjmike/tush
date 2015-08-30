@@ -208,11 +208,13 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
              *to = typeMakeSubs(ts, infs, dt->to);
 
         return typeFn(ts, from, to);
+    }
 
-    } case type_List: {
+    case type_List: {
         return typeList(ts, typeMakeSubs(ts, infs, dt->elements));
+    }
 
-    } case type_Tuple: {
+    case type_Tuple: {
         vector(type*) types = vectorInit(dt->types.length, malloc);
 
         for_vector (type* tupledt, dt->types, {
@@ -239,8 +241,9 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
 
         } else
             return (type*) dt;
+    }
 
-    } case type_Forall: {
+    case type_Forall: {
         type* substDT = typeMakeSubs(ts, infs, dt->dt);
 
         /*Note: VLA*/
@@ -271,8 +274,9 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
 
         } else
             return substDT;
+    }
 
-    } case type_KindNo:
+    case type_KindNo:
         errprintf("Dummy type kind 'KindNo' found in the wild\n");
         return (type*) dt;
     }
