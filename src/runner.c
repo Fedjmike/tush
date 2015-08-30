@@ -231,6 +231,15 @@ static value* runFnApp (envCtx* env, const ast* node) {
 
 /*---- Binary operators ----*/
 
+static value* pipeCall (const ast* node, const value* fn, const value* arg) {
+    value* result = valueCall(fn, arg);
+
+    if (node->op == opPipeZip)
+        result = valueCreateVector(vectorInitChain(2, malloc, result, arg));
+
+    return result;
+}
+
 static value* runPipe (envCtx* env, const ast* node, const value* arg, const value* fn) {
     (void) env;
 
@@ -245,12 +254,12 @@ static value* runPipe (envCtx* env, const ast* node, const value* arg, const val
 
         /*Apply it to each element*/
         for (const value* element; (element = valueIterRead(&iter));)
-            vectorPush(&results, valueCall(fn, element));
+            vectorPush(&results, pipeCall(node, fn, element));
 
         return valueCreateVector(results);
 
     } else
-        return valueCall(fn, arg);
+        return pipeCall(node, fn, arg);
 }
 
 static value* runConcat (envCtx* env, const ast* node, const value* left, const value* right) {
@@ -272,7 +281,10 @@ static value* runBOP (envCtx* env, const ast* node) {
                 *right = run(env, node->r);
 
     switch (node->op) {
-    case opPipe: return runPipe(env, node, left, right);
+    case opPipe:
+    case opPipeZip:
+        return runPipe(env, node, left, right);
+
     case opConcat: return runConcat(env, node, left, right);
 
     default:

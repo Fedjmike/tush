@@ -23,7 +23,7 @@ typedef enum astFlags {
 
 typedef enum opKind {
     opNull = 0,
-    opPipe, opWrite,
+    opPipe, opPipeZip, opWrite,
     opLogicalAnd, opLogicalOr,
     opEqual, opNotEqual, opLess, opLessEqual, opGreater, opGreaterEqual,
     opAdd, opSubtract, opConcat,

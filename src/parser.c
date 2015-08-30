@@ -291,6 +291,7 @@ static ast* parseBOP (parserCtx* ctx, int level) {
            which kind is found*/
     while (  level == 0
              ? (op =   try_match(ctx, "|") ? opPipe
+                     : try_match(ctx, "|:") ? opPipeZip
                      : try_match(ctx, "|>") ? opWrite : opNull)
            : level == 1
              ? (op =   try_match(ctx, "&&") ? opLogicalAnd

@@ -235,7 +235,7 @@ static inline void lexerKeywordsInit (void) {
     lexerKeywords = hashmapInit(1024, malloc);
 
     static const char* ops[] = {
-        "|", "|>", "&&", "||",
+        "|", "|:", "|>", "&&", "||",
         "==", "!=", "<", "<=", ">", ">=",
         /*No *, would override globs (todo)*/
         "+", "-", "++",

@@ -222,25 +222,35 @@ static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
 /*---- Binary operators ----*/
 
 static type* analyzePipe (analyzerCtx* ctx, ast* node, type* arg, type* fn) {
-    type *result, *callResult, *elements;
+    /*Work out what the result of the call is*/
+    type* callResult; {
+        type *elements;
 
-    if (typeAppliesToFn(ctx->ts, arg, fn, &callResult))
-        result = callResult;
+        if (typeAppliesToFn(ctx->ts, arg, fn, &callResult)) {
+            ;
 
-    /*If the parameter is a list, attempt to apply the function instead to
-      all of the elements individually.*/
-    else if (   typeIsListOf(arg, &elements)
-             && typeAppliesToFn(ctx->ts, elements, fn, &callResult)) {
-        /*The result is a list of the results of all the calls*/
-        result = typeList(ctx->ts, callResult);
-        node->flags |= astListApplication;
+        /*If the parameter is a list, instead try to apply the function to
+          each of the elements individually.*/
+        } else if (   typeIsListOf(arg, &elements)
+                 && typeAppliesToFn(ctx->ts, elements, fn, &callResult)) {
+            arg = elements;
+            node->flags |= astListApplication;
 
-    } else {
-        errorFnApp(ctx, arg, fn);
-        result = typeInvalid(ctx->ts);
+        } else {
+            errorFnApp(ctx, arg, fn);
+            callResult = typeInvalid(ctx->ts);
+        }
     }
 
-    return result;
+    if (node->op == opPipeZip)
+        /*Zip up the arg with the result of (each/the) call*/
+        callResult = typeTuple(ctx->ts, vectorInitChain(2, malloc, callResult, arg));
+
+    if (node->flags & astListApplication)
+        return typeList(ctx->ts, callResult);
+
+    else
+        return callResult;
 }
 
 static void errorConcatIsntList (analyzerCtx* ctx, bool left, type* operand) {
@@ -285,7 +295,10 @@ static type* analyzeBOP (analyzerCtx* ctx, ast* node) {
          *right = analyzer(ctx, node->r);
 
     switch (node->op) {
-    case opPipe: return analyzePipe(ctx, node, left, right);
+    case opPipe:
+    case opPipeZip:
+        return analyzePipe(ctx, node, left, right);
+
     case opConcat: return analyzeConcat(ctx, node, left, right);
 
     default:

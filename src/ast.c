@@ -169,6 +169,7 @@ ast* astDup (const ast* original, stdalloc allocator) {
 const char* opKindGetStr (opKind kind) {
     switch (kind) {
     case opPipe: return "|";
+    case opPipeZip: return "|:";
     case opWrite: return "|>";
     case opLogicalAnd: return "&&";
     case opLogicalOr: return "||";
