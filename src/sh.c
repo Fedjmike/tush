@@ -108,7 +108,7 @@ goshResult gosh (compilerCtx* ctx, const char* str, bool display) {
         envCtx env = {};
         result = run(&env, tree);
 
-        if (display && no_errors_recently(internalerrors))
+        if (display)
             displayResult(result, dt);
     }
 
