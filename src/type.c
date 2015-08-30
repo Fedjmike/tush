@@ -182,7 +182,7 @@ static const char* strMapTypevar (strCtx* ctx, const type* dt) {
     return str;
 }
 
-static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
+static const char* typeGetStrImpl (strCtx* ctx, type* dt, bool firstLevel) {
     if (dt->str)
         return dt->str;
 
@@ -197,10 +197,10 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
     case type_KindNo: return "<KindNo, not real>";
 
     case type_Fn: {
-        const char *from = typeGetStrImpl(ctx, dt->from),
-                   *to = typeGetStrImpl(ctx, dt->to);
+        const char *from = typeGetStrImpl(ctx, dt->from, false),
+                   *to = typeGetStrImpl(ctx, dt->to, false);
 
-        bool higherOrderFn = typeIsFn(dt->from);
+        bool higherOrderFn = typeIsFn(dt->from) || dt->from->kind == type_Forall;
 
         bool allocSuccess = 0 != asprintf(&dt->str, higherOrderFn ? "(%s) -> %s" : "%s -> %s", from, to);
 
@@ -211,7 +211,7 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
     }
 
     case type_List: {
-        const char* elements = typeGetStrImpl(ctx, dt->elements);
+        const char* elements = typeGetStrImpl(ctx, dt->elements, false);
 
         bool allocSuccess = 0 != asprintf(&dt->str, "[%s]", elements);
 
@@ -228,7 +228,7 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
 
         /*Work out the length of all the subtypes and store their strings*/
         for_vector_indexed (i, type* dt, dt->types, {
-            typeStrs[i] = typeGetStrImpl(ctx, dt);
+            typeStrs[i] = typeGetStrImpl(ctx, dt, false);
             length += strlen(typeStrs[i]) + 2;
         })
 
@@ -250,7 +250,12 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
         return strMapTypevar(ctx, dt);
 
     case type_Forall: {
-        //todo not "forall a, b." if kind 0
+        const char* dtStr = typeGetStrImpl(ctx, dt->dt, false);
+
+        bool higherKinded = !firstLevel;
+
+        if (!higherKinded)
+            return dtStr;
 
         /*Note: VLA*/
         const char* typevarStrs[dt->typevars.length];
@@ -259,11 +264,9 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt) {
             typevarStrs[i] = strMapTypevar(ctx, typevar);
         })
 
-        const char* dtStr = typeGetStrImpl(ctx, dt->dt);
         char* typevarStr = strjoinwith(dt->typevars.length, (char**) typevarStrs, ", ", malloc);
 
-        //todo brackets necessary?
-        bool allocSuccess = 0 != asprintf(&dt->str, "(forall %s. %s)", typevarStr, dtStr);
+        bool allocSuccess = 0 != asprintf(&dt->str, "forall %s. %s", typevarStr, dtStr);
         free(typevarStr);
 
         if (!precond(allocSuccess))
@@ -294,7 +297,7 @@ const char* typeGetStr (const type* dt) {
 	/*The context keeps track of typevars already given names
 	  and which names have been given.*/
     strCtx ctx = strCtxInit();
-    const char* str = typeGetStrImpl(&ctx, (type*) dt);
+    const char* str = typeGetStrImpl(&ctx, (type*) dt, true);
     strCtxFree(&ctx);
 
     return str;
