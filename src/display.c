@@ -62,15 +62,12 @@ static int displayValueImpl (const value* result, type* dt, printf_t printf) {
 
         putchar(brackets[0]);
 
-        valueIter iter;
-        valueGetIterator(result, &iter);
-
-        for (const value* element; (element = valueIterRead(&iter));) {
-            if (iter.index != 0)
+        for_iterable_value_indexed (i, const value* element, result, {
+            if (i != 0)
                 length += printf(", ");
 
             if (!list)
-                elementType = vectorGet(tuple, iter.index);
+                elementType = vectorGet(tuple, i);
 
             if (!precond(elementType)) {
                 length += valuePrint(element);
@@ -78,7 +75,7 @@ static int displayValueImpl (const value* result, type* dt, printf_t printf) {
             }
 
             length += displayValueImpl(element, elementType, printf);
-        }
+        })
 
         putchar(brackets[1]);
 
@@ -233,10 +230,7 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
 
     /*For each column, find the max width of any value*/
 
-    valueIter iter;
-    valueGetIterator(result, &iter);
-
-    for (const value* inner; (inner = valueIterRead(&iter));) {
+    for_iterable_value (const value* inner, result, {
         for (int col = 0; col < columns; col++) {
             const value* item = valueGetTupleNth(inner, col);
             size_t width = valueGetWidthOfStr(item);
@@ -244,16 +238,13 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
             if (columnWidths[col] < width)
                 columnWidths[col] = width;
         }
-    }
+    })
 
     enum {gap = 2};
 
-    /*Reset the iterator*/
-    valueGetIterator(result, &iter);
-
     /*Print it*/
 
-    for (const value* inner; (inner = valueIterRead(&iter));) {
+    for_iterable_value (const value* inner, result, {
         for (int col = 0; col < columns; col++) {
             const value* item = valueGetTupleNth(inner, col);
             putnchar(' ', gap);
@@ -277,7 +268,7 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
         }
 
         putchar('\n');
-    }
+    })
 
     printf(" :: %s\n", typeGetStr(resultType));
 }

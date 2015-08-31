@@ -77,9 +77,40 @@ value* valueCall (const value* fn, const value* arg);
 //fallback param?
 const char* valueGetFilename (const value* file);
 
+/*---- Iterables ----*/
+
 bool valueGetIterator (const value* iterable, valueIter* iter_out);
 int valueGuessIterLength (valueIter iterator);
 const value* valueIterRead (valueIter* iterator);
+
+/*Iterate over an iterable. If the value given is not an iterable,
+  no iterations will occur and no error state indicated.
+
+  \param   i
+  The name of a variable that will be declared int, and hold the
+  current index.
+
+  \param   name
+  The name of a variable that will be declared const value* and
+  hold the current value in the iterable.
+
+  \param   const value* iterable
+  The value to be iterated over.
+
+  \param   continuation
+  The body of the iteration (including braces)*/
+#define for_iterable_value_indexed(i, decl, iterable, continuation) \
+    do {valueIter __for_iter; \
+        valueGetIterator((iterable), &__for_iter); \
+        for (const value* __for_element; \
+             (__for_element = valueIterRead(&__for_iter));) { \
+            decl = __for_element; int (i) = __for_iter.index; \
+            {continuation} \
+        } \
+    } while (0);
+
+#define for_iterable_value(decl, iterable, continuation) \
+    for_iterable_value_indexed(__for_dummy, decl, iterable, {(void) __for_dummy; continuation})
 
 /*Convert an iterable to a vector*/
 vector(const value*) valueGetVector (const value* iterable);
