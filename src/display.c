@@ -376,7 +376,7 @@ void displayResult (value* result, type* resultType) {
             displayListList(result, resultType, elements, innerElements, 0);
 
         /*Display empty or singular iterables the normal way instead one of the following*/
-        else if (valueGetVector(result).length <= 1)
+        else if (valueGuessIterableLength(result) <= 1)
             displayRegular(result, resultType);
 
         /* [File] -- File lists are displayed in an autocomplete-like grid*/
