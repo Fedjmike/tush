@@ -136,21 +136,32 @@ void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
 }
 
 void replCD (compilerCtx* compiler, const char* input) {
-    goshResult result = gosh(compiler, input, false);
+    int errors = 0;
+    ast* tree = compile(compiler, input, &errors);
 
-    if (!result.v)
-        return;
+    if (errors || typeIsInvalid(tree->dt))
+        ;
 
-    if (!typeIsKind(type_File, result.dt)) {
-        printf(":cd requires a File argument, given %s\n", typeGetStr(result.dt));
-        return;
+    else if (!typeIsKind(type_File, tree->dt))
+        printf(":cd requires a File argument, given %s\n", typeGetStr(tree->dt));
+
+    /*Types fine, try running it*/
+    else {
+        value* result = run(&(envCtx) {}, tree);
+
+        if (!result || valueIsInvalid(result))
+            ;
+
+        else {
+            const char* newWD = valueGetFilename(result);
+            bool error = dirsChangeWD(&compiler->dirs, newWD);
+
+            if (error)
+                printf("Unable to enter directory \"%s\"\n", newWD);
+        }
     }
 
-    const char* newWD = valueGetFilename(result.v);
-    bool error = dirsChangeWD(&compiler->dirs, newWD);
-
-    if (error)
-        printf("Unable to enter directory \"%s\"\n", newWD);
+    astDestroy(tree);
 }
 
 void replAST (compilerCtx* compiler, const char* input) {
