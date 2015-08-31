@@ -423,6 +423,7 @@ const value* valueGetTupleNth (const value* tuple, int n) {
         case 1: return tuple->second;
         /*Will be null if the tuple was a pair, the desired output*/
         case 2: return tuple->third;
+        default: return 0;
         }
 
     case valueVector:
