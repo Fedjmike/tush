@@ -379,7 +379,7 @@ bool valueGetIterator (const value* iterable, valueIter* iter) {
     case valueTriple:
     case valueVector: {
         *iter = (valueIter) {
-            .iterable = iterable, .index = 0
+            .iterable = iterable, .index = -1
         };
 
         iter->kind =   iterable->kind == valuePair ? iterPair
@@ -416,7 +416,7 @@ const value* valueIterRead (valueIter* iterator) {
     if (iterator->kind == iterInvalid)
         return 0;
 
-    return valueGetTupleNth(iterator->iterable, iterator->index++);
+    return valueGetTupleNth(iterator->iterable, ++iterator->index);
 }
 
 vector(const value*) valueGetVector (const value* iterable) {

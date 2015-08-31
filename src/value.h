@@ -15,6 +15,7 @@ typedef enum iterKind {
 typedef struct valueIter {
     iterKind kind;
     const value* iterable;
+    /*The index of the most recently read item*/
     int index;
 } valueIter;
 
