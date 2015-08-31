@@ -93,7 +93,7 @@ void gosh (compilerCtx* ctx, const char* str, bool display) {
 
     if (errors == 0 && no_errors_recently(internalerrors)) {
         /*Run the AST*/
-        envCtx env = {.dirs = &ctx->dirs};
+        envCtx env = {};
         value* result = run(&env, tree);
 
         if (display)
