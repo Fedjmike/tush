@@ -84,32 +84,22 @@ compilerCtx* compilerFree (compilerCtx* ctx) {
 
 /*==== Gosh ====*/
 
-typedef struct goshResult {
-    value* v;
-    type* dt;
-} goshResult;
-
-goshResult gosh (compilerCtx* ctx, const char* str, bool display) {
+void gosh (compilerCtx* ctx, const char* str, bool display) {
     errctx internalerrors = errcount();
     int errors = 0;
 
     ast* tree = compile(ctx, str, &errors);
 
-    value* result = 0;
-    type* dt = tree->dt;
-
     if (errors == 0 && no_errors_recently(internalerrors)) {
         /*Run the AST*/
-        envCtx env = {};
-        result = run(&env, tree);
+        envCtx env = {.dirs = &ctx->dirs};
+        value* result = run(&env, tree);
 
         if (display)
-            displayResult(result, dt);
+            displayResult(result, tree->dt);
     }
 
     astDestroy(tree);
-
-    return (goshResult) {.v = result, .dt = dt};
 }
 
 /*==== REPL ====*/
