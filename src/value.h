@@ -96,9 +96,9 @@ const value* valueIterRead (valueIter* iterator);
   The name of a variable that will be declared int, and hold the
   current index.
 
-  \param   name
-  The name of a variable that will be declared const value* and
-  hold the current value in the iterable.
+  \param   decl
+  The full declaration of a variable that will hold the current
+  value in the iterable.
 
   \param   const value* iterable
   The value to be iterated over.
