@@ -139,12 +139,37 @@ bool inferEqual (inferences* infs, const type* l, const type* r) {
     return false;
 }
 
+void inferInvalidSub (inferences* infs, const type* invalid, const type* other) {
+    if (typeUnifyNoisy)
+        printf("invalid => %s\n", typeGetStr(other));
+
+    if (other->kind == type_Invalid)
+        return;
+
+    inference* inf = infsLookup(infs, other);
+
+	/*Add the invalid to an inference as if it were a typevar*/
+
+    if (inf)
+        infAddTypevar(inf, invalid);
+
+    else
+        infsAdd(infs, invalid, other);
+}
 
 bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
     if (typeUnifyNoisy)
         printf("unifying %s with %s\n", typeGetStr(l), typeGetStr(r));
 
-    if (l->kind == type_Var || r->kind == type_Var) {
+    if (l->kind == type_Invalid) {
+        inferInvalidSub(infs, l, r);
+        return true;
+
+    } else if (r->kind == type_Invalid) {
+        inferInvalidSub(infs, r, l);
+        return true;
+
+    } else if (l->kind == type_Var || r->kind == type_Var) {
         bool fail = inferEqual(infs, l, r);
         return !fail;
 
@@ -200,7 +225,6 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
     case type_Bool:
     case type_Str:
     case type_File:
-    case type_Invalid:
         return (type*) dt;
 
     case type_Fn: {
@@ -223,7 +247,12 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
 
         return typeTuple(ts, types);
 
-    } case type_Var: {
+    }
+
+    /*Invalids are substituted using inferences like typevars
+      Both are compared for equality by ptr*/
+    case type_Invalid:
+    case type_Var: {
         /*Look for something to substitute the typevar for*/
         inference* inf = infsLookup(infs, dt);
 
@@ -313,6 +342,12 @@ type* unifyArgWithFn (typeSys* ts, const type* arg, const type* fn) {
 }
 
 type* unifyMatching (typeSys* ts, const type* l, const type* r) {
+    if (l->kind == type_Invalid)
+        return (type*) r;
+
+    else if (r->kind == type_Invalid)
+        return (type*) l;
+
     vector(type*) boundTypevars;
 
     if (l->kind == type_Forall) {
@@ -326,7 +361,7 @@ type* unifyMatching (typeSys* ts, const type* l, const type* r) {
         boundTypevars = vectorDup(r->typevars, malloc);
 
     else
-        return typeIsEqual(l, r) ? (type*) l : 0;
+        boundTypevars = vectorInit(4, malloc);
 
     inferences infs = infsInit(boundTypevars, malloc);
     bool unifies = typeUnifies(ts, &infs, l, r);
