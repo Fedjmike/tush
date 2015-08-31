@@ -12,22 +12,27 @@ value* builtinExpandGlob (const char* pattern, value* arg) {
     /*arg is ()*/
     (void) arg;
 
-    vector(char*) results = {};
+    value* result;
 
     glob_t matches = {};
     int error = glob(pattern, 0, 0, &matches);
 
-    if (!error) {
-        results = vectorInit(matches.gl_pathc, GC_malloc);
+    if (error)
+        result = valueStoreTuple(0);
 
-        /*Turn the matches into a vector*/
+    else {
+        vector(value*) results = vectorInit(matches.gl_pathc, GC_malloc);
+
+        /*Box the strings in value objects*/
         for (unsigned int n = 0; n < matches.gl_pathc; n++)
             vectorPush(&results, valueCreateFile(matches.gl_pathv[n]));
+
+        result = valueStoreVector(results);
     }
 
     globfree(&matches);
 
-    return valueCreateVector(results);
+    return result;
 }
 
 static value* builtinSize (const value* file) {
@@ -50,18 +55,20 @@ static value* builtinSum (const value* numbers) {
 
     //todo adapt for Number, when it exists
 
-    for_vector (value* number, valueGetVector(numbers), {
+    valueIter iter;
+    bool fail = valueGetIterator(numbers, &iter);
+
+    if (fail)
+        return valueCreateInvalid();
+
+    for (const value* number; (number = valueIterRead(&iter));)
         total += valueGetInt(number);
-    })
 
     return valueCreateInt(total);
 }
 
 static value* builtinZipf (const value* fn, const value* arg) {
-    const value *first = valueCall(fn, arg),
-                *second = arg;
-
-    return valueCreateVector(vectorInitChain(2, malloc, first, second));
+    return valueStoreTuple(2, valueCall(fn, arg), arg);
 }
 
 static value* builtinZipfCurried (const value* fn) {
@@ -85,7 +92,7 @@ static value* builtinSort (const value* list) {
     qsort(vec.buffer, vec.length, sizeof(void*),
           (int (*)(const void *, const void *)) compareTuple);
 
-    return valueCreateVector(vec);
+    return valueStoreVector(vec);
 }
 
 static void addBuiltin (sym* global, const char* name, type* dt, value* val) {

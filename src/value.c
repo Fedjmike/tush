@@ -8,9 +8,9 @@
 #include "runner.h"
 
 typedef enum valueKind {
-    valueInvalid, valueUnit, valueInt, valueStr,
+    valueInvalid, valueUnit, valueInt, valueStr, valueFile,
     valueFn, valueSimpleClosure, valueASTClosure,
-    valueFile, valueVector
+    valuePair, valueTriple, valueVector,
 } valueKind;
 
 typedef struct value {
@@ -41,6 +41,10 @@ typedef struct value {
         char* filename;
         /*Vector*/
         vector(value*) vec; //todo array(value*)
+        /*Pair Triple*/
+        struct {
+            value *first, *second, *third;
+        };
     };
 } value;
 
@@ -99,7 +103,19 @@ value* valueCreateFile (const char* filename) {
     });
 }
 
-value* valueCreateVector (vector(value*) elements) {
+value* valueCreatePair (value* first, value* second) {
+    return valueCreate(valuePair, (value) {
+        .first = first, .second = second
+    });
+}
+
+value* valueCreateTriple (value* first, value* second, value* third) {
+    return valueCreate(valueTriple, (value) {
+        .first = first, .second = second, .third = third
+    });
+}
+
+static value* valueCreateVector (vector(value*) elements) {
     return valueCreate(valueVector, (value) {
         .vec = elements
     });
@@ -114,6 +130,51 @@ value* valueCreateInvalid (void) {
     return invalid;
 }
 
+value* valueStoreTuple (int n, ...) {
+    va_list args;
+    va_start(args, n);
+
+    switch (n) {
+    case 2:
+    case 3: {
+        value *first = va_arg(args, value*),
+              *second = va_arg(args, value*),
+              *third = n == 3 ? va_arg(args, value*) : 0;
+
+        if (n == 2)
+            return valueCreatePair(first, second);
+
+        else
+            return valueCreateTriple(first, second, third);
+    }
+
+    default: {
+        vector(value*) v = vectorInit(n, GC_malloc);
+
+        for (int i = 0; i < n; i++)
+            vectorPush(&v, va_arg(args, value*));
+
+        return valueCreateVector(v);
+    }}
+
+    va_end(args);
+}
+
+value* valueStoreArray (int n, value** const array) {
+    switch (n) {
+    case 2: return valueCreatePair(array[0], array[1]);
+    case 3: return valueCreateTriple(array[0], array[1], array[2]);
+    default: {
+        vector(value*) v = vectorInit(n, GC_malloc);
+        vectorPushFromArray(&v, (void**) array, n, sizeof(value*));
+        return valueCreateVector(v);
+    }}
+}
+
+value* valueStoreVector (vector(value*) v) {
+    return valueCreateVector(v);
+}
+
 /*==== ====*/
 
 const char* valueKindGetStr (valueKind kind) {
@@ -125,6 +186,8 @@ const char* valueKindGetStr (valueKind kind) {
     case valueASTClosure: return "ASTClosure";
     case valueFile: return "File";
     case valueInt: return "Int";
+    case valuePair: return "Pair";
+    case valueTriple: return "Triple";
     case valueVector: return "Vector";
     case valueInvalid: return "<Invalid value>";
     }
@@ -162,6 +225,22 @@ int valuePrintImpl (const value* v, printf_t printf) {
 
     case valueFile:
         return printf("%s", v->filename);
+
+    case valuePair:
+    case valueTriple: {
+        int length = printf("[");
+
+        valuePrintImpl(v->first, printf);
+        length += printf(", ");
+        valuePrintImpl(v->second, printf);
+
+        if (v->kind == valueTriple) {
+            length += printf(", ");
+            valuePrintImpl(v->third, printf);
+        }
+
+        return length += printf("]");
+    }
 
     case valueVector: {
         int length = printf("[");
@@ -279,39 +358,65 @@ const char* valueGetFilename (const value* value) {
 /*---- Iterables ----*/
 
 static bool isIterable (const value* iterable) {
-    return iterable->kind == valueVector;
+    switch (iterable->kind) {
+    case valuePair:
+    case valueTriple:
+    case valueVector:
+        return true;
+    default:
+        return false;
+    }
 }
 
 bool valueGetIterator (const value* iterable, valueIter* iter) {
-    if (!precond(isIterable(iterable)))
+    if (!precond(isIterable(iterable))) {
+        *iter = (valueIter) {.kind = iterInvalid};
         return true;
+    }
 
-    else if (iterable->kind == valueVector) {
+    switch (iterable->kind) {
+    case valuePair:
+    case valueTriple:
+    case valueVector: {
         *iter = (valueIter) {
-            .iterable = iterable, .n = 0
+            .iterable = iterable, .index = 0
         };
-        return false;
 
-    } else {
+        iter->kind =   iterable->kind == valuePair ? iterPair
+                     : iterable->kind == valueTriple ? iterTriple : iterVector;
+
+        return false;
+    }
+
+    default:
         errprintf("Unhandled iterable kind, %s\n", valueKindGetStr(iterable->kind));
         return true;
     }
 }
 
 int valueGuessIterLength (valueIter iterator) {
-    if (!precond(iterator.iterable->kind == valueVector))
-        /*After extensive research, scientists have discovered
-          that iterators are all three items long.*/
-        return 3;
+    switch (iterator.kind) {
+    case iterPair: return 2;
+    case iterTriple: return 3;
 
-    return iterator.iterable->vec.length;
+    case iterVector:
+        if (!precond(iterator.iterable->kind == valueVector))
+            /*After extensive research, scientists have discovered
+              that iterators are all three items long.*/
+            return 3;
+
+        return iterator.iterable->vec.length;
+
+    case iterInvalid:
+        return 0;
+    }
 }
 
 const value* valueIterRead (valueIter* iterator) {
-    if (!precond(iterator->iterable->kind == valueVector))
+    if (iterator->kind == iterInvalid)
         return 0;
 
-    return vectorGet(iterator->iterable->vec, iterator->n++);
+    return valueGetTupleNth(iterator->iterable, iterator->index++);
 }
 
 vector(const value*) valueGetVector (const value* iterable) {
@@ -326,8 +431,24 @@ vector(const value*) valueGetVector (const value* iterable) {
 /*---- ----*/
 
 const value* valueGetTupleNth (const value* tuple, int n) {
-    if (!precond(tuple->kind == valueVector))
+    if (!precond(isIterable(tuple)))
         return valueCreateInvalid();
 
-    return vectorGet(tuple->vec, n);
+    switch (tuple->kind) {
+    case valuePair:
+    case valueTriple:
+        switch (n) {
+        case 0: return tuple->first;
+        case 1: return tuple->second;
+        /*Will be null if the tuple was a pair, the desired output*/
+        case 2: return tuple->third;
+        }
+
+    case valueVector:
+        return vectorGet(tuple->vec, n);
+
+    default:
+        errprintf("Unhandled iterable kind, %s\n", valueKindGetStr(tuple->kind));
+        return valueCreateInvalid();
+    }
 }

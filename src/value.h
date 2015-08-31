@@ -8,14 +8,14 @@
 /*Opaque, use interface below*/
 typedef struct value value;
 
-typedef struct valueIter {
-    const value* iterable;
+typedef enum iterKind {
+    iterVector, iterPair, iterTriple, iterInvalid
+} iterKind;
 
-    /*Information depends on the iterable implementations kind*/
-    union {
-        /*Vector*/
-        int n;
-    };
+typedef struct valueIter {
+    iterKind kind;
+    const value* iterable;
+    int index;
 } valueIter;
 
 /*The value creators allocate objects with a garbage collector!
@@ -50,7 +50,10 @@ value* valueCreateSimpleClosure (const void* env, simpleClosureFn fnptr);
       the corresponding elements.*/
 value* valueCreateASTClosure (vector(sym*) argSymbols, vector(value*) argValues, ast* body);
 
-value* valueCreateVector (vector(value*) elements);
+value* valueStoreTuple (int n, ...);
+value* valueStoreArray (int n, value** const array);
+/*Takes ownership of v*/
+value* valueStoreVector (vector(value*) v);
 
 /*==== (Kind generic) Operations ====*/
 

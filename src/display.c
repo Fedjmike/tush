@@ -182,22 +182,31 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
     size_t columnWidths[columns];
     memset(columnWidths, 0, sizeof(columnWidths));
 
-    /*Find the max size of any value for each column*/
-    for_vector (value* inner, valueGetVector(result), {
-        for_vector_indexed (col, value* item, valueGetVector(inner), {
+    /*For each column, find the max width of any value*/
+
+    valueIter iter;
+    valueGetIterator(result, &iter);
+
+    for (const value* inner; (inner = valueIterRead(&iter));) {
+        for (int col = 0; col < columns; col++) {
+            const value* item = valueGetTupleNth(inner, col);
             size_t width = valueGetWidthOfStr(item);
 
             if (columnWidths[col] < width)
                 columnWidths[col] = width;
-        })
-    })
+        }
+    }
 
     enum {gap = 2};
 
+    /*Reset the iterator*/
+    valueGetIterator(result, &iter);
+
     /*Print it*/
 
-    for_vector (value* inner, valueGetVector(result), {
-        for_vector_indexed (col, value* item, valueGetVector(inner), {
+    for (const value* inner; (inner = valueIterRead(&iter));) {
+        for (int col = 0; col < columns; col++) {
+            const value* item = valueGetTupleNth(inner, col);
             putnchar(' ', gap);
 
             /*Right align (i.e. print padding before the item)
@@ -216,10 +225,10 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
             } else
                 /*Value already printed*/
                 putnchar(' ', padding);
-        })
+        }
 
         putchar('\n');
-    })
+    }
 
     printf(" :: %s\n", typeGetStr(resultType));
 }

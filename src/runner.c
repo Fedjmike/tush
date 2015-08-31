@@ -76,23 +76,27 @@ static value* runFnLit (envCtx* env, const ast* node) {
 }
 
 static value* runTupleLit (envCtx* env, const ast* node) {
-    vector(value*) result = vectorInit(node->children.length, GC_malloc);
+    /*Note: VLA*/
+    value* results[node->children.length];
 
-    for_vector (ast* element, node->children, {
-        vectorPush(&result, run(env, element));
+    for_vector_indexed (i, ast* element, node->children, {
+        results[i] = run(env, element);
     })
 
-    return valueCreateVector(result);
+    return valueStoreArray(node->children.length, results);
 }
 
 static value* runListLit (envCtx* env, const ast* node) {
-    vector(value*) result = vectorInit(node->children.length, GC_malloc);
+    /*Note: VLA*/
+    value* results[node->children.length];
 
-    for_vector (ast* element, node->children, {
-        vectorPush(&result, run(env, element));
+    for_vector_indexed (i, ast* element, node->children, {
+        results[i] = run(env, element);
     })
 
-    return valueCreateVector(result);
+    /*Use StoreArray, not StoreVector, because a literal is quite likely
+      to be small and not need an allocation.*/
+    return valueStoreArray(node->children.length, results);
 }
 
 static value* runUnitLit (envCtx* env, const ast* node) {
@@ -235,7 +239,7 @@ static value* pipeCall (const ast* node, const value* fn, const value* arg) {
     value* result = valueCall(fn, arg);
 
     if (node->op == opPipeZip)
-        result = valueCreateVector(vectorInitChain(2, malloc, result, arg));
+        result = valueStoreTuple(2, result, arg);
 
     return result;
 }
@@ -257,7 +261,7 @@ static value* runPipe (envCtx* env, const ast* node, const value* arg, const val
         for (const value* element; (element = valueIterRead(&iter));)
             vectorPush(&results, pipeCall(node, fn, element));
 
-        return valueCreateVector(results);
+        return valueStoreVector(results);
 
     } else
         return pipeCall(node, fn, arg);
@@ -274,7 +278,7 @@ static value* runConcat (envCtx* env, const ast* node, const value* left, const 
     vectorPushFromVector(&result, lvec);
     vectorPushFromVector(&result, rvec);
 
-    return valueCreateVector(result);
+    return valueStoreVector(result);
 }
 
 static value* runBOP (envCtx* env, const ast* node) {
