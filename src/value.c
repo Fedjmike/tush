@@ -283,18 +283,18 @@ static bool isIterable (const value* iterable) {
 }
 
 bool valueGetIterator (const value* iterable, valueIter* iter) {
-    if (!isIterable(iterable))
-        return false;
+    if (!precond(isIterable(iterable)))
+        return true;
 
     else if (iterable->kind == valueVector) {
         *iter = (valueIter) {
             .iterable = iterable, .n = 0
         };
-        return true;
+        return false;
 
     } else {
         errprintf("Unhandled iterable kind, %s\n", valueKindGetStr(iterable->kind));
-        return false;
+        return true;
     }
 }
 

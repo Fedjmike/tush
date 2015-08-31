@@ -246,8 +246,9 @@ static value* runPipe (envCtx* env, const ast* node, const value* arg, const val
     /*Implicit map*/
     if (node->flags & astListApplication) {
         valueIter iter;
-        /*Fails if the arg isn't an iterable value*/
-        if (!precond(valueGetIterator(arg, &iter)))
+        bool fail = valueGetIterator(arg, &iter);
+
+        if (fail)
             return valueCreateInvalid();
 
         vector(value*) results = vectorInit(valueGuessIterLength(iter), GC_malloc);
