@@ -104,27 +104,6 @@ void gosh (compilerCtx* ctx, const char* str, bool display) {
 
 /*==== REPL ====*/
 
-typedef struct promptCtx {
-    char* str;
-    size_t size;
-    const char* valid_for;
-} promptCtx;
-
-void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
-    if (prompt->valid_for == wdir)
-        return;
-
-    /*Tilde contract the working directory*/
-    char* wdir_contr = pathContract(wdir, homedir, "~", malloc);
-
-    FILE* promptf = fmemopen(prompt->str, prompt->size, "w");
-    fprintf_style(promptf, "{%s} $ ", styleYellow, wdir_contr);
-    fclose(promptf);
-
-    prompt->valid_for = wdir;
-    free(wdir_contr);
-}
-
 void replCD (compilerCtx* compiler, const char* input) {
     int errors = 0;
     ast* tree = compile(compiler, input, &errors);
@@ -215,6 +194,27 @@ void replCmd (compilerCtx* compiler, const char* input) {
     /*Using printf precisions, %.*s, would convert the length to int*/
     fwrite(input, sizeof(*input), cmdLength, stdout);
     printf("'\n");
+}
+
+typedef struct promptCtx {
+    char* str;
+    size_t size;
+    const char* valid_for;
+} promptCtx;
+
+void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
+    if (prompt->valid_for == wdir)
+        return;
+
+    /*Tilde contract the working directory*/
+    char* wdir_contr = pathContract(wdir, homedir, "~", malloc);
+
+    FILE* promptf = fmemopen(prompt->str, prompt->size, "w");
+    fprintf_style(promptf, "{%s} $ ", styleYellow, wdir_contr);
+    fclose(promptf);
+
+    prompt->valid_for = wdir;
+    free(wdir_contr);
 }
 
 void repl (compilerCtx* compiler) {
