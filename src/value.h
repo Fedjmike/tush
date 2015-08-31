@@ -81,7 +81,12 @@ const char* valueGetFilename (const value* file);
 
 int valueGuessIterableLength (const value* iterable);
 
+/*Get an iterator for an iterable value, through an out parameter.
+  Returns true on failure, and gives an iterator that has no elements.*/
 bool valueGetIterator (const value* iterable, valueIter* iter_out);
+
+/*Read the next value from an iterator. Returns null when the iterator
+  has reached the end.*/
 const value* valueIterRead (valueIter* iterator);
 
 /*Iterate over an iterable. If the value given is not an iterable,
