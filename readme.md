@@ -19,6 +19,8 @@ Design
 - A new set of coreutils taking advantage of these facilities.
 - A full scripting language with sane control flow, pattern matching and macros.
 
+See the [quick start guide](/quickstart.md).
+
 The language design has lots of open questions. Among them, how to:
 
 - Handle errors — exceptions, Maybe monad, error codes, other possibilites?

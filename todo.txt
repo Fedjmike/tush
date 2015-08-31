@@ -19,12 +19,15 @@
         [x] Str
         [-] Lambda
             [ ] Arg type inference
+            [x] Running
+                - Duplicate the AST subtree for the expression, replace captured variables with literals
         [ ] Bracketed operators
         [ ] (String) format
         [ ] Regex
         [ ] Option (as in flags)
         -----
         [x] Tuple
+            [ ] Parenless: low precedence comma operator?
         [x] List
         [ ] Records
         [ ] Dictionary
@@ -61,7 +64,7 @@
                 - Right associative composition
                 [ ] filter |?
                 [ ] reduce
-                [ ] zipf |:
+                [x] zipf |:
             [x] Explicit fn
             [ ] Named (optional?) arguments
             [-] Implicit conversions
@@ -80,6 +83,7 @@
         [ ] Containers
             [ ] Lookup, :
     [ ] Statements
+        [ ] File typing
         [-] Decl/assignment
             [ ] Expression level let
             [ ] A helpful error message to distinguish them
@@ -90,7 +94,7 @@
         [ ] if, while, for, switch
         [ ] Working directory control
             into <dir>: {}
-            mkdir <dir>: {}
+            mk-into <dir>: {}
         [ ] Transactions (on the fs)
     [ ] Error handling
     [ ] Macros
@@ -111,7 +115,7 @@
 
 [ ] Unicode
     [ ] In the lexer
-    [ ] Other places e.g. strlen -> strwidth
+    [-] Other places e.g. strlen -> strwidth
 
 [ ] Diagnostics
     [ ] Position information
@@ -171,9 +175,8 @@ hashmap:
 type:
 [ ] Each type T contains a hashmap of fn types T -> K where K is the key. Use this to only allocate one of each fn type.
 [ ] And for lists. Then generalize for any parametric type.
-[ ] Create type str in the ctor?
 [-] Type equality
-[ ] Higher-kinded type printing
+[x] Higher-kinded type printing
 
 ast:
 [ ] Make AST::children a const_vector (combined length and size fields)
@@ -189,6 +192,9 @@ sym:
 
 value:
 [x] valueInvalid
+[ ] Make it a value type?
+[ ] Minimize GetVector usage
+[ ] Get rid of File
 
 == Passes
 
