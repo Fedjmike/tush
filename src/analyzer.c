@@ -74,6 +74,14 @@ static type* analyzeTupleLit (analyzerCtx* ctx, ast* node) {
     return typeTuple(ctx->ts, elements);
 }
 
+static void errorListLitMismatch (analyzerCtx* ctx, type* elements, type* dt) {
+    if (typeIsInvalid(elements) || typeIsInvalid(dt))
+        return;
+
+    error(ctx)("Elements of a list literal must match: given %s while others are %s\n",
+               typeGetStr(dt), typeGetStr(elements));
+}
+
 static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
     /*No elements => type is ['a] */
     if (node->children.length == 0) {
@@ -83,14 +91,26 @@ static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
         return typeForall(ctx->ts, typevars, typeList(ctx->ts, A));
 
     } else {
-        type* elements;
+        type* elements = 0;
 
-        for_vector (ast* element, node->children, {
-            elements = analyzer(ctx, element);
+        for_vector_indexed (i, ast* element, node->children, {
+            type* dt = analyzer(ctx, element);
 
-            //todo check equality
-            //mode average if they differ
-            //todo lowest common interface ?
+            if (!elements)
+                elements = dt;
+
+            else {
+                type* unified;
+                typeCanUnify(ctx->ts, elements, dt, &unified);
+
+                if (unified)
+                    elements = unified;
+
+                else
+                    errorListLitMismatch(ctx, elements, dt);
+            }
+
+            //todo mode average if they differ
         })
 
         return typeList(ctx->ts, elements);
