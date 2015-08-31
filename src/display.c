@@ -47,6 +47,55 @@ static int printFilename (const char* name) {
            : printf("%s", name);
 }
 
+static int displayValueImpl (const value* result, type* dt, printf_t printf) {
+    bool dry = printf == dryprintf;
+
+    type* elementType = 0;
+    vector(type*) tuple;
+
+    /*Iterable types*/
+    if (   typeIsListOf(dt, &elementType)
+        || typeIsTupleOf(dt, &tuple)) {
+        bool list = elementType != 0;
+        char* brackets = list ? "[]" : "()";
+        int length = 2;
+
+        putchar(brackets[0]);
+
+        valueIter iter;
+        valueGetIterator(result, &iter);
+
+        for (const value* element; (element = valueIterRead(&iter));) {
+            if (iter.index != 0)
+                length += printf(", ");
+
+            if (!list)
+                elementType = vectorGet(tuple, iter.index);
+
+            if (!precond(elementType)) {
+                length += valuePrint(element);
+                continue;
+            }
+
+            length += displayValueImpl(element, elementType, printf);
+        }
+
+        putchar(brackets[1]);
+
+        return length;
+
+    } else
+        return (dry ? valueGetWidthOfStr : valuePrint)(result);
+}
+
+static int displayGetWidthOfStr (const value* result, type* dt) {
+    return displayValueImpl(result, dt, dryprintf);
+}
+
+static int displayValue (const value* result, type* dt) {
+    return displayValueImpl(result, dt, printf);
+}
+
 static void displayGrid (vector(const char*) entries, int (*printEntry)(const char*), size_t columnWidth) {
     enum {gap = 2};
     columnWidth += gap;
@@ -140,10 +189,10 @@ static void displayFile (const char* filename) {
         displayDirectory(filename);
 }
 
-static void displayRegular (value* result, type* resultType) {
-    valuePrint(result);
+static void displayRegular (value* result, type* dt) {
+    displayValue(result, dt);
     //todo if multiline result, type on new line
-    printf(" :: %s\n", typeGetStr(resultType));
+    printf(" :: %s\n", typeGetStr(dt));
 }
 
 /*Display a list of files as a grid of names, going down the rows
@@ -215,12 +264,12 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
             type* itemType = vectorGet(tuple, col);
             bool rightAlign = typeIsKind(type_Int, itemType);
 
-            size_t width = (rightAlign ? valueGetWidthOfStr : valuePrint)(item);
+            size_t width = (rightAlign ? displayGetWidthOfStr : displayValue)(item, itemType);
             size_t padding = columnWidths[col] - width;
 
             if (rightAlign) {
                 putnchar(' ', padding);
-                valuePrint(item);
+                displayValue(item, itemType);
 
             } else
                 /*Value already printed*/
@@ -266,7 +315,7 @@ void displayListList (value* result, type* resultType, type* elementType, type* 
             displayListList(element, elementType, innerElementType, innerInnerElementType, depth+1);
 
         else
-            valuePrint(element);
+            displayValue(element, elementType);
 
         if (i < elements.length-1) {
             putchar(',');

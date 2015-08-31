@@ -227,33 +227,13 @@ int valuePrintImpl (const value* v, printf_t printf) {
         return printf("%s", v->filename);
 
     case valuePair:
-    case valueTriple: {
-        int length = printf("[");
+        return printf("<pair>");
 
-        valuePrintImpl(v->first, printf);
-        length += printf(", ");
-        valuePrintImpl(v->second, printf);
+    case valueTriple:
+        return printf("<triple>");
 
-        if (v->kind == valueTriple) {
-            length += printf(", ");
-            valuePrintImpl(v->third, printf);
-        }
-
-        return length += printf("]");
-    }
-
-    case valueVector: {
-        int length = printf("[");
-
-        for_vector_indexed (i, value* element, v->vec, {
-            if (i != 0)
-                length += printf(", ");
-
-            length += valuePrintImpl(element, printf);
-        })
-
-        return length += printf("]");
-    }
+    case valueVector:
+        return printf("<vector of %d>", v->vec.length);
 
     case valueInvalid:
         return printf("<invalid>");
