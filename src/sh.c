@@ -40,6 +40,7 @@ typedef struct compilerCtx {
     sym* global;
 } compilerCtx;
 
+/*Parse and semantically analyze a string. Returns the typed AST.*/
 ast* compile (compilerCtx* ctx, const char* str, int* errors) {
     /*Store the error count ourselves if given a null ptr*/
     if (!errors)
@@ -104,6 +105,9 @@ void gosh (compilerCtx* ctx, const char* str, bool display) {
 
 /*==== REPL ====*/
 
+/*   :cd <dir>
+  Expects a File returning expression. If given, runs it and attempts
+  to change the working directory.*/
 void replCD (compilerCtx* compiler, const char* input) {
     int errors = 0;
     ast* tree = compile(compiler, input, &errors);
@@ -133,6 +137,8 @@ void replCD (compilerCtx* compiler, const char* input) {
     astDestroy(tree);
 }
 
+/*   :ast <expr>
+  Displays that syntax tree of a program, without running it.*/
 void replAST (compilerCtx* compiler, const char* input) {
     ast* tree = compile(compiler, input, 0);
 
@@ -142,6 +148,8 @@ void replAST (compilerCtx* compiler, const char* input) {
     astDestroy(tree);
 }
 
+/*   :type <expr>
+  Displays the type of an expression, without running it*/
 void replType (compilerCtx* compiler, const char* input) {
     int errors = 0;
     ast* tree = compile(compiler, input, &errors);
@@ -164,6 +172,10 @@ static replCommand commands[] = {
     {"type", strlen("type"), replType}
 };
 
+/*Execute a string if it is a built-in command, by searching through
+  the `commands` array.
+  \param input is the string *after* the colon which indicates the
+         beginning of a built-in.*/
 void replCmd (compilerCtx* compiler, const char* input) {
     char* firstSpace = strchr(input, ' ');
     size_t cmdLength = firstSpace ? (size_t)(firstSpace - input) : strlen(input);
@@ -202,6 +214,8 @@ typedef struct promptCtx {
     const char* valid_for;
 } promptCtx;
 
+/*Rewrite a prompt string given the working dir and home dir.
+  Rewrites it if and only if the working directory has changed.*/
 void writePrompt (promptCtx* prompt, const char* wdir, const char* homedir) {
     if (prompt->valid_for == wdir)
         return;
