@@ -255,7 +255,7 @@ static value* runPipe (envCtx* env, const ast* node, const value* arg, const val
         if (fail)
             return valueCreateInvalid();
 
-        vector(value*) results = vectorInit(valueGuessIterLength(iter), GC_malloc);
+        vector(value*) results = vectorInit(valueGuessIterableLength(arg), GC_malloc);
 
         /*Apply it to each element*/
         for (const value* element; (element = valueIterRead(&iter));)

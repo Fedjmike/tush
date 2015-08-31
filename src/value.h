@@ -79,8 +79,9 @@ const char* valueGetFilename (const value* file);
 
 /*---- Iterables ----*/
 
+int valueGuessIterableLength (const value* iterable);
+
 bool valueGetIterator (const value* iterable, valueIter* iter_out);
-int valueGuessIterLength (valueIter iterator);
 const value* valueIterRead (valueIter* iterator);
 
 /*Iterate over an iterable. If the value given is not an iterable,

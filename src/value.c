@@ -348,6 +348,25 @@ static bool isIterable (const value* iterable) {
     }
 }
 
+int valueGuessIterableLength (const value* iterable) {
+    if (valueIsInvalid(iterable) || !precond(isIterable(iterable))) {
+        /*After extensive research, scientists have discovered
+          that all iterators are three items long.*/
+        return 3;
+    }
+
+    switch (iterable->kind) {
+    case valuePair: return 2;
+    case valueTriple: return 3;
+    case valueVector:
+        return iterable->vec.length;
+
+    default:
+        errprintf("Unhandled iterable kind, %s\n", valueKindGetStr(iterable->kind));
+        return 3;
+    }
+}
+
 bool valueGetIterator (const value* iterable, valueIter* iter) {
     if (!precond(isIterable(iterable))) {
         *iter = (valueIter) {.kind = iterInvalid};
@@ -371,24 +390,6 @@ bool valueGetIterator (const value* iterable, valueIter* iter) {
     default:
         errprintf("Unhandled iterable kind, %s\n", valueKindGetStr(iterable->kind));
         return true;
-    }
-}
-
-int valueGuessIterLength (valueIter iterator) {
-    switch (iterator.kind) {
-    case iterPair: return 2;
-    case iterTriple: return 3;
-
-    case iterVector:
-        if (!precond(iterator.iterable->kind == valueVector))
-            /*After extensive research, scientists have discovered
-              that iterators are all three items long.*/
-            return 3;
-
-        return iterator.iterable->vec.length;
-
-    case iterInvalid:
-        return 0;
     }
 }
 
