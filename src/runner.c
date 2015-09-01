@@ -240,9 +240,8 @@ static value* runPipe (envCtx* env, const ast* node, const value* arg, const val
     /*Implicit map*/
     if (node->flags & astListApplication) {
         valueIter iter;
-        bool fail = valueGetIterator(arg, &iter);
 
-        if (fail)
+        if (valueGetIterator(arg, &iter))
             return valueCreateInvalid();
 
         vector(value*) results = vectorInit(valueGuessIterableLength(arg), GC_malloc);

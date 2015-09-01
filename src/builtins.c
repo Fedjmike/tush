@@ -56,9 +56,8 @@ static value* builtinSum (const value* numbers) {
     //todo adapt for Number, when it exists
 
     valueIter iter;
-    bool fail = valueGetIterator(numbers, &iter);
 
-    if (fail)
+    if (valueGetIterator(numbers, &iter))
         return valueCreateInvalid();
 
     for (const value* number; (number = valueIterRead(&iter));)
