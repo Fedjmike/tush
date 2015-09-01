@@ -81,6 +81,9 @@ static int displayValueImpl (const value* result, type* dt, printf_t printf) {
 
         return length;
 
+    } else if (typeIsKind(type_Bool, dt)) {
+        return printf(valueGetInt(result) ? "true" : "false");
+
     } else
         return (dry ? valueGetWidthOfStr : valuePrint)(result);
 }
