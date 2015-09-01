@@ -73,7 +73,7 @@ static void errorListLitMismatch (analyzerCtx* ctx, type* elements, type* dt) {
     if (typeIsInvalid(elements) || typeIsInvalid(dt))
         return;
 
-    error(ctx)("Elements of a list literal must match: given %s while others are %s\n",
+    error(ctx)("list element mismatch: given %s while others are %s\n",
                typeGetStr(dt), typeGetStr(elements));
 }
 
@@ -147,25 +147,20 @@ static type* analyzeSymbol (analyzerCtx* ctx, ast* node) {
 
 static void errorClassicUnixApp (analyzerCtx* ctx, type* arg) {
     if (typeIsInvalid(arg))
-        ;
+        return;
 
-    else
-        error(ctx)("Unix invocation (stdin -> stdout) requires string arguments, given %s\n",
-                   typeGetStr(arg));
+    error(ctx)("%s given to string stream program\n", typeGetStr(arg));
 }
 
 static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
-    if (typeIsInvalid(fn))
+    if (!typeIsInvalid(fn))
         ;
 
     else if (!typeIsFn(fn))
-        error(ctx)("type %s is not a function\n", typeGetStr(fn));
+        error(ctx)("%s is not a function\n", typeGetStr(fn));
 
-    else if (typeIsInvalid(arg))
-        ;
-
-    else
-        error(ctx)("type %s does not apply to function %s\n", typeGetStr(arg), typeGetStr(fn));
+    else if (!typeIsInvalid(arg))
+        error(ctx)("%s given to function %s\n", typeGetStr(arg), typeGetStr(fn));
 }
 
 static bool isUnixBasicSerializable (type* dt) {
@@ -260,39 +255,41 @@ static type* analyzePipe (analyzerCtx* ctx, ast* node, type* arg, type* fn) {
         return callResult;
 }
 
-static void errorConcatIsntList (analyzerCtx* ctx, bool left, type* operand) {
-    if (typeIsInvalid(operand))
-        return;
-
-    error(ctx)("%s operand of concat operator (++), %s, is not a list\n",
-               left ? "Left" : "Right",
-               typeGetStr(operand));
-}
-
-static void errorConcatMismatch (analyzerCtx* ctx, type* left, type* right) {
+static void errorConcat (analyzerCtx* ctx, type* left, type* right) {
     if (typeIsInvalid(left) || typeIsInvalid(right))
         return;
 
-    error(ctx)("Operands of concat operator (++), %s and %s, do not match\n",
-               typeGetStr(left), typeGetStr(right));
+    bool leftNotList = !typeIsList(left),
+         rightNotList = !typeIsList(right);
+
+    if (leftNotList || rightNotList) {
+        if (leftNotList && rightNotList) {
+            error(ctx)(  typeIsEqual(left, right)
+                       ? "concat operator (++): operands, %s, are not lists\n"
+                       : "concat operator (++): operands, %s and %s, are not lists\n",
+                       typeGetStr(left), typeGetStr(right));
+
+        } else
+            error(ctx)("concat operator (++): %s operand, %s, is not a list\n",
+                       leftNotList ? "left" : "right",
+                       typeGetStr(leftNotList ? left : right));
+
+    } else
+        error(ctx)("concat operator (++): operand mismatch: %s and %s\n",
+                   typeGetStr(left), typeGetStr(right));
 }
 
 static type* analyzeConcat (analyzerCtx* ctx, ast* node, type* left, type* right) {
     (void) node;
 
     type* result;
+    bool unifies = typeCanUnify(ctx->ts, left, right, &result);
 
-    if (!typeIsList(left))
-        errorConcatIsntList(ctx, true, left);
-
-    if (!typeIsList(right))
-        errorConcatIsntList(ctx, false, right);
-
-    if (typeCanUnify(ctx->ts, left, right, &result))
+    if (unifies && typeIsList(result))
         return result;
 
     else {
-        errorConcatMismatch(ctx, left, right);
+        errorConcat(ctx, left, right);
         return typeInvalid(ctx->ts);
     }
 }
