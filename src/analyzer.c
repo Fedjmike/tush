@@ -316,7 +316,8 @@ static type* analyzeBOP (analyzerCtx* ctx, ast* node) {
 static type* analyzeLet (analyzerCtx* ctx, ast* node) {
     type* init = analyzer(ctx, node->r);
 
-    node->symbol->dt = init;
+    if (node->symbol)
+        node->symbol->dt = init;
 
     return typeUnitary(ctx->ts, type_Unit);
 }
