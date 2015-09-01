@@ -40,14 +40,6 @@ type* typeUnitary (typeSys* ts, typeKind kind) {
     return ts->unitaries[kind];
 }
 
-type* typeInt (typeSys* ts) {
-    return typeUnitary(ts, type_Int);
-}
-
-type* typeFile (typeSys* ts) {
-    return typeUnitary(ts, type_File);
-}
-
 static type* typeNonUnitary (typeSys* ts, typeKind kind, type init) {
     type* dt = typeCreate(kind, init);
     vectorPush(&ts->others, dt);
@@ -103,49 +95,6 @@ typeSys* typesFree (typeSys* ts) {
     vectorFreeObjs(&ts->others, (vectorDtor) typeDestroy);
 
     return ts;
-}
-
-/*==== ====*/
-
-type* typeFnChain (int kindNo, typeSys* ts, ...) {
-    type* result = typeUnitary(ts, type_Unit);
-
-    va_list args;
-    va_start(args, ts);
-
-    for (int i = 0; i < kindNo; i++) {
-        typeKind kind = va_arg(args, int);
-        type* dt = typeUnitary(ts, kind);
-
-        /*On the first iteration the result is just the unitary type
-          (using the induction variable to make it easy for the compiler to optimize)*/
-        if (i == 0)
-            result = dt;
-
-        else
-            result = typeFn(ts, result, dt);
-    }
-
-    va_end(args);
-
-    return result;
-}
-
-type* typeTupleChain (int arity, typeSys* ts, ...) {
-    va_list args;
-    va_start(args, ts);
-
-    vector(type*) types = vectorInit(arity, malloc);
-
-    /*Turn the arg list into a vector*/
-    for (int i = 0; i < arity; i++) {
-        type* dt = va_arg(args, type*);
-        vectorPush(&types, dt);
-    }
-
-    va_end(args);
-
-    return typeTuple(ts, types);
 }
 
 /*==== String representation ===*/

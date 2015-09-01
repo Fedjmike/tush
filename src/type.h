@@ -34,8 +34,6 @@ typeSys* typesFree (typeSys* ts);
 
 type* typeUnitary (typeSys* ts, typeKind kind);
 
-type* typeInt (typeSys* ts);
-type* typeFile (typeSys* ts);
 type* typeFn (typeSys* ts, type* from, type* to);
 type* typeList (typeSys* ts, type* elements);
 type* typeTuple (typeSys* ts, vector(type*) types);
@@ -44,13 +42,6 @@ type* typeVar (typeSys* ts);
 type* typeForall (typeSys* ts, vector(type*) typevars, type* dt);
 
 type* typeInvalid (typeSys* ts);
-
-/*A helper function for construction fn types.
-  Accepts a list of typeKinds, which must be unitary types.*/
-type* typeFnChain (int kindNo, typeSys* ts, ...);
-
-/*Accepts a list of type* */
-type* typeTupleChain (int arity, typeSys* ts, ...);
 
 /*==== ====*/
 

@@ -131,7 +131,7 @@ static type* analyzeLit (analyzerCtx* ctx, ast* node) {
 
 static type* analyzeGlobLit (analyzerCtx* ctx, ast* node) {
     (void) node;
-    return typeList(ctx->ts, typeFile(ctx->ts));
+    return typeList(ctx->ts, typeUnitary(ctx->ts, type_File));
 }
 
 static type* analyzeSymbol (analyzerCtx* ctx, ast* node) {

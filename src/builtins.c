@@ -102,35 +102,39 @@ static void addBuiltin (sym* global, const char* name, type* dt, value* val) {
 }
 
 void addBuiltins (typeSys* ts, sym* global) {
+    type *File = typeUnitary(ts, type_File),
+         *Int = typeUnitary(ts, type_Int);
+
     addBuiltin(global, "size",
-               typeFnChain(2, ts, type_File, type_Int),
+               typeFn(ts, File, Int),
                valueCreateFn(builtinSize));
 
     addBuiltin(global, "sum",
-               typeFn(ts, typeList(ts, typeInt(ts)), typeInt(ts)),
+               typeFn(ts, typeList(ts, Int), Int),
                valueCreateFn(builtinSum));
 
     {
         type *A = typeVar(ts),
              *B = typeVar(ts);
+        type* B_A = typeTuple(ts, vectorInitChain(2, malloc, B, A));
 
         addBuiltin(global, "zipf",
                    /*'a 'b => ('a -> 'b) -> 'a -> ('b, 'a)*/
                    typeForall(ts, vectorInitChain(2, malloc, A, B),
                        typeFn(ts, typeFn(ts, A, B),
-                       typeFn(ts, A,
-                                  typeTupleChain(2, ts, B, A)))),
+                       typeFn(ts, A, B_A))),
                    valueCreateFn(builtinZipfCurried));
     }
 
     {
         type* A = typeVar(ts);
+        type* Int_A = typeTuple(ts, vectorInitChain(2, malloc, Int, A));
 
         addBuiltin(global, "sort",
-                   /*[(Integer, 'a)] -> [(Integer, 'a)]*/
+                   /*[(Int, 'a)] -> [(Int, 'a)]*/
                    typeForall(ts, vectorInitChain(1, malloc, A),
-                       typeFn(ts, typeList(ts, typeTupleChain(2, ts, typeInt(ts), A)),
-                                  typeList(ts, typeTupleChain(2, ts, typeInt(ts), A)))),
+                       typeFn(ts, typeList(ts, Int_A),
+                                  typeList(ts, Int_A))),
                    valueCreateFn(builtinSort));
     }
 }
