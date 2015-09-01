@@ -49,6 +49,10 @@ static void printer (printerCtx* ctx, const ast* node) {
         printer_outf(ctx)("int: %ld\n", node->literal.integer);
         break;
 
+    case astFloatLit:
+        printer_outf(ctx)("float: %f\n", node->literal.number);
+        break;
+
     case astBoolLit:
         printer_outf(ctx)("bool: %s\n", node->literal.truth ? "true" : "false");
         break;

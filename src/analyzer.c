@@ -116,6 +116,7 @@ static type* analyzeLit (analyzerCtx* ctx, ast* node) {
     switch (node->kind) {
     case astUnitLit: return typeUnitary(ctx->ts, type_Unit);
     case astIntLit: return typeUnitary(ctx->ts, type_Int);
+    case astFloatLit: return typeUnitary(ctx->ts, type_Float);
     case astBoolLit: return typeUnitary(ctx->ts, type_Bool);
     case astStrLit: return typeUnitary(ctx->ts, type_Str);
     case astFileLit: return typeUnitary(ctx->ts, type_File);
@@ -336,6 +337,7 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
         [astInvalid] = analyzeLit,
         [astUnitLit] = analyzeLit,
         [astIntLit] = analyzeLit,
+        [astFloatLit] = analyzeLit,
         [astBoolLit] = analyzeLit,
         [astStrLit] = analyzeLit,
         [astFileLit] = analyzeLit,

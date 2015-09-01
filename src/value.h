@@ -37,6 +37,7 @@ typedef value* (*simpleClosureFn)(const void* env, const value* arg);
 value* valueCreateInvalid (void);
 value* valueCreateUnit (void);
 value* valueCreateInt (int integer);
+value* valueCreateFloat (double number);
 value* valueCreateStr (char* str);
 value* valueCreateFn (value* (*fnptr)(const value*));
 value* valueCreateFile (const char* filename);

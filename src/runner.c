@@ -112,6 +112,7 @@ static value* runLit (envCtx* env, const ast* node) {
     switch (node->kind) {
     case astUnitLit: return valueCreateUnit();
     case astIntLit: return valueCreateInt(node->literal.integer);
+    case astFloatLit: return valueCreateFloat(node->literal.number);
     case astBoolLit: return valueCreateInt(node->literal.truth);
     case astStrLit: return valueCreateStr(node->literal.str);
     /*This one thrown in too because it's similarly simple*/
@@ -312,6 +313,7 @@ value* run (envCtx* env, const ast* node) {
         [astInvalid] = runLit,
         [astUnitLit] = runLit,
         [astIntLit] = runLit,
+        [astFloatLit] = runLit,
         [astBoolLit] = runLit,
         [astStrLit] = runLit,
         /*---*/

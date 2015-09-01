@@ -189,7 +189,7 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt, bool firstLevel) {
     switch (dt->kind) {
     case type_Unit: return "()";
     case type_Int: return "Int";
-    case type_Num: return "Num";
+    case type_Float: return "Float";
     case type_Bool: return "Bool";
     case type_Str: return "Str";
     case type_File: return "File";

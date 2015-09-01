@@ -8,7 +8,7 @@
 #include "runner.h"
 
 typedef enum valueKind {
-    valueInvalid, valueUnit, valueInt, valueStr, valueFile,
+    valueInvalid, valueUnit, valueInt, valueFloat, valueStr, valueFile,
     valueFn, valueSimpleClosure, valueASTClosure,
     valuePair, valueTriple, valueVector,
 } valueKind;
@@ -19,6 +19,8 @@ typedef struct value {
     union {
         /*Int*/
         int64_t integer;
+        /*Float*/
+        double number;
         /*Str*/
         struct {
             char* str;
@@ -66,6 +68,12 @@ value* valueCreateUnit (void) {
 value* valueCreateInt (int integer) {
     return valueCreate(valueInt, (value) {
         .integer = integer
+    });
+}
+
+value* valueCreateFloat (double number) {
+    return valueCreate(valueFloat, (value) {
+        .number = number
     });
 }
 
@@ -180,12 +188,13 @@ value* valueStoreVector (vector(value*) v) {
 const char* valueKindGetStr (valueKind kind) {
     switch (kind) {
     case valueUnit: return "Unit";
+    case valueInt: return "Int";
+    case valueFloat: return "Float";
     case valueStr: return "Str";
     case valueFn: return "Fn";
     case valueSimpleClosure: return "SimpleClosure";
     case valueASTClosure: return "ASTClosure";
     case valueFile: return "File";
-    case valueInt: return "Int";
     case valuePair: return "Pair";
     case valueTriple: return "Triple";
     case valueVector: return "Vector";
@@ -209,6 +218,9 @@ int valuePrintImpl (const value* v, printf_t printf) {
 
     case valueInt:
         return printf("%ld", v->integer);
+
+    case valueFloat:
+        return printf("%f", v->number);
 
     case valueStr:
         //todo escape
