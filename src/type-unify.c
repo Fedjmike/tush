@@ -218,15 +218,10 @@ bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
 }
 
 type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
-    switch (dt->kind) {
-    case type_Unit:
-    case type_Int:
-    case type_Num:
-    case type_Bool:
-    case type_Str:
-    case type_File:
+    if (!typeKindIsntUnitary(dt->kind))
         return (type*) dt;
 
+    switch (dt->kind) {
     case type_Fn: {
         type *from = typeMakeSubs(ts, infs, dt->from),
              *to = typeMakeSubs(ts, infs, dt->to);
@@ -305,13 +300,10 @@ type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
             return substDT;
     }
 
-    case type_KindNo:
-        errprintf("Dummy type kind 'KindNo' found in the wild\n");
+    default:
+        errprintf("Unhandled type kind, %s\n", typeGetStr(dt));
         return (type*) dt;
     }
-
-    errprintf("Unhandled type, kind %d, %s\n", dt->kind, typeGetStr(dt));
-    return (type*) dt;
 }
 
 type* unifyArgWithFn (typeSys* ts, const type* arg, const type* fn) {
