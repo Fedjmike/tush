@@ -38,11 +38,6 @@ static value* getSymbolValue (envCtx* env, sym* symbol) {
 
 }
 
-static value* runInvalid (envCtx* env, const ast* node) {
-    (void) env, (void) node;
-    return valueCreateInvalid();
-}
-
 static value* runFnLit (envCtx* env, const ast* node) {
     /*Actual args = captures + explicit args*/
     int argNo = node->captured->length + node->children.length;
@@ -99,29 +94,6 @@ static value* runListLit (envCtx* env, const ast* node) {
     return valueStoreArray(node->children.length, results);
 }
 
-static value* runUnitLit (envCtx* env, const ast* node) {
-    (void) env, (void) node;
-    return valueCreateUnit();
-}
-
-static value* runIntLit (envCtx* env, const ast* node) {
-    (void) env;
-
-    return valueCreateInt(node->literal.integer);
-}
-
-static value* runBoolLit (envCtx* env, const ast* node) {
-    (void) env;
-
-    return valueCreateInt(node->literal.truth);
-}
-
-static value* runStrLit (envCtx* env, const ast* node) {
-    (void) env;
-
-    return valueCreateStr(node->literal.str);
-}
-
 static value* runFileLit (envCtx* env, const ast* node) {
     (void) env;
 
@@ -132,6 +104,23 @@ static value* runGlobLit (envCtx* env, const ast* node) {
     (void) env;
 
     return builtinExpandGlob(node->literal.str, valueCreateUnit());
+}
+
+static value* runLit (envCtx* env, const ast* node) {
+    (void) env;
+
+    switch (node->kind) {
+    case astUnitLit: return valueCreateUnit();
+    case astIntLit: return valueCreateInt(node->literal.integer);
+    case astBoolLit: return valueCreateInt(node->literal.truth);
+    case astStrLit: return valueCreateStr(node->literal.str);
+    /*This one thrown in too because it's similarly simple*/
+    case astInvalid: return valueCreateUnit();
+
+    default:
+        errprintf("Unhandled literal kind, %s", astKindGetStr(node->kind));
+        return valueCreateInvalid();
+    }
 }
 
 static value* runSymbol (envCtx* env, const ast* node) {
@@ -314,16 +303,18 @@ value* run (envCtx* env, const ast* node) {
     typedef value* (*handler_t)(envCtx*, const ast*);
 
     static handler_t table[astKindNo] = {
-        [astInvalid] = runInvalid,
         [astFnLit] = runFnLit,
         [astTupleLit] = runTupleLit,
         [astListLit] = runListLit,
-        [astUnitLit] = runUnitLit,
-        [astIntLit] = runIntLit,
-        [astBoolLit] = runBoolLit,
-        [astStrLit] = runStrLit,
         [astFileLit] = runFileLit,
         [astGlobLit] = runGlobLit,
+        /*Common handler*/
+        [astInvalid] = runLit,
+        [astUnitLit] = runLit,
+        [astIntLit] = runLit,
+        [astBoolLit] = runLit,
+        [astStrLit] = runLit,
+        /*---*/
         [astSymbol] = runSymbol,
         [astFnApp] = runFnApp,
         [astBOP] = runBOP,
