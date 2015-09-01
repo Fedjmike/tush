@@ -22,11 +22,6 @@ inline static printf_t* error (analyzerCtx* ctx) {
 
 /*==== ====*/
 
-static type* analyzeInvalid (analyzerCtx* ctx, ast* node) {
-    (void) node;
-    return typeInvalid(ctx->ts);
-}
-
 static type* analyzeFnLit (analyzerCtx* ctx, ast* node) {
     /*Type the arg patterns
       (this must occur before typing the body because the args will
@@ -117,29 +112,20 @@ static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
     }
 }
 
-static type* analyzeUnitLit (analyzerCtx* ctx, ast* node) {
-    (void) node;
-    return typeUnitary(ctx->ts, type_Unit);
-}
+static type* analyzeLit (analyzerCtx* ctx, ast* node) {
+    switch (node->kind) {
+    case astUnitLit: return typeUnitary(ctx->ts, type_Unit);
+    case astIntLit: return typeUnitary(ctx->ts, type_Int);
+    case astBoolLit: return typeUnitary(ctx->ts, type_Bool);
+    case astStrLit: return typeUnitary(ctx->ts, type_Str);
+    case astFileLit: return typeUnitary(ctx->ts, type_File);
+    /*This one thrown in too because it's similarly simple*/
+    case astInvalid: return typeInvalid(ctx->ts);
 
-static type* analyzeIntLit (analyzerCtx* ctx, ast* node) {
-    (void) node;
-    return typeUnitary(ctx->ts, type_Int);
-}
-
-static type* analyzeBoolLit (analyzerCtx* ctx, ast* node) {
-    (void) node;
-    return typeUnitary(ctx->ts, type_Bool);
-}
-
-static type* analyzeStrLit (analyzerCtx* ctx, ast* node) {
-    (void) node;
-    return typeUnitary(ctx->ts, type_Str);
-}
-
-static type* analyzeFileLit (analyzerCtx* ctx, ast* node) {
-    (void) node;
-    return typeFile(ctx->ts);
+    default:
+        errprintf("Unhandled literal kind, %s", astKindGetStr(node->kind));
+        return typeInvalid(ctx->ts);
+    }
 }
 
 static type* analyzeGlobLit (analyzerCtx* ctx, ast* node) {
@@ -343,15 +329,17 @@ static type* analyzer (analyzerCtx* ctx, ast* node) {
     typedef type* (*handler_t)(analyzerCtx*, ast*);
 
     static handler_t table[astKindNo] = {
-        [astInvalid] = analyzeInvalid,
         [astFnLit] = analyzeFnLit,
         [astTupleLit] = analyzeTupleLit,
         [astListLit] = analyzeListLit,
-        [astUnitLit] = analyzeUnitLit,
-        [astIntLit] = analyzeIntLit,
-        [astBoolLit] = analyzeBoolLit,
-        [astStrLit] = analyzeStrLit,
-        [astFileLit] = analyzeFileLit,
+        /*Common handler*/
+        [astInvalid] = analyzeLit,
+        [astUnitLit] = analyzeLit,
+        [astIntLit] = analyzeLit,
+        [astBoolLit] = analyzeLit,
+        [astStrLit] = analyzeLit,
+        [astFileLit] = analyzeLit,
+        /*---*/
         [astGlobLit] = analyzeGlobLit,
         [astSymbol] = analyzeSymbol,
         [astFnApp] = analyzeFnApp,
