@@ -1,8 +1,13 @@
 #include "test.h"
 
+#include <gc.h>
+
 #include "src/sym.h"
 
 void test_sym (void) {
+    /*Symbols interact with the GC because they can own GC objects*/
+    GC_INIT();
+
     sym* scope = symInit();
     require(scope);
 
