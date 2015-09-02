@@ -182,6 +182,8 @@ void replMemStats (compilerCtx* compiler, const char* input) {
         }
     }
 
+#if GC_VERSION_MAJOR > 7
+#if GC_VERSION_MINOR > 3
     struct GC_prof_stats_s stats;
     GC_get_prof_stats(&stats, sizeof(stats));
 
@@ -192,6 +194,8 @@ void replMemStats (compilerCtx* compiler, const char* input) {
            "    freed: %lu bytes\n",
            stats.allocd_bytes_before_gc, stats.reclaimed_bytes_before_gc);
     printf("heap size: %lu bytes\n", stats.heapsize_full);
+#endif // GC_VERSION_MINOR
+#endif // GC_VERSION_MAJOR
 }
 
 typedef struct replCommand {
