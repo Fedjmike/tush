@@ -47,7 +47,7 @@ static ast* parseFnLit (parserCtx* ctx) {
 
     vector(ast*) args = vectorInit(2, malloc);
 
-    while (!see(ctx, "->"))
+    while (see_kind(ctx, tokenNormal))
         vectorPush(&args, parserPattern(ctx));
 
     /*Body*/
