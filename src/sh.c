@@ -182,8 +182,8 @@ void replMemStats (compilerCtx* compiler, const char* input) {
         }
     }
 
-#if GC_VERSION_MAJOR > 7
-#if GC_VERSION_MINOR > 3
+#if GC_VERSION_MAJOR >= 7
+#if GC_VERSION_MINOR >= 3
     struct GC_prof_stats_s stats;
     GC_get_prof_stats(&stats, sizeof(stats));
 
