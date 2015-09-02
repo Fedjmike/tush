@@ -260,14 +260,20 @@ void repl (compilerCtx* compiler) {
         else if (!strcmp(input, ":exit"))
             break;
 
-        add_history(input);
-        write_history(historyFilename);
-
         if (input[0] == ':')
             replCmd(compiler, input+1);
 
         else
             gosh(compiler, input, true);
+
+        //todo move both history and collection to a separate thread
+        //(but the still sync it will the prompt)
+
+        add_history(input);
+        write_history(historyFilename);
+
+        //todo wait til false (nothing to collect)
+        GC_collect_a_little();
     }
 
     free(prompt.str);
