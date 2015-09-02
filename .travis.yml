@@ -1,15 +1,11 @@
 language: c
 compiler:
-    - gcc-5
     - clang
 branches:
     except: gh-pages
 addons:
     apt:
-        sources:
-        - ubuntu-toolchain-r-test
         packages:
-        - gcc-5
         - valgrind
         - libreadline-dev
         - libgc-dev
