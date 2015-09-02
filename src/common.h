@@ -7,6 +7,8 @@
 #include <string.h>
 #include <stdio.h>
 
+#include <gc.h>
+
 typedef int printf_t(const char*, ...);
 
 /*=== Internal errors ====*/
@@ -37,3 +39,17 @@ static inline bool no_errors_recently (errctx errors) {
 
 #define precond(cond) \
     ((cond) ? true : (errprintf("Precondition '%s' is false\n", #cond), false))
+
+/*==== ====*/
+
+static inline void* GC_calloc_(size_t n, size_t size) {
+    size_t total = n*size;
+
+    if (!precond(total/n == size))
+        return 0;
+
+    return GC_malloc(total);
+};
+
+/*GC_malloc does clearing for you*/
+#define gcalloc ((alloc_t) {GC_malloc, GC_calloc_, GC_free, GC_realloc, GC_strdup})

@@ -147,7 +147,7 @@ bool unixSerialize (vector(const char*)* args, value* v, type* dt) {
 
         /*Allocate more space for the elements early since we know how
           many there will be.*/
-        vectorResize(args, args->capacity + vec.length);
+        vectorResize(args, args->capacity + vec.length, realloc);
 
         const char* (*getter)(const value*) =   typeIsKind(type_Str, elements)
                                               ? valueGetStr : valueGetFilename;
@@ -202,7 +202,7 @@ static value* runClassicUnixApp (envCtx* env, const ast* node, const char* progr
         return valueCreateInvalid();
 
     /*Read the pipe*/
-    char* output = readall(programOutput, GC_malloc, GC_realloc);
+    char* output = readall(programOutput, gcalloc);
 
     return valueCreateStr(output);
 }

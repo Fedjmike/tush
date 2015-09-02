@@ -35,10 +35,10 @@ static void infDestroy (inference* inf) {
     free(inf);
 }
 
-inferences infsInit (vector(const type*) bound, stdalloc allocator) {
+inferences infsInit (vector(const type*) bound, malloc_t malloc) {
     return (inferences) {
         .bound = bound,
-        .v = vectorInit(8, allocator)
+        .v = vectorInit(8, malloc)
     };
 }
 

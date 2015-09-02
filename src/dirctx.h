@@ -20,7 +20,7 @@ static dirCtx* dirsFree (dirCtx* dirs);
 
 static bool dirsChangeWD (dirCtx* dirs, const char* newWD);
 
-static char* dirsSearch (dirCtx* dirs, const char* str, stdalloc allocator);
+static char* dirsSearch (dirCtx* dirs, const char* str, malloc_t malloc);
 
 /*==== Inline implementations ====*/
 
@@ -63,9 +63,9 @@ inline static bool dirsChangeWD (dirCtx* dirs, const char* newWD) {
     return error;
 }
 
-inline static char* dirsSearch (dirCtx* dirs, const char* str, stdalloc allocator) {
+inline static char* dirsSearch (dirCtx* dirs, const char* str, malloc_t malloc) {
     enum {bufsize = 512};
-    char* fullpath = allocator(bufsize);
+    char* fullpath = malloc(bufsize);
 
     for_vector (const char* dir, dirs->searchPaths, {
         int printed = snprintf(fullpath, bufsize, "%s/%s", dir, str);

@@ -125,21 +125,21 @@ ast* astCreateInvalid (void) {
     return astCreate(astInvalid, (ast) {});
 }
 
-ast* astDup (const ast* original, stdalloc allocator) {
-    ast* node = allocator(sizeof(ast));
+ast* astDup (const ast* original, malloc_t malloc) {
+    ast* node = malloc(sizeof(ast));
     *node = *original;
 
     if (original->l)
-        node->l = astDup(original->l, allocator);
+        node->l = astDup(original->l, malloc);
 
     if (original->r)
-        node->r = astDup(original->r, allocator);
+        node->r = astDup(original->r, malloc);
 
     if (!vectorNull(original->children)) {
-        node->children = vectorInit(original->children.length, allocator);
+        node->children = vectorInit(original->children.length, malloc);
 
         for_vector (ast* child, original->children, {
-            vectorPush(&node->children, astDup(child, allocator));
+            vectorPush(&node->children, astDup(child, malloc));
         })
     }
 
@@ -149,7 +149,7 @@ ast* astDup (const ast* original, stdalloc allocator) {
     case astGlobLit:
         if (original->literal.str) {
             size_t length = strlen(original->literal.str)+1;
-            node->literal.str = allocator(length);
+            node->literal.str = malloc(length);
             memcpy(node->literal.str, original->literal.str, length);
         }
 
@@ -157,8 +157,8 @@ ast* astDup (const ast* original, stdalloc allocator) {
 
     case astFnLit:
         if (original->captured) {
-            node->captured = allocator(sizeof(vector));
-            *node->captured = vectorDup(*original->captured, allocator);
+            node->captured = malloc(sizeof(vector));
+            *node->captured = vectorDup(*original->captured, malloc);
         }
 
         break;

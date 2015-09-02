@@ -6,7 +6,7 @@
 #include <common.h>
 #include <vector.h>
 
-char* pathGetAbsolute (const char* path, stdalloc allocator);
+char* pathGetAbsolute (const char* path, malloc_t malloc);
 
 /*Stats the path to see if it's a directory. Returns false for non-files.*/
 bool pathIsDir (const char* path);
@@ -24,7 +24,7 @@ vector(char*) initVectorFromPATH (void);
 
   e.g. prefix="/home/name" prefixes path="/home/name/desktop"
        it can be contracted by replacement="~" to "~/desktop" */
-char* pathContract (const char* path, const char* prefix, const char* replacement, stdalloc allocator);
+char* pathContract (const char* path, const char* prefix, const char* replacement, malloc_t malloc);
 
 /*Duplicate a path with the separators ('/') replaced with nulls
   so that the segments may be easily iterated over and treated as
@@ -32,4 +32,4 @@ char* pathContract (const char* path, const char* prefix, const char* replacemen
   final segment starting with null.
 
   e.g. "xxx/yyy/zzz" -> "xxx\0yyy\0zzz\0\0"*/
-char* pathGetSegments (const char* path, stdalloc allocator);
+char* pathGetSegments (const char* path, malloc_t malloc);

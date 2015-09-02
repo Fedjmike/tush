@@ -232,7 +232,7 @@ inline static token lexerNext (lexerCtx* ctx) {
 };
 
 static inline void lexerKeywordsInit (void) {
-    lexerKeywords = hashmapInit(1024, malloc);
+    lexerKeywords = hashmapInit(1024, calloc);
 
     static const char* ops[] = {
         "|", "|:", "|>", "&&", "||",

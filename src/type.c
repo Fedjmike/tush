@@ -118,7 +118,7 @@ static const char* strNewTypevar (strCtx* ctx) {
 
 static const char* strMapTypevar (strCtx* ctx, const type* dt) {
     if (mapNull(ctx->typevars))
-        ctx->typevars = intmapInit(32, malloc);
+        ctx->typevars = intmapInit(32, calloc);
 
     const char* str = intmapMap(&ctx->typevars, (intptr_t) dt);
 
