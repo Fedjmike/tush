@@ -103,7 +103,7 @@ static value* runFileLit (envCtx* env, const ast* node) {
 static value* runGlobLit (envCtx* env, const ast* node) {
     (void) env;
 
-    return builtinExpandGlob(node->literal.str, valueCreateUnit());
+    return builtinExpandGlob(node->literal.str);
 }
 
 static value* runLit (envCtx* env, const ast* node) {

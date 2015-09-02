@@ -8,10 +8,7 @@
 #include "value.h"
 #include "sym.h"
 
-value* builtinExpandGlob (const char* pattern, value* arg) {
-    /*arg is ()*/
-    (void) arg;
-
+value* builtinExpandGlob (const char* pattern) {
     value* result;
 
     glob_t matches = {};
