@@ -1,6 +1,8 @@
 *.o
 *.exe
 /sh
+/bin
+/obj
 /.gosh_history
 /*.layout
 /*.cbp
