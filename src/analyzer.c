@@ -153,7 +153,7 @@ static void errorClassicUnixApp (analyzerCtx* ctx, type* arg) {
 }
 
 static void errorFnApp (analyzerCtx* ctx, type* arg, type* fn) {
-    if (!typeIsInvalid(fn))
+    if (typeIsInvalid(fn))
         ;
 
     else if (!typeIsFn(fn))
