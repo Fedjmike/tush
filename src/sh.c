@@ -169,6 +169,31 @@ void replType (compilerCtx* compiler, const char* input) {
     astDestroy(tree);
 }
 
+/*   :mem-stats
+  Some memory usage statistics.*/
+void replMemStats (compilerCtx* compiler, const char* input) {
+    (void) compiler;
+
+    //todo unicode charptr++
+    for (; *input; input++) {
+        if (!isspace(*input)) {
+            repl_errorf(":mem-stats takes no arguments, given %s\n", input);
+            return;
+        }
+    }
+
+    struct GC_prof_stats_s stats;
+    GC_get_prof_stats(&stats, sizeof(stats));
+
+    printf("allocated: %lu bytes \t (since last collection)\n"
+           "    freed: %lu bytes\n",
+           stats.bytes_allocd_since_gc, stats.bytes_reclaimed_since_gc);
+    printf("allocated: %lu bytes \t (before that)\n"
+           "    freed: %lu bytes\n",
+           stats.allocd_bytes_before_gc, stats.reclaimed_bytes_before_gc);
+    printf("heap size: %lu bytes\n", stats.heapsize_full);
+}
+
 typedef struct replCommand {
     const char* name;
     size_t length;
@@ -178,7 +203,8 @@ typedef struct replCommand {
 static replCommand commands[] = {
     {"cd", strlen("cd"), replCD},
     {"ast", strlen("ast"), replAST},
-    {"type", strlen("type"), replType}
+    {"type", strlen("type"), replType},
+    {"mem-stats", strlen("mem-stats"), replMemStats}
 };
 
 /*Execute a string if it is a built-in command, by searching through
@@ -206,7 +232,7 @@ void replCmd (compilerCtx* compiler, const char* input) {
         bool nameMatches = !strncmp(input, cmd.name, cmd.length);
 
         if (nameMatches) {
-            cmd.handler(compiler, input + cmd.length + 1);
+            cmd.handler(compiler, input + cmd.length);
             return;
         }
     }
