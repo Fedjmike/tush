@@ -12,6 +12,8 @@ typedef struct dirCtx {
     /*This is for UI purposes and shouldn't be used to construct
       actual paths.*/
     char* workingDirDisplay;
+    /*Can be used to construct paths.*/
+    const char* workingDirReal;
 } dirCtx;
 
 static dirCtx dirsInit ();
@@ -59,6 +61,8 @@ inline static bool dirsChangeWD (dirCtx* dirs, const char* newWD) {
 
         dirs->workingDirDisplay = absolute;
     }
+
+    dirs->workingDirReal = getcwd(GC_MALLOC_ATOMIC(1024), 1024);
 
     return error;
 }
