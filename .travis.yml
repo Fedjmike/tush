@@ -8,12 +8,25 @@ addons:
         packages:
         - valgrind
         - libreadline-dev
-        - libgc-dev
 before_install:
     - pushd ..
+    -
     - git clone http://github.com/Fedjmike/libkiss
-    - cd libkiss
+    - pushd libkiss
     - make
     - popd
+    -
+    - git clone git://github.com/ivmai/bdwgc.git
+    - pushd bdwgc
+    - git clone git://github.com/ivmai/libatomic_ops.git
+    - autoreconf -vif
+    - automake --add-missing
+    - ./configure
+    - make
+    - popd
+    -
+    - popd
+env:
+    - EXTRA_CFLAGS="-I../bdwgc/include" EXTRA_LDFLAGS="-L../bdwgc/.libs" LD_LIBRARY_PATH="../bdwgc/.libs:$LD_LIBRARY_PATH"
 script:
-    - make --keep-going all tests
+    - make  --keep-going all tests

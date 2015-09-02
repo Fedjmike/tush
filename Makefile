@@ -1,6 +1,6 @@
 CC = clang
-CFLAGS = -std=c11 -O3 -Werror -Wall -Wextra -I../libkiss -g
-LDFLAGS = -lgc -lreadline -L../libkiss -lkiss
+CFLAGS = $(EXTRA_CFLAGS) -std=c11 -Werror -Wall -Wextra -I../libkiss -g
+LDFLAGS = $(EXTRA_LDFLAGS) -lgc -lreadline -L../libkiss -lkiss
 
 HEADERS = $(wildcard src/*.h)
 MAIN = src/sh.c
