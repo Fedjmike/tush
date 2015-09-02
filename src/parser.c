@@ -88,13 +88,28 @@ static ast* parsePath (parserCtx* ctx) {
     bool modifier = false,
          glob = false;
 
+    astFlags flags = flagNone;
+
     const char* str = ctx->current.buffer;
 
-    /*Path modifier*/
-    if (*str == '/') {
-        modifier = true;
+    /*Inspect the first char*/
+    if (str[0] == '/' || str[0] == '-') {
+        /*Root*/
+        if (str[0] == '-')
+            flags |= flagAbsolutePath;
+
+        /*Path modifier*/
+        else
+            modifier = true;
+
         str++;
     }
+
+    /*If the string contains either path segments or an extension
+      then it cannot be searched for in PATH*/
+    if (   strchr(str, '/') == 0
+        && strchr(str, '.') == 0)
+        flags |= flagAllowPathSearch;
 
     /*Search the path segments looking for glob operators
       (yes, could just strchr directly but in the future this fn
@@ -112,7 +127,7 @@ static ast* parsePath (parserCtx* ctx) {
     /*To be implemented*/
     (void) modifier;
 
-    return (glob ? astCreateGlobLit : astCreateFileLit)(ctx->current.buffer);
+    return (glob ? astCreateGlobLit : astCreateFileLit)(str, flags);
 }
 
 static bool isPathToken (const char* str) {
@@ -186,7 +201,7 @@ static ast* parseAtom (parserCtx* ctx) {
             node = parseSymbol(ctx, symbol);
 
         else
-            node = astCreateFileLit(ctx->current.buffer);
+            node = parsePath(ctx);
 
         accept(ctx);
 

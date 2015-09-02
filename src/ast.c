@@ -84,15 +84,15 @@ ast* astCreateStrLit (const char* str) {
     });
 }
 
-ast* astCreateFileLit (const char* str) {
+ast* astCreateFileLit (const char* str, astFlags flags) {
     return astCreate(astFileLit, (ast) {
-        .literal.str = strdup(str),
+        .flags = flags, .literal.str = strdup(str),
     });
 }
 
-ast* astCreateGlobLit (const char* str) {
+ast* astCreateGlobLit (const char* str, astFlags flags) {
     return astCreate(astGlobLit, (ast) {
-        .literal.str = strdup(str),
+        .flags = flags, .literal.str = strdup(str),
     });
 }
 
