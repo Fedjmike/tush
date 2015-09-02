@@ -288,7 +288,7 @@ void repl (compilerCtx* compiler) {
 
     while (true) {
         /*Regenerate the prompt (if necessary)*/
-        writePrompt(&prompt, compiler->dirs.workingDir, homedir);
+        writePrompt(&prompt, compiler->dirs.workingDirDisplay, homedir);
 
         char* input = readline(prompt.str);
 
