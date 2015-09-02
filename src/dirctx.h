@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unistd.h>
+#include <gc.h>
 #include <vector.h>
 
 #include "common.h"
@@ -10,35 +11,35 @@ typedef struct dirCtx {
     vector(char*) searchPaths;
     /*This is for UI purposes and shouldn't be used to construct
       actual paths.*/
-    char* workingDir;
+    char* workingDirDisplay;
 } dirCtx;
 
-/*Takes ownership of the parameters. workingDir is allowed to be null.*/
-static dirCtx dirsInit (vector(char*) searchPaths, char* workingDir);
-
+static dirCtx dirsInit ();
 static dirCtx* dirsFree (dirCtx* dirs);
 
 static bool dirsChangeWD (dirCtx* dirs, const char* newWD);
 
-static char* dirsSearch (dirCtx* dirs, const char* str, malloc_t malloc);
+static const char* dirsSearch (dirCtx* dirs, const char* str);
 
 /*==== Inline implementations ====*/
 
-inline static dirCtx dirsInit (vector(char*) searchPaths, char* workingDir) {
+inline static dirCtx dirsInit () {
+    char* workingDir = getWorkingDir(gcalloc);
+
     return (dirCtx) {
-        .searchPaths = searchPaths,
-        .workingDir = workingDir
+        .searchPaths = initVectorFromPATH(gcalloc),
+        .workingDirDisplay = workingDir,
+        .workingDirReal = GC_STRDUP(workingDir)
     };
 }
 
 inline static dirCtx* dirsFree (dirCtx* dirs) {
-    vectorFreeObjs(&dirs->searchPaths, free);
-    free(dirs->workingDir);
+    /*Nothing to do because everything was GC allocated*/
     return dirs;
 };
 
 inline static bool dirsChangeWD (dirCtx* dirs, const char* newWD) {
-    char* absolute = pathGetAbsolute(newWD, malloc);
+    char* absolute = pathGetAbsolute(newWD, GC_malloc);
 
     /*The actual change of directory must be made after getting the
       absolute path as it would affect doing so.
@@ -52,18 +53,19 @@ inline static bool dirsChangeWD (dirCtx* dirs, const char* newWD) {
             //todo errno
             errprintf("Unable to turn the working directory, \"%s\", into an absolute path\n", newWD);
 
-            absolute = malloc(strlen(newWD) + 5);
+            absolute = GC_malloc(strlen(newWD) + 5);
             sprintf(absolute, "??""?/%s", newWD);
         }
 
-        free(dirs->workingDir);
-        dirs->workingDir = absolute;
+        dirs->workingDirDisplay = absolute;
     }
 
     return error;
 }
 
-inline static char* dirsSearch (dirCtx* dirs, const char* str, malloc_t malloc) {
+inline static const char* dirsSearch (dirCtx* dirs, const char* str) {
+    const char* path = 0;
+
     enum {bufsize = 512};
     char* fullpath = malloc(bufsize);
 
@@ -76,11 +78,13 @@ inline static char* dirsSearch (dirCtx* dirs, const char* str, malloc_t malloc) 
             continue;
         }
 
-        bool fail = access(fullpath, F_OK);
+        bool notfound = access(fullpath, F_OK);
 
-        if (!fail)
-            return fullpath;
+        if (!notfound)
+            path = dir;
     })
 
-    return 0;
+    free(fullpath);
+
+    return path;
 }

@@ -11,13 +11,14 @@ char* pathGetAbsolute (const char* path, malloc_t malloc);
 /*Stats the path to see if it's a directory. Returns false for non-files.*/
 bool pathIsDir (const char* path);
 
-/*Get the current working directory. Caller owns the result.
+/*Get the current working directory.
   Fails if there are permission issues.*/
-char* getWorkingDir (void);
+char* getWorkingDir (alloc_t alloc);
 
 const char* getHomeDir (void);
 
-vector(char*) initVectorFromPATH (void);
+/*Create a vector from the PATH environment variables.*/
+vector(char*) initVectorFromPATH (alloc_t alloc);
 
 /*Take a path and replace a directory with another string, if it prefixes the path.
   If it doesn't, the given path is duplicated.

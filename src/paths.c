@@ -33,16 +33,16 @@ bool pathIsDir (const char* path) {
     return !error && file.mode == file_dir;
 }
 
-char* getWorkingDir (void) {
+char* getWorkingDir (alloc_t alloc) {
     int buffer_size = 256;
 
     do {
-        char* buffer = malloc(buffer_size);
+        char* buffer = alloc.malloc(buffer_size);
 
         if (getcwd(buffer, buffer_size) != 0)
             return buffer;
 
-        free(buffer);
+        alloc.free(buffer);
         buffer_size *= 2;
 
     /*Keep trying with a larger buffer, if that was the problem*/
@@ -55,8 +55,8 @@ const char* getHomeDir (void) {
     return getenv("HOME");
 }
 
-vector(char*) initVectorFromPATH (void) {
-    vector(char*) paths = vectorInit(16, malloc);
+vector(char*) initVectorFromPATH (alloc_t alloc) {
+    vector(char*) paths = vectorInit(16, alloc.malloc);
 
     //TODO: secure_getenv ??
     const char* PATH = getenv("PATH");
@@ -76,11 +76,11 @@ vector(char*) initVectorFromPATH (void) {
         if (nextcolon) {
             size_t pathlength = nextcolon-path;
             /*Copy up to the colon, add a null*/
-            dupe = strncpy(malloc(pathlength+1), path, pathlength);
+            dupe = strncpy(alloc.malloc(pathlength+1), path, pathlength);
             dupe[pathlength] = 0;
 
         } else
-            dupe = strdup(path);
+            dupe = alloc.strdup(path);
 
         vectorPush(&paths, dupe);
     }

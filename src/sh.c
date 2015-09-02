@@ -71,7 +71,7 @@ ast* compile (compilerCtx* ctx, const char* str, int* errors) {
 compilerCtx compilerInit (void) {
     return (compilerCtx) {
         .ts = typesInit(),
-        .dirs = dirsInit(initVectorFromPATH(), getWorkingDir()),
+        .dirs = dirsInit(),
         .global = symInit()
     };
 }
