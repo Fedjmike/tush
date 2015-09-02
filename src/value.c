@@ -139,15 +139,17 @@ value* valueCreateInvalid (void) {
 }
 
 value* valueStoreTuple (int n, ...) {
-    va_list args;
-    va_start(args, n);
-
     switch (n) {
     case 2:
     case 3: {
+        va_list args;
+        va_start(args, n);
+
         value *first = va_arg(args, value*),
               *second = va_arg(args, value*),
               *third = n == 3 ? va_arg(args, value*) : 0;
+
+        va_end(args);
 
         if (n == 2)
             return valueCreatePair(first, second);
@@ -159,13 +161,12 @@ value* valueStoreTuple (int n, ...) {
     default: {
         vector(value*) v = vectorInit(n, GC_malloc);
 
-        for (int i = 0; i < n; i++)
-            vectorPush(&v, va_arg(args, value*));
+        for_n_args (n, value* element, n, {
+            vectorPush(&v, element);
+        })
 
         return valueCreateVector(v);
     }}
-
-    va_end(args);
 }
 
 value* valueStoreArray (int n, value** const array) {
