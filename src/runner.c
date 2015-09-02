@@ -1,6 +1,6 @@
 #include "runner.h"
 
-#include <gc/gc.h>
+#include <gc.h>
 
 #include "sym.h"
 #include "ast.h"

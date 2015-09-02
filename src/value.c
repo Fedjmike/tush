@@ -1,7 +1,7 @@
 #include "value.h"
 
 #include <stdio.h>
-#include <gc/gc.h>
+#include <gc.h>
 #include <common.h>
 
 #include "sym.h"

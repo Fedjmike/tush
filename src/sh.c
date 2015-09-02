@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <readline/readline.h>
 #include <readline/history.h>
-#include <gc/gc.h>
+#include <gc.h>
 
 #include "common.h"
 #include "type.h"
