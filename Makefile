@@ -12,7 +12,10 @@ INSTALLPATH = /usr/local/bin/tush
 all: sh
 install: $(INSTALLPATH)
 
-%/:
+obj/:
+	@mkdir -p $@
+
+bin/:
 	@mkdir -p $@
 
 obj/%.o: src/%.c $(HEADERS)
