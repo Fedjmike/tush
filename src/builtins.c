@@ -75,6 +75,23 @@ static value* builtinZipfCurried (const value* fn) {
     return valueCreateSimpleClosure(fn, (simpleClosureFn) builtinZipf);
 }
 
+static value* builtinGetTupleNth (const value* tuple, int n) {
+    const value* nth = valueGetTupleNth(tuple, n);
+
+    if (!nth)
+        return valueCreateInvalid();
+
+    return (value*) nth;
+}
+
+static value* builtinFst (const value* pair) {
+    return builtinGetTupleNth(pair, 0);
+}
+
+static value* builtinSnd (const value* pair) {
+    return builtinGetTupleNth(pair, 1);
+}
+
 int compareTuple (const value** left, const value** right) {
     const value *firstOfLeft = valueGetTupleNth(*left, 0),
                 *firstOfRight = valueGetTupleNth(*right, 0);
@@ -123,6 +140,28 @@ void addBuiltins (typeSys* ts, sym* global) {
                        typeFn(ts, typeFn(ts, A, B),
                        typeFn(ts, A, B_A))),
                    valueCreateFn(builtinZipfCurried));
+    }
+
+    {
+        type *A = typeVar(ts),
+             *B = typeVar(ts);
+        type* A_B = typeTuple(ts, vectorInitChain(2, malloc, A, B));
+
+        addBuiltin(global, "fst",
+                   typeForall(ts, vectorInitChain(2, malloc, A, B),
+                       typeFn(ts, A_B, A)),
+                   valueCreateFn(builtinFst));
+    }
+
+    {
+        type *A = typeVar(ts),
+             *B = typeVar(ts);
+        type* A_B = typeTuple(ts, vectorInitChain(2, malloc, A, B));
+
+        addBuiltin(global, "snd",
+                   typeForall(ts, vectorInitChain(2, malloc, A, B),
+                       typeFn(ts, A_B, B)),
+                   valueCreateFn(builtinSnd));
     }
 
     {
