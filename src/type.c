@@ -203,7 +203,7 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt, bool firstLevel) {
 
         bool higherKinded = !firstLevel;
 
-        if (!higherKinded)
+        if (!higherKinded  && typeIsFn(dt->dt))
             return dtStr;
 
         /*Note: VLA*/
@@ -215,7 +215,7 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt, bool firstLevel) {
 
         char* typevarStr = strjoinwith(dt->typevars.length, (char**) typevarStrs, ", ", malloc);
 
-        bool allocSuccess = 0 != asprintf(&dt->str, "forall %s. %s", typevarStr, dtStr);
+        bool allocSuccess = 0 != asprintf(&dt->str, "%s => %s", typevarStr, dtStr);
         free(typevarStr);
 
         if (!precond(allocSuccess))
