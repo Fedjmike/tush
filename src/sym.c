@@ -29,7 +29,7 @@ static sym* symCreateParented (symKind kind, sym* parent, const char* name, sym 
 static void symDestroy (sym* symbol) {
     vectorFreeObjs(&symbol->children, (vectorDtor) symDestroy);
     free(symbol->name);
-    free(symbol);
+    GC_FREE(symbol);
 }
 
 sym* symAdd (sym* parent, const char* name) {
