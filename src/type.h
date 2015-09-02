@@ -64,7 +64,6 @@ bool typeIsEqual (const type* l, const type* r);
   test. By locking the two together, a failure state is removed.*/
 
 bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** result);
-bool typeUnitAppliesToFn (const type* fn, type** result);
 
 bool typeIsListOf (const type* dt, type** elements);
 bool typeIsTupleOf (const type* dt, vector(const type*)* types);

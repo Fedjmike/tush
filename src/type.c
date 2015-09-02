@@ -369,15 +369,6 @@ bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** resul
     return applies;
 }
 
-bool typeUnitAppliesToFn (const type* fn, type** result) {
-    bool applies = fn->kind == type_Fn && fn->from->kind == type_Unit;
-
-    if (applies && result)
-        *result = fn->to;
-
-    return applies;
-}
-
 bool typeIsListOf (const type* dt, type** elements) {
     seeThroughQuantifier(&dt);
 
