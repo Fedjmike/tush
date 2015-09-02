@@ -210,7 +210,7 @@ static value* runClassicUnixApp (envCtx* env, const ast* node, const char* progr
 static value* runFnApp (envCtx* env, const ast* node) {
     value* result = run(env, node->r);
 
-    if (node->flags & astUnixInvocation)
+    if (node->flags & flagUnixInvocation)
         result = runClassicUnixApp(env, node, valueGetFilename(result));
 
     else {
@@ -238,7 +238,7 @@ static value* runPipe (envCtx* env, const ast* node, const value* arg, const val
     (void) env;
 
     /*Implicit map*/
-    if (node->flags & astListApplication) {
+    if (node->flags & flagListApplication) {
         valueIter iter;
 
         if (valueGetIterator(arg, &iter))

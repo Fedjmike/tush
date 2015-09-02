@@ -187,7 +187,7 @@ static type* analyzeFnApp (analyzerCtx* ctx, ast* node) {
 
     /*A classic Unix program invocation*/
     if (typeIsKind(type_File, result)) {
-        node->flags |= astUnixInvocation;
+        node->flags |= flagUnixInvocation;
 
         for_vector (ast* argNode, node->children, {
             type* arg = analyzer(ctx, argNode);
@@ -236,7 +236,7 @@ static type* analyzePipe (analyzerCtx* ctx, ast* node, type* arg, type* fn) {
         } else if (   typeIsListOf(arg, &elements)
                  && typeAppliesToFn(ctx->ts, elements, fn, &callResult)) {
             arg = elements;
-            node->flags |= astListApplication;
+            node->flags |= flagListApplication;
 
         } else {
             errorFnApp(ctx, arg, fn);
@@ -248,7 +248,7 @@ static type* analyzePipe (analyzerCtx* ctx, ast* node, type* arg, type* fn) {
         /*Zip up the arg with the result of (each/the) call*/
         callResult = typeTuple(ctx->ts, vectorInitChain(2, malloc, callResult, arg));
 
-    if (node->flags & astListApplication)
+    if (node->flags & flagListApplication)
         return typeList(ctx->ts, callResult);
 
     else

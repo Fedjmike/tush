@@ -219,13 +219,3 @@ const char* astKindGetStr (astKind kind) {
 
     return "<unhandled AST kind>";
 }
-
-const char* astFlagGetStr (astFlags flag) {
-    switch (flag) {
-    case astNoFlags: return "NoFlags";
-    case astUnixInvocation: return "UnixInvocation";
-    case astListApplication: return "ListApplication";
-    }
-
-    return "<unhandled AST flag>";
-}

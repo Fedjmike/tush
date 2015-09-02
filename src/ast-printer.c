@@ -35,10 +35,11 @@ static void printLR (printerCtx* ctx, const ast* node) {
 }
 
 static void printer (printerCtx* ctx, const ast* node) {
-    printer_outf(ctx)(node->flags ? "+ %s   %s\n" : "+ %s\n",
-                      astKindGetStr(node->kind),
-                      astFlagGetStr(node->flags));
+    printer_outf(ctx)("+ %s\n", astKindGetStr(node->kind));
     ctx->depth++;
+
+    if (node->flags != flagNone)
+        printer_outf(ctx)("flags: %d\n", node->flags);
 
     switch (node->kind) {
     case astUnitLit:

@@ -14,11 +14,14 @@ typedef enum astKind {
 } astKind;
 
 typedef enum astFlags {
-    astNoFlags = 0,
+    flagNone = 0,
     /*FnApp*/
-    astUnixInvocation,
+    flagUnixInvocation = 1 << 0,
     /*BOP[o=Pipe]*/
-    astListApplication,
+    flagListApplication = 1 << 1,
+    /*FileLit*/
+    flagAbsolutePath = 1 << 2,
+    flagAllowPathSearch = 1 << 3
 } astFlags;
 
 typedef enum opKind {
@@ -85,4 +88,3 @@ ast* astDup (const ast* tree, stdalloc allocator);
 
 const char* opKindGetStr (opKind kind);
 const char* astKindGetStr (astKind kind);
-const char* astFlagGetStr (astFlags flag);
