@@ -105,6 +105,15 @@ void gosh (compilerCtx* ctx, const char* str, bool display) {
 
 /*==== REPL ====*/
 
+void repl_errorf (const char* format, ...) {
+    fputs("error: ", stderr);
+
+    va_list args;
+    va_start(args, format);
+    vfprintf(stderr, format,  args);
+    va_end(args);
+}
+
 /*   :cd <dir>
   Expects a File returning expression. If given, runs it and attempts
   to change the working directory.*/
@@ -116,7 +125,7 @@ void replCD (compilerCtx* compiler, const char* input) {
         ;
 
     else if (!typeIsKind(type_File, tree->dt))
-        printf(":cd requires a File argument, given %s\n", typeGetStr(tree->dt));
+        repl_errorf(":cd requires a File argument, given %s\n", typeGetStr(tree->dt));
 
     /*Types fine, try running it*/
     else {
@@ -130,7 +139,7 @@ void replCD (compilerCtx* compiler, const char* input) {
             bool error = dirsChangeWD(&compiler->dirs, newWD);
 
             if (error)
-                printf("Unable to enter directory \"%s\"\n", newWD);
+                repl_errorf("unable to enter directory \"%s\"\n", newWD);
         }
     }
 
@@ -181,7 +190,7 @@ void replCmd (compilerCtx* compiler, const char* input) {
     size_t cmdLength = firstSpace ? (size_t)(firstSpace - input) : strlen(input);
 
     if (cmdLength == 0) {
-        printf("No command name given\n");
+        repl_errorf("no command name given\n");
         return;
     }
 
@@ -202,10 +211,10 @@ void replCmd (compilerCtx* compiler, const char* input) {
         }
     }
 
-    printf("No command named ':");
+    repl_errorf("no command named ':");
     /*Using printf precisions, %.*s, would convert the length to int*/
-    fwrite(input, sizeof(*input), cmdLength, stdout);
-    printf("'\n");
+    fwrite(input, sizeof(*input), cmdLength, stderr);
+    fprintf(stderr, "'\n");
 }
 
 typedef struct promptCtx {
