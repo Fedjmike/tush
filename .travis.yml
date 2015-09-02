@@ -20,4 +20,4 @@ before_install:
     - make
     - popd
 script:
-    - make --keep-going all
+    - make --keep-going all tests

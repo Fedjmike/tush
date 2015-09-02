@@ -3,28 +3,27 @@ CFLAGS = -std=c11 -O3 -Werror -Wall -Wextra -I../libkiss -g
 LDFLAGS = -lgc -lreadline -L../libkiss -lkiss
 
 HEADERS = $(wildcard src/*.h)
-OBJECTS = $(patsubst src/%.c, obj/%.o, $(wildcard src/*.c))
+MAIN = src/sh.c
+OBJECTS = $(patsubst src/%.c, obj/%.o, $(filter-out $(MAIN), $(wildcard src/*.c)))
+MAIN_OBJECT = $(patsubst src/%.c, obj/%.o, $(MAIN))
 
 INSTALLPATH = /usr/local/bin/tush
 
 all: sh
 install: $(INSTALLPATH)
 
-obj/:
-	@mkdir -p obj
+%/:
+	@mkdir -p $@
 
 obj/%.o: src/%.c $(HEADERS)
-	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo " [CC] $@"
+	@$(CC) $(CFLAGS) -c $< -o $@
 
-sh: obj/ $(OBJECTS)
-	@$(CC) $(OBJECTS) $(LDFLAGS) -o $@
+sh: obj/ $(OBJECTS) $(MAIN_OBJECT)
 	@echo " [LD] $@"
+	@$(CC) $(OBJECTS) $(MAIN_OBJECT) $(LDFLAGS) -o $@
 	@du -h $@
 	@echo
-
-test: sh
-	valgrind -q --leak-check=full --suppressions=boehm-gc.supp ./sh
 
 clean:
 	rm -f obj/*.o sh sh.exe
@@ -35,4 +34,24 @@ $(INSTALLPATH): sh
 uninstall:
 	rm -f $(INSTALLPATH)
 
-.PHONY: all test clean install uninstall
+TEST_CFLAGS = $(CFLAGS) -I.
+TEST_LDFLAGS = $(LDFLAGS)
+
+TEST_HEADERS = $(wildcard tests/*.h)
+TESTS = $(patsubst tests/%.c, bin/%, $(wildcard tests/test-*.c))
+
+VALGRIND = valgrind -q --leak-check=full --suppressions=boehm-gc.supp
+
+bin/%: tests/%.c  $(HEADERS) $(TEST_HEADERS) $(OBJECTS)
+	@echo " [CC] $@"
+	@$(CC) $(TEST_CFLAGS) $< $(OBJECTS) $(TEST_LDFLAGS) -o $@
+	@echo " [$@]"
+	@$(VALGRIND) $@
+	@echo "... passed"
+
+tests: bin/ $(TESTS)
+
+run: sh
+	$(VALGRIND) ./sh
+
+.PHONY: all tests run clean install uninstall
