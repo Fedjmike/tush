@@ -1,5 +1,6 @@
 #include "sym.h"
 
+#include <gc.h>
 #include "common.h"
 
 static void symAddChild(sym* parent, sym* child) {
@@ -11,7 +12,9 @@ static void symAddChild(sym* parent, sym* child) {
 }
 
 static sym* symCreate (symKind kind, const char* name, sym init) {
-    sym* symbol = malloci(sizeof(sym), &init);
+    /*A sym can contain GC references, so the GC needs to know of it*/
+    sym* symbol = GC_MALLOC_UNCOLLECTABLE(sizeof(sym));
+    *symbol = init;
     symbol->kind = kind;
     symbol->name = strdup(name);
     return symbol;

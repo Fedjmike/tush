@@ -103,7 +103,7 @@ int compareTuple (const value** left, const value** right) {
 }
 
 static value* builtinSort (const value* list) {
-    vector(const value*) vec = vectorDup(valueGetVector(list), malloc);
+    vector(const value*) vec = vectorDup(valueGetVector(list), GC_malloc);
 
     qsort(vec.buffer, vec.length, sizeof(void*),
           (int (*)(const void *, const void *)) compareTuple);

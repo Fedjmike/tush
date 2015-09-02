@@ -1,30 +1,42 @@
 {
-   boehm44
+   boehm00
    Memcheck:Cond
    ...
    fun:GC_core_malloc
 }
 {
-   boehm44
+   boehm01
    Memcheck:Value8
    ...
    fun:GC_core_malloc
 }
 {
-   boehm44
+   boehm02
    Memcheck:Cond
    ...
    fun:GC_init
 }
 {
-   boehm44
+   boehm03
    Memcheck:Value8
    ...
    fun:GC_init
 }
 {
-   boehm44
+   boehm04
    Memcheck:Leak
    ...
    fun:GC_init
+}
+{
+   boehm05
+   Memcheck:Value8
+   ...
+   fun:GC_gcollect
+}
+{
+   boehm06
+   Memcheck:Cond
+   ...
+   fun:GC_gcollect
 }
