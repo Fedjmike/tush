@@ -11,7 +11,7 @@
 
 static ast* parseExpr (parserCtx* ctx);
 
-static type* parserType (parserCtx* ctx) {
+static type* parseType (parserCtx* ctx) {
     if (try_match(ctx, "Int"))
         return typeUnitary(ctx->ts, type_Int);
 
@@ -27,7 +27,7 @@ static type* parserType (parserCtx* ctx) {
 /**
  * Pattern = <Name> [ "::" Type ]
  */
-static ast* parserPattern (parserCtx* ctx) {
+static ast* parsePattern (parserCtx* ctx) {
     ast* node;
 
     //todo accept only [\w\d-]
@@ -44,7 +44,7 @@ static ast* parserPattern (parserCtx* ctx) {
     }
 
     if (try_match(ctx, "::"))
-        node = astCreateTypeHint(node, parserType(ctx));
+        node = astCreateTypeHint(node, parseType(ctx));
 
     return node;
 }
@@ -65,7 +65,7 @@ static ast* parseFnLit (parserCtx* ctx) {
     vector(ast*) args = vectorInit(2, malloc);
 
     while (see_kind(ctx, tokenNormal))
-        vectorPush(&args, parserPattern(ctx));
+        vectorPush(&args, parsePattern(ctx));
 
     /*Body*/
 
