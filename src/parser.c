@@ -11,7 +11,7 @@
 
 static ast* parseExpr (parserCtx* ctx);
 
-static type* parseType (parserCtx* ctx) {
+static type* parseType (parserCtx* ctx, bool allowFns) {
     type* dt;
 
     if (try_match(ctx, "Int"))
@@ -22,7 +22,7 @@ static type* parseType (parserCtx* ctx) {
 
     /*List*/
     else if (try_match(ctx, "[")) {
-        dt = typeList(ctx->ts, parseType(ctx));
+        dt = typeList(ctx->ts, parseType(ctx, true));
         match(ctx, "]");
 
 
@@ -32,7 +32,7 @@ static type* parseType (parserCtx* ctx) {
             dt = typeUnitary(ctx->ts, type_Unit);
 
         else {
-            dt = parseType(ctx);
+            dt = parseType(ctx, true);
 
             /*Tuple*/
             if (see(ctx, ",")) {
@@ -40,7 +40,7 @@ static type* parseType (parserCtx* ctx) {
                 vectorPush(&types, dt);
 
                 while (try_match(ctx, ","))
-                    vectorPush(&types, parseType(ctx));
+                    vectorPush(&types, parseType(ctx, true));
 
                 dt = typeTuple(ctx->ts, types);
             }
@@ -52,6 +52,9 @@ static type* parseType (parserCtx* ctx) {
         expected(ctx, "type name");
         dt = typeInvalid(ctx->ts);
     }
+
+    if (allowFns && try_match(ctx, "->"))
+        dt = typeFn(ctx->ts, dt, parseType(ctx, true));
 
     return dt;
 }
@@ -76,7 +79,7 @@ static ast* parsePattern (parserCtx* ctx) {
     }
 
     if (try_match(ctx, "::"))
-        node = astCreateTypeHint(node, parseType(ctx));
+        node = astCreateTypeHint(node, parseType(ctx, false));
 
     return node;
 }
