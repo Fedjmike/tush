@@ -164,6 +164,9 @@ static void displayFile (const char* filename) {
         else
             printf("A %s", fmode_getstr(file.mode));
 
+        /*Print the absolute path*/
+        printf(", located at %s", filename);
+
     } else {
         switch (error) {
         case staterr_notexist:
