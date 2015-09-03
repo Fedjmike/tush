@@ -11,7 +11,7 @@
 
 typedef int printf_t(const char*, ...);
 
-/*=== Internal errors ====*/
+/*==== Internal errors ====*/
 
 extern _Atomic unsigned int internalerrors;
 

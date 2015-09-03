@@ -185,6 +185,7 @@ bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
 
     /*Kinds equal*/
     } else {
+        /*Unitary types only unify if exactly equal*/
         if (!typeKindIsntUnitary(l->kind))
             return l == r ? (type*) l : 0;
 

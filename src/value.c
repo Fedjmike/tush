@@ -23,7 +23,7 @@ typedef struct value {
         double number;
         /*Str*/
         struct {
-            char* str;
+            const char* str;
             size_t strlen;
         };
         /*File*/
@@ -416,7 +416,7 @@ int valueGuessIterableLength (const value* iterable) {
 }
 
 bool valueGetIterator (const value* iterable, valueIter* iter) {
-    if (!precond(isIterable(iterable))) {
+    if (valueIsInvalid(iterable) || !precond(isIterable(iterable))) {
         *iter = (valueIter) {.kind = iterInvalid};
         return true;
     }

@@ -51,6 +51,7 @@ bin/%: tests/%.c  $(HEADERS) $(TEST_HEADERS) $(OBJECTS)
 	@echo " [$@]"
 	@$(VALGRIND) $@
 	@echo "... passed"
+	@echo
 
 tests: bin/ $(TESTS)
 

@@ -38,6 +38,7 @@ value* valueCreateInvalid (void);
 value* valueCreateUnit (void);
 value* valueCreateInt (int integer);
 value* valueCreateFloat (double number);
+/*Duplicates str*/
 value* valueCreateStr (char* str);
 
 /*Duplicates the filename but takes the relative path, which must be GC allocated.*/
@@ -122,7 +123,9 @@ const value* valueIterRead (valueIter* iterator);
 #define for_iterable_value(decl, iterable, continuation) \
     for_iterable_value_indexed(__for_dummy, decl, iterable, {(void) __for_dummy; continuation})
 
-/*Convert an iterable to a vector*/
+/**Convert an iterable to a vector.
+   Returns a zero length vector if it can't.
+   Are you sure you can't access it through an iterator instead?*/
 vector(const value*) valueGetVector (const value* iterable);
 
 const value* valueGetTupleNth (const value* tuple, int n);

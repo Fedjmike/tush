@@ -46,7 +46,7 @@ static value* runFnLit (envCtx* env, const ast* node) {
 
     /*These two vectors form a simple map from symbol to value, hence
       their elements must correspond.*/
-    vector(sym*) argSymbols = vectorInit(argNo, GC_malloc);
+    vector(sym*) argSymbols = vectorInit(argNo, GC_malloc_atomic);
     vector(value*) argValues = vectorInit(argNo, GC_malloc);
 
     /*Fill the symbols vector with the captured symbols and arg symbols*/

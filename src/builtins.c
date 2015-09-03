@@ -51,8 +51,6 @@ static value* builtinSize (const value* file) {
 static value* builtinSum (const value* numbers) {
     int64_t total = 0;
 
-    //todo adapt for Number, when it exists
-
     valueIter iter;
 
     if (valueGetIterator(numbers, &iter))
@@ -100,13 +98,13 @@ int compareTuple (const value** left, const value** right) {
     return indexOfLeft - indexOfRight;
 }
 
-static value* builtinSort (const value* list) {
-    vector(const value*) vec = vectorDup(valueGetVector(list), GC_malloc);
+static value* builtinSort (const value* table) {
+    vector(const value*) rows = vectorDup(valueGetVector(table), GC_malloc);
 
-    qsort(vec.buffer, vec.length, sizeof(void*),
+    qsort(rows.buffer, rows.length, sizeof(void*),
           (int (*)(const void *, const void *)) compareTuple);
 
-    return valueStoreVector(vec);
+    return valueStoreVector(rows);
 }
 
 static void addBuiltin (sym* global, const char* name, type* dt, value* val) {

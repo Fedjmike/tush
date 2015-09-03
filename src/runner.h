@@ -13,4 +13,5 @@ typedef struct envCtx {
     dirCtx* dirs;
 } envCtx;
 
+/*Assumes well-formed input. In particular, the AST should be typed.*/
 value* run (envCtx* env, const ast* tree);
