@@ -102,6 +102,8 @@ static ast* parsePath (parserCtx* ctx) {
         else
             modifier = true;
 
+        /*Move past this char.
+          This "translates" the string into its OS path equivalent*/
         str++;
     }
 

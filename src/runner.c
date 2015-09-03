@@ -97,11 +97,28 @@ static value* runListLit (envCtx* env, const ast* node) {
 }
 
 static value* runFileLit (envCtx* env, const ast* node) {
-    return valueCreateFile(node->literal.str, env->dirs->workingDirReal);
+    const char* str = node->literal.str;
+
+    if (node->flags & flagAbsolutePath)
+        return valueCreateFile(str, 0);
+
+    else {
+        const char* path = node->flags & flagAllowPathSearch ? dirsSearch(env->dirs, str) : 0;
+
+        if (path)
+            return valueCreateFile(str, path);
+
+        else
+            return valueCreateFile(str, env->dirs->workingDirReal);
+    }
 }
 
 static value* runGlobLit (envCtx* env, const ast* node) {
-    return builtinExpandGlob(node->literal.str, env->dirs->workingDirReal);
+    if (node->flags & flagAbsolutePath)
+        return builtinExpandGlob(node->literal.str, 0);
+
+    else
+        return builtinExpandGlob(node->literal.str, env->dirs->workingDirReal);
 }
 
 static value* runLit (envCtx* env, const ast* node) {

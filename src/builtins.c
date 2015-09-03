@@ -8,8 +8,21 @@
 #include "value.h"
 #include "sym.h"
 
-/*workingDir is a GC allocated immutable string*/
 value* builtinExpandGlob (const char* pattern, const char* workingDir) {
+    /*No working dir => the path is absolute*/
+    if (!workingDir) {
+        /*Must be provided to glob() as such*/
+        if (!precond(pattern[0] == '/')) {
+            size_t length = strlen(pattern) + 2;
+            char* absolutepattern = GC_MALLOC(length);
+
+            absolutepattern[0] = '/';
+            strcpy(absolutepattern+1, pattern);
+
+            pattern = absolutepattern;
+        }
+    }
+
     value* result;
 
     glob_t matches = {};
