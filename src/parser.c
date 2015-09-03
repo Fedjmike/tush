@@ -12,16 +12,48 @@
 static ast* parseExpr (parserCtx* ctx);
 
 static type* parseType (parserCtx* ctx) {
+    type* dt;
+
     if (try_match(ctx, "Int"))
-        return typeUnitary(ctx->ts, type_Int);
+        dt = typeUnitary(ctx->ts, type_Int);
 
     else if (try_match(ctx, "File"))
-        return typeUnitary(ctx->ts, type_File);
+        dt = typeUnitary(ctx->ts, type_File);
 
-    else {
+    /*List*/
+    else if (try_match(ctx, "[")) {
+        dt = typeList(ctx->ts, parseType(ctx));
+        match(ctx, "]");
+
+
+    } else if (try_match(ctx, "(")) {
+        /*Unit*/
+        if (see(ctx, ")"))
+            dt = typeUnitary(ctx->ts, type_Unit);
+
+        else {
+            dt = parseType(ctx);
+
+            /*Tuple*/
+            if (see(ctx, ",")) {
+                vector(type*) types = vectorInit(3, malloc);
+                vectorPush(&types, dt);
+
+                while (try_match(ctx, ","))
+                    vectorPush(&types, parseType(ctx));
+
+                dt = typeTuple(ctx->ts, types);
+            }
+        }
+
+        match(ctx, ")");
+
+    } else {
         expected(ctx, "type name");
-        return typeInvalid(ctx->ts);
+        dt = typeInvalid(ctx->ts);
     }
+
+    return dt;
 }
 
 /**
