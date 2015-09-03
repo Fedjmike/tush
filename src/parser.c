@@ -95,11 +95,14 @@ static ast* parsePath (parserCtx* ctx) {
     /*Inspect the first char*/
     if (str[0] == '/' || str[0] == '-') {
         /*Root*/
-        if (str[0] == '-')
+        if (str[0] == '-') {
             flags |= flagAbsolutePath;
 
+            if (str[1] == 0)
+                str = "-/";
+
         /*Path modifier*/
-        else
+        } else
             modifier = true;
 
         /*Move past this char.

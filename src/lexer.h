@@ -237,8 +237,9 @@ static inline void lexerKeywordsInit (void) {
     static const char* ops[] = {
         "|", "|:", "|>", "&&", "||",
         "==", "!=", "<", "<=", ">", ">=",
-        /*No *, would override globs (todo)*/
-        "+", "-", "++",
+        /* * would override globs (todo)*/
+        /* - would override the root (todo)*/
+        "+", "++",
         "/", "%",
         "->"
     };
