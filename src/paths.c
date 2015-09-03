@@ -114,10 +114,13 @@ char* pathContract (const char* path, const char* prefix, const char* replacemen
 }
 
 char* pathGetSegments (const char* path, malloc_t malloc) {
+    bool absolute = path[0] == '/';
+
     /*Copy the string*/
     size_t length = strlen(path);
-    char* segments = malloc(length+2);
+    char* segments = malloc(length+3) + (absolute ? 1 : 0);
     memcpy(segments, path, length+1);
+
     /*With a second null*/
     segments[length+1] = 0;
 
@@ -126,6 +129,13 @@ char* pathGetSegments (const char* path, malloc_t malloc) {
          (nextslash = strchr(current, '/'));
          current = nextslash+1) {
         *nextslash = 0;
+    }
+
+    /*We moved the copy up a byte earlier
+      Now we move it back and put root name*/
+    if (absolute) {
+        segments--;
+        segments[0] = '/';
     }
 
     return segments;
