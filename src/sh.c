@@ -49,7 +49,7 @@ ast* compile (compilerCtx* ctx, const char* str, int* errors) {
     /*Turn the string into an AST*/
     ast* tree; {
         lexerCtx lexer = lexerInit(str);
-        parserResult result = parse(ctx->global, &lexer);
+        parserResult result = parse(ctx->global, &ctx->ts, &lexer);
         lexerDestroy(&lexer);
 
         tree = result.tree;

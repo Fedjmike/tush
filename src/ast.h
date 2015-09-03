@@ -8,7 +8,7 @@ typedef enum astKind {
     astBOP, astFnApp, astSymbol,
     astUnitLit, astIntLit, astFloatLit, astBoolLit, astStrLit,
     astFileLit, astGlobLit, astListLit, astTupleLit, astFnLit,
-    astLet,
+    astLet, astTypeHint,
     astInvalid,
     astKindNo
 } astKind;
@@ -78,6 +78,7 @@ ast* astCreateTupleLit (vector(ast*) elements);
 ast* astCreateFnLit (vector(ast*) args, ast* expr, vector(sym*) captured);
 
 ast* astCreateLet (sym* symbol, ast* init);
+ast* astCreateTypeHint (ast* symbol, type* dt);
 
 ast* astCreateInvalid (void);
 

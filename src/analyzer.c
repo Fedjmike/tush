@@ -30,11 +30,17 @@ static type* analyzeFnLit (analyzerCtx* ctx, ast* node) {
     vector(type*) typevars = vectorInit(2, malloc);
 
     for_vector (ast* pattern, node->children, {
-        /*Nothing we can say about the arg for now*/
-        type* typevar = typeVar(ctx->ts);
-        vectorPush(&typevars, typevar);
+        type* dt;
 
-        pattern->symbol->dt = typevar;
+        if (pattern->kind == astTypeHint) {
+            dt = pattern->dt;
+
+        } else {
+            dt = typeVar(ctx->ts);
+            vectorPush(&typevars, dt);
+        }
+
+        pattern->symbol->dt = dt;
         pattern->dt = pattern->symbol->dt;
     })
 

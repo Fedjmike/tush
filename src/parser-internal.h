@@ -27,13 +27,15 @@ typedef struct parserCtx {
     /*A stack of functions, representing the lexical context*/
     vector(parserFnCtx*) fns;
 
+    typeSys* ts;
+
     lexerCtx* lexer;
     token current;
 
     int errors;
 } parserCtx;
 
-static parserCtx parserInit (sym* global, lexerCtx* lexer);
+static parserCtx parserInit (sym* global, typeSys* ts, lexerCtx* lexer);
 static parserCtx* parserFree (parserCtx* ctx);
 
 static void enter_fn (parserCtx* ctx, sym* newscope, vector(sym*)* captured);
@@ -55,11 +57,12 @@ static bool try_match (parserCtx* ctx, const char* look);
 
 /*==== Inline implementations ====*/
 
-inline static parserCtx parserInit (sym* global, lexerCtx* lexer) {
+inline static parserCtx parserInit (sym* global, typeSys* ts, lexerCtx* lexer) {
     return (parserCtx) {
         .global = global,
         .scope = global,
         .fns = vectorInit(10, malloc),
+        .ts = ts,
         .lexer = lexer,
         .current = lexerNext(lexer),
         .errors = 0

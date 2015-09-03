@@ -7,11 +7,25 @@
 
 #include "sym.h"
 #include "ast.h"
+#include "type.h"
 
 static ast* parseExpr (parserCtx* ctx);
 
+static type* parserType (parserCtx* ctx) {
+    if (try_match(ctx, "Int"))
+        return typeUnitary(ctx->ts, type_Int);
+
+    else if (try_match(ctx, "File"))
+        return typeUnitary(ctx->ts, type_File);
+
+    else {
+        expected(ctx, "type name");
+        return typeInvalid(ctx->ts);
+    }
+}
+
 /**
- * Pattern = <Name>
+ * Pattern = <Name> [ "::" Type ]
  */
 static ast* parserPattern (parserCtx* ctx) {
     ast* node;
@@ -28,6 +42,9 @@ static ast* parserPattern (parserCtx* ctx) {
         expected(ctx, "function argument");
         node = astCreateInvalid();
     }
+
+    if (try_match(ctx, "::"))
+        node = astCreateTypeHint(node, parserType(ctx));
 
     return node;
 }
@@ -390,8 +407,8 @@ static ast* parseS (parserCtx* ctx) {
     return node;
 }
 
-parserResult parse (sym* global, lexerCtx* lexer) {
-    parserCtx ctx = parserInit(global, lexer);
+parserResult parse (sym* global, typeSys* ts, lexerCtx* lexer) {
+    parserCtx ctx = parserInit(global, ts, lexer);
     ast* tree = parseS(&ctx);
 
     if (!tree) {

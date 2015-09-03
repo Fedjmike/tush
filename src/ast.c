@@ -121,6 +121,15 @@ ast* astCreateLet (sym* symbol, ast* init) {
     });
 }
 
+ast* astCreateTypeHint (ast* symbol, type* dt) {
+    precond(symbol->kind == astSymbol);
+    precond(symbol->symbol);
+
+    return astCreate(astTypeHint, (ast) {
+        .l = symbol, .dt = dt, .symbol = symbol->symbol
+    });
+}
+
 ast* astCreateInvalid (void) {
     return astCreate(astInvalid, (ast) {});
 }
@@ -213,6 +222,7 @@ const char* astKindGetStr (astKind kind) {
     case astTupleLit: return "TupleLit";
     case astFnLit: return "FnLit";
     case astLet: return "Let";
+    case astTypeHint: return "TypeHint";
     case astInvalid: return "Invalid";
     case astKindNo: return "<KindNo; not real>";
     }

@@ -82,6 +82,7 @@ static void printer (printerCtx* ctx, const ast* node) {
         printer_outf(ctx)("symbol: %s\n", symGetName(node->symbol));
         break;
 
+    case astTypeHint:
     case astListLit:
     case astTupleLit:
     case astFnApp:

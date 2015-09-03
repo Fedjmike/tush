@@ -241,7 +241,7 @@ static inline void lexerKeywordsInit (void) {
         /* - would override the root (todo)*/
         "+", "++",
         "/", "%",
-        "->"
+        "->", "::"
     };
 
     static const char* kws[] = {

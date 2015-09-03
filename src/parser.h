@@ -7,4 +7,4 @@ typedef struct parserResult {
     int errors;
 } parserResult;
 
-parserResult parse (sym* global, lexerCtx* lexer);
+parserResult parse (sym* global, typeSys* ts, lexerCtx* lexer);
