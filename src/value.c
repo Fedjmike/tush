@@ -26,6 +26,14 @@ typedef struct value {
             char* str;
             size_t strlen;
         };
+        /*File*/
+        struct {
+            const char* filename;
+            const char* relativeTo;
+            /*The absolute form of the filename. May not have been
+              computed yet and therefore null.*/
+            const char* absolute;
+        };
         /*Fn*/
         value* (*fnptr)(const value*);
         /*SimpleClosure*/
@@ -39,8 +47,6 @@ typedef struct value {
             const vector(value*)* argValues;
             ast* body;
         };
-        /*File*/
-        char* filename;
         /*Vector*/
         vector(value*) vec; //todo array(value*)
         /*Pair Triple*/
@@ -85,6 +91,14 @@ value* valueCreateStr (char* str) {
     });
 }
 
+value* valueCreateFile (const char* filename, const char* relativeTo) {
+    return valueCreate(valueFile, (value) {
+        .filename = GC_STRDUP(filename),
+        .relativeTo = relativeTo,
+        .absolute = 0
+    });
+}
+
 value* valueCreateFn (value* (*fnptr)(const value*)) {
     return valueCreate(valueFn, (value) {
         .fnptr = fnptr
@@ -102,12 +116,6 @@ value* valueCreateASTClosure (vector(sym*) argSymbols, vector(value*) argValues,
         .argSymbols = malloci(sizeof(vector), &argSymbols),
         .argValues = malloci(sizeof(vector), &argValues),
         .body = body
-    });
-}
-
-value* valueCreateFile (const char* filename) {
-    return valueCreate(valueFile, (value) {
-        .filename = GC_STRDUP(filename)
     });
 }
 
@@ -333,19 +341,46 @@ value* valueCall (const value* fn, const value* arg) {
     }
 }
 
-const char* valueGetFilename (const value* value) {
-    if (value->kind == valueInvalid)
-        return 0;
+static bool isFileish (const value* v) {
+    return    v->kind == valueFile
+           || v->kind == valueStr;
+}
 
-    if (!precond(   value->kind == valueFile
-                 || value->kind == valueStr))
-        return 0;
+const char* valueGetFilename (const value* v) {
+    if (   !precond(v)
+        || v->kind == valueInvalid
+        || !precond(isFileish(v)))
+        return "";
 
-    if (value->kind == valueFile)
-        return value->filename;
+    if (v->kind == valueFile) {
+        /*Non-relative path, return directly*/
+        if (!v->relativeTo)
+            return v->filename;
+
+        /*Construct the absolute*/
+        if (!v->absolute) {
+            size_t length = strlen(v->relativeTo) + strlen(v->filename) + 2;
+            ((value*) v)->absolute = GC_MALLOC_ATOMIC(length);
+            snprintf((char*) v->absolute, length, "%s/%s", v->relativeTo, v->filename);
+        }
+
+        return v->absolute;
+
+    } else
+        return v->str;
+}
+
+const char* valueGetDisplayFilename (const value* v) {
+    if (   !precond(v)
+        || v->kind == valueInvalid
+        || !precond(isFileish(v)))
+        return "";
+
+    if (v->kind == valueFile)
+        return v->filename;
 
     else
-        return value->str;
+        return v->str;
 }
 
 /*---- Iterables ----*/

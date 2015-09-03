@@ -93,7 +93,7 @@ void gosh (compilerCtx* ctx, const char* str, bool display) {
 
     if (errors == 0 && no_errors_recently(internalerrors)) {
         /*Run the AST*/
-        envCtx env = {};
+        envCtx env = {.dirs = &ctx->dirs};
         value* result = run(&env, tree);
 
         if (display)
@@ -129,7 +129,7 @@ void replCD (compilerCtx* compiler, const char* input) {
 
     /*Types fine, try running it*/
     else {
-        value* result = run(&(envCtx) {}, tree);
+        value* result = run(&(envCtx) {.dirs = &compiler->dirs}, tree);
 
         if (!result || valueIsInvalid(result))
             ;

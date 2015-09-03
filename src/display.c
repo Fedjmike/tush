@@ -199,7 +199,7 @@ static void displayRegular (value* result, type* dt) {
   first and then wrapping up to the next column.*/
 static void displayFileList (value* result, type* resultType) {
     /*Turn the file list into a vector of names*/
-    vector(const char*) names = vectorMapInit((vectorMapper) valueGetFilename,
+    vector(const char*) names = vectorMapInit((vectorMapper) valueGetDisplayFilename,
                                               valueGetVector(result), malloc);
 
     /*Find the longest filename*/
@@ -256,9 +256,12 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
               if the column is an int*/
 
             type* itemType = vectorGet(tuple, col);
-            bool rightAlign = typeIsKind(type_Int, itemType);
 
-            size_t width = (rightAlign ? displayGetWidthOfStr : displayValue)(item, itemType);
+            bool rightAlign = typeIsKind(type_Int, itemType);
+            bool filename = typeIsKind(type_File, itemType);
+
+            size_t width =   filename ? printf("%s", valueGetDisplayFilename(item))
+                           : (rightAlign ? displayGetWidthOfStr : displayValue)(item, itemType);
             size_t padding = columnWidths[col] - width;
 
             if (rightAlign) {

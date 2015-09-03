@@ -2,6 +2,8 @@
 
 #include <gc.h>
 
+#include "dirctx.h"
+
 #include "sym.h"
 #include "ast.h"
 #include "type.h"
@@ -95,15 +97,11 @@ static value* runListLit (envCtx* env, const ast* node) {
 }
 
 static value* runFileLit (envCtx* env, const ast* node) {
-    (void) env;
-
-    return valueCreateFile(node->literal.str);
+    return valueCreateFile(node->literal.str, env->dirs->workingDirReal);
 }
 
 static value* runGlobLit (envCtx* env, const ast* node) {
-    (void) env;
-
-    return builtinExpandGlob(node->literal.str);
+    return builtinExpandGlob(node->literal.str, env->dirs->workingDirReal);
 }
 
 static value* runLit (envCtx* env, const ast* node) {

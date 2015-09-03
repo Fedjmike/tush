@@ -8,7 +8,8 @@
 #include "value.h"
 #include "sym.h"
 
-value* builtinExpandGlob (const char* pattern) {
+/*workingDir is a GC allocated immutable string*/
+value* builtinExpandGlob (const char* pattern, const char* workingDir) {
     value* result;
 
     glob_t matches = {};
@@ -22,7 +23,7 @@ value* builtinExpandGlob (const char* pattern) {
 
         /*Box the strings in value objects*/
         for (unsigned int n = 0; n < matches.gl_pathc; n++)
-            vectorPush(&results, valueCreateFile(matches.gl_pathv[n]));
+            vectorPush(&results, valueCreateFile(matches.gl_pathv[n], workingDir));
 
         result = valueStoreVector(results);
     }

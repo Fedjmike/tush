@@ -9,6 +9,8 @@ typedef struct envCtx {
     //todo intmap
     vector(sym*) symbols;
     vector(sym*) values;
+
+    dirCtx* dirs;
 } envCtx;
 
 value* run (envCtx* env, const ast* tree);

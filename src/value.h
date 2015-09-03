@@ -39,9 +39,11 @@ value* valueCreateUnit (void);
 value* valueCreateInt (int integer);
 value* valueCreateFloat (double number);
 value* valueCreateStr (char* str);
-value* valueCreateFn (value* (*fnptr)(const value*));
-value* valueCreateFile (const char* filename);
 
+/*Duplicates the filename but takes the relative path, which must be GC allocated.*/
+value* valueCreateFile (const char* filename, const char* relativeTo);
+
+value* valueCreateFn (value* (*fnptr)(const value*));
 value* valueCreateSimpleClosure (const void* env, simpleClosureFn fnptr);
 
 /*Represents a closure by an expression (AST tree) plus arguments to it.
@@ -77,6 +79,7 @@ value* valueCall (const value* fn, const value* arg);
 //todo can fail
 //fallback param?
 const char* valueGetFilename (const value* file);
+const char* valueGetDisplayFilename (const value* file);
 
 /*---- Iterables ----*/
 
