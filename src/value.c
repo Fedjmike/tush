@@ -113,8 +113,8 @@ value* valueCreateSimpleClosure (const void* env, simpleClosureFn fnptr) {
 
 value* valueCreateASTClosure (vector(sym*) argSymbols, vector(value*) argValues, ast* body) {
     return valueCreate(valueASTClosure, (value) {
-        .argSymbols = malloci(sizeof(vector), &argSymbols),
-        .argValues = malloci(sizeof(vector), &argValues),
+        .argSymbols = alloci(sizeof(vector), &argSymbols, GC_malloc),
+        .argValues = alloci(sizeof(vector), &argValues, GC_malloc),
         .body = body
     });
 }
