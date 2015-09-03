@@ -263,7 +263,7 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
             bool rightAlign = typeIsKind(type_Int, itemType);
             bool filename = typeIsKind(type_File, itemType);
 
-            size_t width =   filename ? printf("%s", valueGetDisplayFilename(item))
+            size_t width =   filename ? printFilename(valueGetDisplayFilename(item))
                            : (rightAlign ? displayGetWidthOfStr : displayValue)(item, itemType);
             size_t padding = columnWidths[col] - width;
 
