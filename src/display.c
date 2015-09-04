@@ -69,12 +69,11 @@ static int displayValueImpl (const value* result, type* dt, printf_t printf) {
             if (!list)
                 elementType = vectorGet(tuple, i);
 
-            if (!precond(elementType)) {
+            if (!precond(elementType))
                 length += valuePrint(element);
-                continue;
-            }
 
-            length += displayValueImpl(element, elementType, printf);
+            else
+                length += displayValueImpl(element, elementType, printf);
         })
 
         putchar(brackets[1]);

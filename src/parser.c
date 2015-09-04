@@ -11,6 +11,17 @@
 
 static ast* parseExpr (parserCtx* ctx);
 
+/**
+ * Type = (   Int | File | ( "[" Type "]" )
+ *          | ( "(" Type [{ "," Type }] ")" ) )
+ *        [ "->" Type ]
+ *
+ * Some situations don't allow function types directly, they must be
+ * placed in brackets. This is controlled by [allowFns].
+ * For example:
+ *   \x :: T -> ...
+ * The '->' begins the function body, not a function type.
+ */
 static type* parseType (parserCtx* ctx, bool allowFns) {
     type* dt;
 
@@ -24,7 +35,6 @@ static type* parseType (parserCtx* ctx, bool allowFns) {
     else if (try_match(ctx, "[")) {
         dt = typeList(ctx->ts, parseType(ctx, true));
         match(ctx, "]");
-
 
     } else if (try_match(ctx, "(")) {
         /*Unit*/
