@@ -60,7 +60,8 @@ static int displayValueImpl (const value* result, type* dt, printf_t printf) {
         char* brackets = list ? "[]" : "()";
         int length = 2;
 
-        putchar(brackets[0]);
+        if (!dry)
+            putchar(brackets[0]);
 
         for_iterable_value_indexed (i, const value* element, result, {
             if (i != 0)
@@ -76,7 +77,8 @@ static int displayValueImpl (const value* result, type* dt, printf_t printf) {
                 length += displayValueImpl(element, elementType, printf);
         })
 
-        putchar(brackets[1]);
+        if (!dry)
+            putchar(brackets[1]);
 
         return length;
 
