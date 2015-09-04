@@ -240,7 +240,9 @@ static void displayTable (value* result, type* resultType, vector(type*) tuple) 
     for_iterable_value (const value* inner, result, {
         for (int col = 0; col < columns; col++) {
             const value* item = valueGetTupleNth(inner, col);
-            size_t width = valueGetWidthOfStr(item);
+            type* itemType = vectorGet(tuple, col);
+
+            size_t width = displayGetWidthOfStr(item, itemType);
 
             if (columnWidths[col] < width)
                 columnWidths[col] = width;
