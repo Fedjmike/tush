@@ -216,11 +216,13 @@ const char* valueKindGetStr (valueKind kind) {
 /*==== (Kind generic) Operations ====*/
 
 bool valueIsInvalid (const value* v) {
-    return v->kind == valueInvalid;
+    return !v || v->kind == valueInvalid;
 }
 
 int valuePrintImpl (const value* v, printf_t printf) {
-    //todo TYPE
+    if (!precond(v))
+        return printf("<null>");
+
     switch (v->kind) {
     case valueUnit:
         return printf("()");
@@ -274,8 +276,16 @@ int valuePrint (const value* v) {
 
 /*==== Kind specific operations ====*/
 
+static bool precond_valueKind (const value* v, valueKind kind) {
+    return precond(v) && !valueIsInvalid(v) && precond(v->kind == kind);
+}
+
+static bool precond_value (const value* v, bool (*predicate)(const value*)) {
+    return precond(v) && !valueIsInvalid(v) && precond(predicate(v));
+}
+
 int64_t valueGetInt (const value* num) {
-    if (!precond(num->kind == valueInt))
+    if (!precond_valueKind(num, valueInt))
         /*This interface gives no way to inform of an error. todo?*/
         return 0;
 
@@ -283,7 +293,7 @@ int64_t valueGetInt (const value* num) {
 }
 
 static const char* valueGetStrImpl (const value* str, size_t* length) {
-    if (!precond(str->kind == valueStr)) {
+    if (!precond_valueKind(str, valueStr)) {
         if (length)
             *length = 0;
 
@@ -305,6 +315,9 @@ const char* valueGetStrWithLength (const value* str, size_t* length) {
 }
 
 value* valueCall (const value* fn, const value* arg) {
+    if (!precond(fn) || !precond(arg))
+        return valueCreateInvalid();
+
     switch (fn->kind) {
     case valueFn:
         return fn->fnptr(arg);
@@ -347,9 +360,7 @@ static bool isFileish (const value* v) {
 }
 
 const char* valueGetFilename (const value* v) {
-    if (   !precond(v)
-        || v->kind == valueInvalid
-        || !precond(isFileish(v)))
+    if (!precond_value(v, isFileish))
         return "";
 
     if (v->kind == valueFile) {
@@ -371,9 +382,7 @@ const char* valueGetFilename (const value* v) {
 }
 
 const char* valueGetDisplayFilename (const value* v) {
-    if (   !precond(v)
-        || v->kind == valueInvalid
-        || !precond(isFileish(v)))
+    if (!precond_value(v, isFileish))
         return "";
 
     if (v->kind == valueFile)
@@ -397,7 +406,7 @@ static bool isIterable (const value* iterable) {
 }
 
 int valueGuessIterableLength (const value* iterable) {
-    if (valueIsInvalid(iterable) || !precond(isIterable(iterable))) {
+    if (!precond_value(iterable, isIterable)) {
         /*After extensive research, scientists have discovered
           that all iterators are three items long.*/
         return 3;
@@ -416,7 +425,7 @@ int valueGuessIterableLength (const value* iterable) {
 }
 
 bool valueGetIterator (const value* iterable, valueIter* iter) {
-    if (valueIsInvalid(iterable) || !precond(isIterable(iterable))) {
+    if (!precond_value(iterable, isIterable)) {
         *iter = (valueIter) {.kind = iterInvalid};
         return true;
     }
@@ -442,14 +451,15 @@ bool valueGetIterator (const value* iterable, valueIter* iter) {
 }
 
 const value* valueIterRead (valueIter* iterator) {
-    if (iterator->kind == iterInvalid)
+    if (   !precond(iterator)
+        || iterator->kind == iterInvalid)
         return 0;
 
     return valueGetTupleNth(iterator->iterable, ++iterator->index);
 }
 
 vector(const value*) valueGetVector (const value* iterable) {
-    if (   !precond(isIterable(iterable))
+    if (   !precond_value(iterable, isIterable)
         || !precond(iterable->kind == valueVector))
         /*Dummy vector*/
         return vectorInit(1, GC_malloc);
@@ -460,7 +470,7 @@ vector(const value*) valueGetVector (const value* iterable) {
 /*---- ----*/
 
 const value* valueGetTupleNth (const value* tuple, int n) {
-    if (!precond(isIterable(tuple)))
+    if (!precond_value(tuple, isIterable))
         return valueCreateInvalid();
 
     switch (tuple->kind) {
