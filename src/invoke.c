@@ -7,7 +7,16 @@
 
 #include "common.h"
 
-bool invokeSyncronously (char** argv) {
+static _Noreturn void invoke (const char* program, char** argv) {
+    execv(program, argv);
+    /*exec* only returns if there was an error*/
+
+    perror("error: failed to execute program");
+    printf("       program '%s'\n", program);
+    exit(1);
+}
+
+int invokeSyncronously (char** argv) {
     const char* program = argv[0];
 
     pid_t child;
@@ -15,24 +24,25 @@ bool invokeSyncronously (char** argv) {
     switch ((child = fork())) {
     case -1:
         errprintf("Failed to start a new process\n");
-        return true;
+        return -1;
 
     /*Child (the program)*/
     case 0:
-        execvp(program, argv);
-
-        /*exec* only returns if there was an error*/
-        errprintf("Failed to execute '%s'\n", program);
-        exit(1);
+        invoke(program, argv);
 
     /*Parent (the shell)*/
     default: {
         int status;
-        waitpid(child, &status, 0);
-        //todo return status?
-    }}
 
-    return false;
+        if (waitpid(child, &status, 0) != child)
+            return -2;
+
+        if (WIFEXITED(status))
+            return WEXITSTATUS(status);
+
+        else
+            return -3;
+    }}
 }
 
 FILE* invokePiped (char** argv) {
@@ -56,12 +66,9 @@ FILE* invokePiped (char** argv) {
     case 0:
         /*Use the pipe as stdout*/
         fclose(stdout);
-        dup(programPipe[1]);
+        dup2(programPipe[1], STDIN_FILENO);
 
-        execvp(program, argv);
-
-        errprintf("Failed to execute '%s'\n", program);
-        exit(1);
+        invoke(program, argv);
 
     /*Parent*/
     default:
