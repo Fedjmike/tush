@@ -50,7 +50,6 @@ bin/%: tests/%.c  $(HEADERS) $(TEST_HEADERS) $(OBJECTS)
 	@$(CC) $(TEST_CFLAGS) $< $(OBJECTS) $(TEST_LDFLAGS) -o $@
 	@echo " [$@]"
 	@$(VALGRIND) $@
-	@echo "... passed"
 	@echo
 
 tests: bin/ $(TESTS)

@@ -22,6 +22,7 @@ extern _Atomic unsigned int test_errors;
     int main (int argc, char** argv) {        \
         (void) argc, (void) argv;             \
         test_main();                          \
+        if (!test_errors) puts("Passed");     \
         return test_errors;                   \
     }
 
