@@ -326,6 +326,8 @@ void repl (compilerCtx* compiler) {
 int main (int argc, char** argv) {
     GC_INIT();
 
+    terminalInit();
+
     rl_basic_word_break_characters = " \t\n\"\\'`@$><=;|&{([,";
 
     compilerCtx compiler = compilerInit();

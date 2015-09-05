@@ -13,6 +13,8 @@
 #define styleWhite   "\e[1;37m"
 #define styleReset   "\e[0m"
 
+void terminalInit (void);
+
 unsigned int getWindowWidth (void);
 
 int printf_style (const char* format, ...);
