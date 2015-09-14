@@ -62,9 +62,9 @@ typedef struct ast {
     };
 } ast;
 
-ast* astCreateBOP (ast* l, ast* r, opKind op);
-ast* astCreateFnApp (vector(ast*) args, ast* fn);
-ast* astCreateSymbol (sym* symbol);
+ast* astCreateFnLit (vector(ast*) args, ast* expr, vector(sym*) captured);
+ast* astCreateTupleLit (vector(ast*) elements);
+ast* astCreateListLit (vector(ast*) elements);
 
 ast* astCreateUnitLit (void);
 ast* astCreateIntLit (int64_t integer);
@@ -73,12 +73,13 @@ ast* astCreateBoolLit (bool truth);
 ast* astCreateStrLit (const char* str);
 ast* astCreateFileLit (const char* str, astFlags flags);
 ast* astCreateGlobLit (const char* str, astFlags flags);
-ast* astCreateListLit (vector(ast*) elements);
-ast* astCreateTupleLit (vector(ast*) elements);
-ast* astCreateFnLit (vector(ast*) args, ast* expr, vector(sym*) captured);
 
-ast* astCreateLet (sym* symbol, ast* init);
+ast* astCreateSymbol (sym* symbol);
+ast* astCreateFnApp (vector(ast*) args, ast* fn);
+ast* astCreateBOP (ast* l, ast* r, opKind op);
+
 ast* astCreateTypeHint (ast* symbol, type* dt);
+ast* astCreateLet (sym* symbol, ast* init);
 
 ast* astCreateInvalid (void);
 

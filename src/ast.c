@@ -35,24 +35,22 @@ void astDestroy (ast* node) {
     free(node);
 }
 
-ast* astCreateBOP (ast* l, ast* r, opKind op) {
-    return astCreate(astBOP, (ast) {
-        .l = l,
-        .r = r,
-        .op = op
+ast* astCreateListLit (vector(ast*) elements) {
+    return astCreate(astListLit, (ast) {
+        .children = elements,
     });
 }
 
-ast* astCreateFnApp (vector(ast*) args, ast* fn) {
-    return astCreate(astFnApp, (ast) {
-        .r = fn,
-        .children = args
+ast* astCreateTupleLit (vector(ast*) elements) {
+    return astCreate(astTupleLit, (ast) {
+        .children = elements,
     });
 }
 
-ast* astCreateSymbol (sym* symbol) {
-    return astCreate(astSymbol, (ast) {
-        .symbol = symbol
+ast* astCreateFnLit (vector(ast*) args, ast* expr, vector(sym*) captured) {
+    return astCreate(astFnLit, (ast) {
+        .children = args, .r = expr,
+        .captured = malloci(sizeof(vector), &captured)
     });
 }
 
@@ -96,28 +94,24 @@ ast* astCreateGlobLit (const char* str, astFlags flags) {
     });
 }
 
-ast* astCreateListLit (vector(ast*) elements) {
-    return astCreate(astListLit, (ast) {
-        .children = elements,
+ast* astCreateSymbol (sym* symbol) {
+    return astCreate(astSymbol, (ast) {
+        .symbol = symbol
     });
 }
 
-ast* astCreateTupleLit (vector(ast*) elements) {
-    return astCreate(astTupleLit, (ast) {
-        .children = elements,
+ast* astCreateFnApp (vector(ast*) args, ast* fn) {
+    return astCreate(astFnApp, (ast) {
+        .r = fn,
+        .children = args
     });
 }
 
-ast* astCreateFnLit (vector(ast*) args, ast* expr, vector(sym*) captured) {
-    return astCreate(astFnLit, (ast) {
-        .children = args, .r = expr,
-        .captured = malloci(sizeof(vector), &captured)
-    });
-}
-
-ast* astCreateLet (sym* symbol, ast* init) {
-    return astCreate(astLet, (ast) {
-        .symbol = symbol, .r = init
+ast* astCreateBOP (ast* l, ast* r, opKind op) {
+    return astCreate(astBOP, (ast) {
+        .l = l,
+        .r = r,
+        .op = op
     });
 }
 
@@ -127,6 +121,12 @@ ast* astCreateTypeHint (ast* symbol, type* dt) {
 
     return astCreate(astTypeHint, (ast) {
         .l = symbol, .dt = dt, .symbol = symbol->symbol
+    });
+}
+
+ast* astCreateLet (sym* symbol, ast* init) {
+    return astCreate(astLet, (ast) {
+        .symbol = symbol, .r = init
     });
 }
 
