@@ -33,9 +33,6 @@ void terminalInit (void) {
         signal(SIGTTIN, SIG_IGN);
         signal(SIGTTOU, SIG_IGN);
 
-        /*Child termination*/
-        signal(SIGCHLD, SIG_IGN);
-
         /*Enter a new process group*/
 
         pid_t shell_pgid = getpid();
