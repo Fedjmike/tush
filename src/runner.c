@@ -209,17 +209,29 @@ static value* runClassicUnixApp (envCtx* env, const ast* node, const char* progr
 
     vectorPush(&args, 0);
 
-    /*Run the program*/
-    FILE* programOutput = invokePiped((char**) args.buffer);
+    /*Invoke the program*/
+
+    value* result;
+
+    if (node->flags & flagUnixSynchronous)
+        result = valueCreateInt(invokeSyncronously((char**) args.buffer));
+
+    else {
+        /*Run the program*/
+        FILE* programOutput = invokePiped((char**) args.buffer);
+
+        if (!precond(programOutput))
+            return valueCreateInvalid();
+
+        /*Read the pipe*/
+        char* output = readall(programOutput, gcalloc);
+
+        result = valueCreateStr(output);
+    }
+
     vectorFree(&args);
 
-    if (!precond(programOutput))
-        return valueCreateInvalid();
-
-    /*Read the pipe*/
-    char* output = readall(programOutput, gcalloc);
-
-    return valueCreateStr(output);
+    return result;
 }
 
 static value* runFnApp (envCtx* env, const ast* node) {

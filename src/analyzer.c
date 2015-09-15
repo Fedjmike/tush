@@ -387,6 +387,13 @@ analyzerResult analyze (typeSys* ts, ast* node) {
     analyzerCtx ctx = analyzerInit(ts);
     analyzer(&ctx, node);
 
+    /*A top level fn app gets to execute synchronously.
+      That is, take control of the terminal and return only an error code.*/
+    if (node->kind == astFnApp && (node->flags & flagUnixInvocation)) {
+        node->flags |= flagUnixSynchronous;
+        node->dt = typeUnitary(ts, type_Int);
+    }
+
     analyzerResult result = {
         .errors = ctx.errors
     };

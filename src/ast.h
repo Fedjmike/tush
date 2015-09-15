@@ -17,11 +17,12 @@ typedef enum astFlags {
     flagNone = 0,
     /*FnApp*/
     flagUnixInvocation = 1 << 0,
+    flagUnixSynchronous = 1 << 1,
     /*BOP[o=Pipe]*/
-    flagListApplication = 1 << 1,
+    flagListApplication = 1 << 2,
     /*FileLit*/
-    flagAbsolutePath = 1 << 2,
-    flagAllowPathSearch = 1 << 3
+    flagAbsolutePath = 1 << 3,
+    flagAllowPathSearch = 1 << 4
 } astFlags;
 
 typedef enum opKind {
