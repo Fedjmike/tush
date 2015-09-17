@@ -94,9 +94,9 @@
         <section>
             <h1 class="content-head">Getting it</h1>
             
-            You can download a precompiled Linux binary <a href="https://github.com/Fedjmike/tush/releases/tag/alpha-0.01">here</a>:
+            You can download a precompiled Linux binary <a href="https://github.com/Fedjmike/tush/releases/tag/alpha-0.02">here</a>:
             
-            <pre><code>wget </code><a href="https://github.com/Fedjmike/tush/releases/download/alpha-0.01/tush"><code>https://github.com/Fedjmike/tush/releases/download/alpha-0.01/tush</code></a><code>
+            <pre><code>wget </code><a href="https://github.com/Fedjmike/tush/releases/download/alpha-0.02/tush"><code>https://github.com/Fedjmike/tush/releases/download/alpha-0.02/tush</code></a><code>
 chmod +x tush
 sudo mv tush /usr/local/bin</code></pre>
             
@@ -111,15 +111,16 @@ sudo mv tush /usr/local/bin</code></pre>
             <p>Implemented so far:</p>
             <ul class="tight">
                 <li>Files, globs, strings, integers, lists and tuples.</li>
-                <li>Lambdas, function application, list concatenation, <code>let</code>.</li>
-                <li>Basic polymorphism.</li>
-                <li>Some builtins: <code>size</code>, <code>cat</code>, <code>lc</code> (line count), <code>sum</code>, <code>zipf</code>.</li>
+                <li>Lambdas (with type hinting), function application, list concatenation, <code>let</code>.</li>
+                <li>Synchronous and piped Unix program invocation.</li>
+                <li>Basic polymorphism (without type inference).</li>
+                <li>Some builtins: <code>size</code>, <code>cat</code>, <code>lc</code> (line count), <code>sum</code>, <code>zipf</code>, <code>fst</code>, <code>snd</code>.</li>
                 <li>Output display for type names, files and directories, file lists, tuple lists (a.k.a. tables) and nested lists.</li>
                 <li>A readline based REPL.</li>
             </ul>
             
             <h2 class="content-head">Future</h2>
-            <p>On the immediate horizon is global type inference and program invocation. There is some basic support for asynchronous (pipeless) program invocation.</p>
+            <p>On the immediate horizon is global type inference and program invocation. There is already support for Unix (string stream) program invocation..</p>
             <p>Beyond the language itself, Tush will have:</p>
             <ul class="tight">
                 <li>A C API for writing native Tush programs.</li>
@@ -132,7 +133,7 @@ sudo mv tush /usr/local/bin</code></pre>
     </div>
     
     <footer class="ribbon">
-        Last updated 28/08/2015.
+        Last updated 17/09/2015.
     </footer>
     
     <script type="text/javascript">
