@@ -61,6 +61,40 @@ static value* builtinSize (const value* file) {
     return valueCreateInt(st.size);
 }
 
+static value* builtinLinecount (const value* file) {
+    const char* filename = valueGetFilename(file);
+
+    if (!filename)
+        return valueCreateInvalid();
+
+    FILE* f = fopen(filename, "r");
+
+    if (!f)
+        return valueCreateInvalid();
+
+    int lines = 1;
+    int lastch = 0;
+
+    while (true) {
+        int ch = fgetc(f);
+
+        if (ch == '\n')
+            lines++;
+
+        else if (ch == EOF)
+            break;
+
+        lastch = ch;
+    }
+
+    if (lastch == '\n')
+        lines--;
+
+    fclose(f);
+
+    return valueCreateInt(lines);
+}
+
 static value* builtinSum (const value* numbers) {
     int64_t total = 0;
 
@@ -133,6 +167,10 @@ void addBuiltins (typeSys* ts, sym* global) {
     addBuiltin(global, "size",
                typeFn(ts, File, Int),
                valueCreateFn(builtinSize));
+
+    addBuiltin(global, "lc",
+               typeFn(ts, File, Int),
+               valueCreateFn(builtinLinecount));
 
     addBuiltin(global, "sum",
                typeFn(ts, typeList(ts, Int), Int),
