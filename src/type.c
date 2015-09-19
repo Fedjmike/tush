@@ -332,7 +332,7 @@ static type* fnGetTo (typeSys* ts, const type* fn) {
 
     case type_Forall:
         //todo: not all typevar will appear in the result, remove them
-        return typeForall(ts, fn->typevars, fnGetTo(ts, fn->dt));
+        return typeForall(ts, vectorDup(fn->typevars, malloc), fnGetTo(ts, fn->dt));
 
     default:
         errprintf("Unhandled function kind, %s\n", typeGetStr(fn));
