@@ -15,7 +15,7 @@
 [-] Language
     [-] Values
         [x] Integer
-        [x] Number
+        [-] Number
         [x] Str
         [-] Lambda
             [ ] Arg type inference
@@ -33,11 +33,13 @@
         [ ] Dictionary
         -----
         [-] File
-            [ ] Fix paths
-                - Root spelled '-'
+            [-] Fix paths
+                [x] Root spelled '-'
                 - Home directories, '~'
+			[ ] Search only if used as a fn?
             [ ] Quoted names
             [ ] Escapes?
+            [ ] Implicit conversion from string?
         [ ] Directory (trailing /)
         [ ] FileListing (like ls -l)
         [-] Glob
@@ -88,6 +90,10 @@
             [ ] Expression level let
             [ ] A helpful error message to distinguish them
             [ ] Self reference error
+            [ ] Only allow symbol names to be [\w\d-]
+			[-] Type hinting
+				[ ] Typevars
+					[ ] Implicit
         [ ] Functions
             [ ] Options
             [ ] Dependency functions
@@ -131,6 +137,7 @@
         [ ] Interactive command construction, extensible
         [ ] Job control
         [ ] Concurrent histories
+        [ ] Errors keep the prompt, like fish
     [ ] Display
         [-] Value printing
             [-] Highlighting
@@ -145,12 +152,36 @@
     [ ] JIT
     [ ] Compilation to POSIX shell
 
+[-] Tests
+    [x] sym
+    [ ] ast
+        [ ] ast-printer
+    [ ] type
+        [ ] type-unify
+    [ ] value
+    
+    [ ] paths
+    [ ] dirctx
+    [ ] terminal
+    [ ] invoke
+    [ ] common
+    
+    [ ] builtins
+    
+    [-] lexer
+    [ ] parser
+    [ ] analyzer
+    [ ] runner
+    [ ] display
+	
+    [ ] sh
+
 ---------
 
 [-] Gather todos
 [ ] Minimize asserts !!!!
 [ ] Multithreaded Boehm leaks (currently suppressed)
-[ ] Uses of realloc (others?) in stdalloc taking fns
+[-] Uses of realloc (others?) in stdalloc taking fns
 [ ] Pull bool fns from loops
 [ ] Document the purpose of each module
 
@@ -163,7 +194,7 @@ vector:
 
 hashmap:
 [ ] Simplify impl.
-[ ] tsearch and tsearch?
+[ ] hsearch and tsearch?
 [ ] Args of const map* -> map
 [ ] Change XXXAdd to XXXSet and make an XXXAdd that doesn't overwrite values
 
@@ -179,6 +210,9 @@ type:
 [x] Higher-kinded type printing
 
 ast:
+[ ] Combine flags and kind using a bitfield
+	- No, would slow down frequent access of kind
+[ ] Move children, l, r into the union
 [ ] Make AST::children a const_vector (combined length and size fields)
 [ ] Pooled allocator for AST
     - Substitute for malloc/free in debug
