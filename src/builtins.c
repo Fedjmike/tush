@@ -182,10 +182,11 @@ void addBuiltins (typeSys* ts, sym* global) {
         type* B_A = typeTuple(ts, vectorInitChain(2, malloc, B, A));
 
         addBuiltin(global, "zipf",
-                   /*'a 'b => ('a -> 'b) -> 'a -> ('b, 'a)*/
-                   typeForall(ts, vectorInitChain(2, malloc, A, B),
+                   /*'a => 'b => ('a -> 'b) -> 'a -> ('b, 'a)*/
+                   typeForall(ts, A,
+                   typeForall(ts, B,
                        typeFn(ts, typeFn(ts, A, B),
-                       typeFn(ts, A, B_A))),
+                       typeFn(ts, A, B_A)))),
                    valueCreateFn(builtinZipfCurried));
     }
 
@@ -195,8 +196,9 @@ void addBuiltins (typeSys* ts, sym* global) {
         type* A_B = typeTuple(ts, vectorInitChain(2, malloc, A, B));
 
         addBuiltin(global, "fst",
-                   typeForall(ts, vectorInitChain(2, malloc, A, B),
-                       typeFn(ts, A_B, A)),
+                   typeForall(ts, A,
+                   typeForall(ts, B,
+                       typeFn(ts, A_B, A))),
                    valueCreateFn(builtinFst));
     }
 
@@ -206,8 +208,9 @@ void addBuiltins (typeSys* ts, sym* global) {
         type* A_B = typeTuple(ts, vectorInitChain(2, malloc, A, B));
 
         addBuiltin(global, "snd",
-                   typeForall(ts, vectorInitChain(2, malloc, A, B),
-                       typeFn(ts, A_B, B)),
+                   typeForall(ts, A,
+                   typeForall(ts, B,
+                       typeFn(ts, A_B, B))),
                    valueCreateFn(builtinSnd));
     }
 
@@ -217,7 +220,7 @@ void addBuiltins (typeSys* ts, sym* global) {
 
         addBuiltin(global, "sort",
                    /*[(Int, 'a)] -> [(Int, 'a)]*/
-                   typeForall(ts, vectorInitChain(1, malloc, A),
+                   typeForall(ts, A,
                        typeFn(ts, typeList(ts, Int_A),
                                   typeList(ts, Int_A))),
                    valueCreateFn(builtinSort));

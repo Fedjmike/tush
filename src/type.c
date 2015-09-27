@@ -23,9 +23,6 @@ static void typeDestroy (type* dt) {
     if (dt->kind == type_Tuple)
         vectorFree(&dt->types);
 
-    else if (dt->kind == type_Forall)
-        vectorFree(&dt->typevars);
-
     free(dt->str);
     free(dt);
 }
@@ -68,9 +65,9 @@ type* typeVar (typeSys* ts) {
     return typeNonUnitary(ts, type_Var, (type) {});
 }
 
-type* typeForall (typeSys* ts, vector(type*) typevars, type* dt) {
+type* typeForall (typeSys* ts, type* typevar, type* dt) {
     return typeNonUnitary(ts, type_Forall, (type) {
-        .typevars = typevars, .dt = dt
+        .typevar = typevar, .dt = dt
     });
 }
 
@@ -199,24 +196,17 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt, bool firstLevel) {
         return strMapTypevar(ctx, dt);
 
     case type_Forall: {
-        const char* dtStr = typeGetStrImpl(ctx, dt->dt, false);
-
+        bool stillFirstLevel = firstLevel && dt->dt->kind == type_Forall;
         bool higherKinded = !firstLevel;
 
+        const char* dtStr = typeGetStrImpl(ctx, dt->dt, stillFirstLevel);
+
+        /*Top level quantifiers for functions are left implicit*/
         if (!higherKinded  && typeIsFn(dt->dt))
             return dtStr;
 
-        /*Note: VLA*/
-        const char* typevarStrs[dt->typevars.length];
-
-        for_vector_indexed (i, type* typevar, dt->typevars, {
-            typevarStrs[i] = strMapTypevar(ctx, typevar);
-        })
-
-        char* typevarStr = strjoinwith(dt->typevars.length, (char**) typevarStrs, ", ", malloc);
-
+        const char* typevarStr = strMapTypevar(ctx, dt->typevar);
         bool allocSuccess = 0 != asprintf(&dt->str, "%s => %s", typevarStr, dtStr);
-        free(typevarStr);
 
         if (!precond(allocSuccess))
             /*Could return dtStr, but best not to give valid /looking/
@@ -255,7 +245,7 @@ const char* typeGetStr (const type* dt) {
 /*==== Tests ====*/
 
 static void seeThroughQuantifier (const type** dt) {
-    if ((*dt)->kind == type_Forall)
+    while ((*dt)->kind == type_Forall)
         *dt = (*dt)->dt;
 }
 
@@ -331,8 +321,8 @@ static type* fnGetTo (typeSys* ts, const type* fn) {
         return fn->to;
 
     case type_Forall:
-        //todo: not all typevar will appear in the result, remove them
-        return typeForall(ts, vectorDup(fn->typevars, malloc), fnGetTo(ts, fn->dt));
+        //todo: the typevar won't always appear in the result, remove it
+        return typeForall(ts, fn->typevar, fnGetTo(ts, fn->dt));
 
     default:
         errprintf("Unhandled function kind, %s\n", typeGetStr(fn));

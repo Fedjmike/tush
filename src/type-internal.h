@@ -16,7 +16,7 @@ typedef struct type {
         vector(type*) types;
         /*Forall*/
         struct {
-            vector(type*) typevars;
+            type* typevar;
             type* dt;
         };
     };

@@ -39,7 +39,7 @@ type* typeList (typeSys* ts, type* elements);
 type* typeTuple (typeSys* ts, vector(type*) types);
 
 type* typeVar (typeSys* ts);
-type* typeForall (typeSys* ts, vector(type*) typevars, type* dt);
+type* typeForall (typeSys* ts, type* typevar, type* dt);
 
 type* typeInvalid (typeSys* ts);
 

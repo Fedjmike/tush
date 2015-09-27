@@ -27,18 +27,10 @@ static type* analyzeFnLit (analyzerCtx* ctx, ast* node) {
       (this must occur before typing the body because the args will
        be used in it and thus need types)*/
 
-    vector(type*) typevars = vectorInit(2, malloc);
-
     for_vector (ast* pattern, node->children, {
-        type* dt;
-
-        if (pattern->kind == astTypeHint) {
-            dt = pattern->dt;
-
-        } else {
-            dt = typeVar(ctx->ts);
-            vectorPush(&typevars, dt);
-        }
+        type* dt =   pattern->kind == astTypeHint
+                   ? pattern->dt
+                   : typeVar(ctx->ts);
 
         pattern->symbol->dt = dt;
         pattern->dt = pattern->symbol->dt;
@@ -52,15 +44,12 @@ static type* analyzeFnLit (analyzerCtx* ctx, ast* node) {
 
     for_vector_reverse (ast* pattern, node->children, {
         result = typeFn(ctx->ts, pattern->dt, result);
+
+        if (typeIsKind(type_Var, pattern->dt))
+            result = typeForall(ctx->ts, pattern->dt, result);
     })
 
-    if (typevars.length != 0)
-        return typeForall(ctx->ts, typevars, result);
-
-    else {
-        vectorFree(&typevars);
-        return result;
-    }
+    return result;
 }
 
 static type* analyzeTupleLit (analyzerCtx* ctx, ast* node) {
@@ -87,9 +76,7 @@ static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
     /*No elements => type is ['a] */
     if (node->children.length == 0) {
         type* A = typeVar(ctx->ts);
-        vector(type*) typevars = vectorInitChain(1, malloc, A);
-
-        return typeForall(ctx->ts, typevars, typeList(ctx->ts, A));
+        return typeForall(ctx->ts, A, typeList(ctx->ts, A));
 
     } else {
         type* elements = 0;
