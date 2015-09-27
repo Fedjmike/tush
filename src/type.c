@@ -128,7 +128,7 @@ static const char* strMapTypevar (strCtx* ctx, const type* dt) {
     return str;
 }
 
-static const char* typeGetStrImpl (strCtx* ctx, type* dt, bool firstLevel) {
+static const char* typeGetStrImpl (strCtx* ctx, type* dt, bool implicitQuantifiers) {
     if (dt->str)
         return dt->str;
 
@@ -144,7 +144,10 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt, bool firstLevel) {
 
     case type_Fn: {
         const char *from = typeGetStrImpl(ctx, dt->from, false),
-                   *to = typeGetStrImpl(ctx, dt->to, false);
+                   /*   A -> 'a => B('a) == 'a => A -> B('a)
+                     If we were allowed implicit quantifiers up until now,
+                     then allow them in fn result as well.*/
+                   *to = typeGetStrImpl(ctx, dt->to, implicitQuantifiers);
 
         bool higherOrderFn = typeIsFn(dt->from) || dt->from->kind == type_Forall;
 
@@ -196,13 +199,10 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt, bool firstLevel) {
         return strMapTypevar(ctx, dt);
 
     case type_Forall: {
-        bool stillFirstLevel = firstLevel && dt->dt->kind == type_Forall;
-        bool higherKinded = !firstLevel;
-
-        const char* dtStr = typeGetStrImpl(ctx, dt->dt, stillFirstLevel);
+        const char* dtStr = typeGetStrImpl(ctx, dt->dt, implicitQuantifiers);
 
         /*Top level quantifiers for functions are left implicit*/
-        if (!higherKinded  && typeIsFn(dt->dt))
+        if (implicitQuantifiers && typeIsFn(dt->dt))
             return dtStr;
 
         const char* typevarStr = strMapTypevar(ctx, dt->typevar);
