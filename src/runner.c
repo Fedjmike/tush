@@ -290,7 +290,7 @@ static value* runConcat (envCtx* env, const ast* node, const value* left, const 
                          rvec = valueGetVector(right);
 
     //todo opt.
-    vector(value*) result = vectorInit(lvec.length + rvec.length, malloc);
+    vector(value*) result = vectorInit(lvec.length + rvec.length, GC_malloc);
     vectorPushFromVector(&result, lvec);
     vectorPushFromVector(&result, rvec);
 
