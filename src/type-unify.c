@@ -37,14 +37,14 @@ static void infDestroy (inference* inf) {
     free(inf);
 }
 
-inferences infsInit (malloc_t malloc) {
+static inferences infsInit (malloc_t malloc) {
     return (inferences) {
         .bound = vectorInit(8, malloc),
         .v = vectorInit(8, malloc)
     };
 }
 
-inferences* infsFree (inferences* infs) {
+static inferences* infsFree (inferences* infs) {
     vectorFree(&infs->bound);
     vectorFreeObjs(&infs->v, (vectorDtor) infDestroy);
     return infs;
@@ -90,7 +90,7 @@ static bool infsMerge (inferences* infs, inference* l, inference* r) {
     return false;
 }
 
-bool inferEqual (inferences* infs, const type* l, const type* r) {
+static bool inferEqual (inferences* infs, const type* l, const type* r) {
     if (typeUnifyNoisy)
         printf("%s = %s\n", typeGetStr(l), typeGetStr(r));
 
@@ -142,7 +142,7 @@ bool inferEqual (inferences* infs, const type* l, const type* r) {
     return false;
 }
 
-void inferInvalidSub (inferences* infs, const type* invalid, const type* other) {
+static void inferInvalidSub (inferences* infs, const type* invalid, const type* other) {
     if (typeUnifyNoisy)
         printf("invalid => %s\n", typeGetStr(other));
 
@@ -160,7 +160,7 @@ void inferInvalidSub (inferences* infs, const type* invalid, const type* other) 
         infsAdd(infs, invalid, other);
 }
 
-bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
+static bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
     if (typeUnifyNoisy)
         printf("unifying %s with %s\n", typeGetStr(l), typeGetStr(r));
 
@@ -221,7 +221,7 @@ bool typeUnifies (typeSys* ts, inferences* infs, const type* l, const type* r) {
     }
 }
 
-type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
+static type* typeMakeSubs (typeSys* ts, const inferences* infs, const type* dt) {
     if (!typeKindIsntUnitary(dt->kind))
         return (type*) dt;
 

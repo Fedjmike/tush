@@ -211,7 +211,7 @@ static const char* typeGetStrImpl (strCtx* ctx, type* dt, bool firstLevel) {
         if (!precond(allocSuccess))
             /*Could return dtStr, but best not to give valid /looking/
               output if it isn't actually valid.*/
-            return "(forall . )";
+            return "( => )";
 
         return dt->str;
     }}
