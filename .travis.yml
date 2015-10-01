@@ -8,6 +8,13 @@ addons:
         packages:
         - valgrind
         - libreadline-dev
+    coverity_scan:
+        project:
+            name: "Fedjmike/tush"
+        description: "Build submitted via Travis CI"
+        notification_email: sam.nipps+github@gmail.com
+        build_command:   "make -j4"
+        branch_pattern: coverity-scan
 before_install:
     - pushd ..
     -
@@ -27,6 +34,8 @@ before_install:
     -
     - popd
 env:
-    - EXTRA_CFLAGS="-I../bdwgc/include" EXTRA_LDFLAGS="-L../bdwgc/.libs" LD_LIBRARY_PATH="../bdwgc/.libs:$LD_LIBRARY_PATH"
+    global:
+        - EXTRA_CFLAGS="-I../bdwgc/include" EXTRA_LDFLAGS="-L../bdwgc/.libs" LD_LIBRARY_PATH="../bdwgc/.libs:$LD_LIBRARY_PATH"
+        - secure: "JvDy4PCCvauF+yN6TXr0Xz1303mpBc2htxb9yy5M32gqMk7FaouARQO+BApj8Hg8WRL0pBW/ZkYj8bRAuQVK0Qsf1e2UI8ypiV7vhTgtoLKqb4aR0VltmmiwNQip1sq8zBH6IIpN2NjI10o33lbnM+0G3sV5M+ec5Aivtl0tcOa7Zv7VotNgp3Y/bfQzqorFS5bRjgIvtVr4ckdoFcewJ/lSMmybcEN6ODcPm8wRqmw4JGCZMhol4jZ54IFHw0wwx0D6rryvFXSNqIO35fXj8cWFbTWt3S+uLw2znjb66UTyRjdoSusjRhsIX1KPGgYCPUq467p65JlesOiUJWiBlJl58gDvEhW9wDZ5aOpXYgc2vmL9tPCJoBJ3fbHgBanZU9jNOeuAhRMJH47O8hs04c5sodNgjGgL3G5mja4UwWbGde9TWGTie8E5cQRgQvtMtIfuTdZ4UWzGcWJYCYEzy0NSeihJs39ywinzTjTbWM5mwx1sKi0JTllB0x/vjmapddGgTXSXDVD4kDYVmHWGBJaKB7lH+UzWg0H1vO44UfAEddzV/l11H+NvxAEv4X15ZQcxiqlQ5QBX5Iqw35CxZ1gX3W/X2lpJ5sMwKvhMCnkI4VEqocd6gDMl/SZbBQ7q0ezlj/MwXzjW5ElWSzdJNmUlh3ayFdJ387ygJ35Jjtw="
 script:
     - make  --keep-going all tests
