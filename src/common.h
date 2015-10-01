@@ -16,7 +16,7 @@ typedef int printf_t(const char*, ...);
 extern _Atomic unsigned int internalerrors;
 
 static inline void errprintf__ (const char* file, const char* fn, int line, const char* format, ...) {
-    fprintf(stderr, "Gosh internal error: %s:%d: (%s): ", file, line, fn);
+    fprintf(stderr, "Tush internal error: %s:%d: (%s): ", file, line, fn);
     va_list args;
     va_start(args, format);
     vfprintf(stderr, format, args);

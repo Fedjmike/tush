@@ -83,9 +83,9 @@ compilerCtx* compilerFree (compilerCtx* ctx) {
     return ctx;
 }
 
-/*==== Gosh ====*/
+/*==== Tush ====*/
 
-void gosh (compilerCtx* ctx, const char* str, bool display) {
+void tush (compilerCtx* ctx, const char* str, bool display) {
     errctx internalerrors = errcount();
     int errors = 0;
 
@@ -276,8 +276,8 @@ void repl (compilerCtx* compiler) {
     char* historyFilename;
     bool historyStaticStr = false;
 
-    if (!precond(asprintf(&historyFilename, "%s/.gosh_history", homedir))) {
-        historyFilename = "./.gosh_history";
+    if (!precond(asprintf(&historyFilename, "%s/.tush_history", homedir))) {
+        historyFilename = "./.tush_history";
         historyStaticStr = true;
     }
 
@@ -303,7 +303,7 @@ void repl (compilerCtx* compiler) {
             replCmd(compiler, input+1);
 
         else
-            gosh(compiler, input, true);
+            tush(compiler, input, true);
 
         //todo move both history and collection to a separate thread
         //(but the still sync it will the prompt)
@@ -337,11 +337,11 @@ int main (int argc, char** argv) {
         repl(&compiler);
 
     else if (argc == 2)
-        gosh(&compiler, argv[1], true);
+        tush(&compiler, argv[1], true);
 
     else {
         char* input = strjoinwith(argc, argv, " ", malloc);
-        gosh(&compiler, input, true);
+        tush(&compiler, input, true);
         free(input);
     }
 
