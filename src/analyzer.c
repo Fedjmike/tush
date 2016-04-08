@@ -81,6 +81,8 @@ static type* analyzeListLit (analyzerCtx* ctx, ast* node) {
     } else {
         type* elements = 0;
 
+        /*Make sure the element types are consistent*/
+
         for_vector_indexed (i, ast* element, node->children, {
             type* dt = analyzer(ctx, element);
 

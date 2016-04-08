@@ -5,9 +5,9 @@
 #include "forward.h"
 
 typedef enum astKind {
-    astBOP, astFnApp, astSymbol,
     astUnitLit, astIntLit, astFloatLit, astBoolLit, astStrLit,
     astFileLit, astGlobLit, astListLit, astTupleLit, astFnLit,
+    astBOP, astFnApp, astSymbol,
     astLet, astTypeHint,
     astInvalid,
     astKindNo

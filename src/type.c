@@ -360,6 +360,9 @@ bool typeAppliesToFn (typeSys* ts, const type* arg, const type* fn, type** resul
 }
 
 bool typeIsListOf (const type* dt, type** elements) {
+    if (!precond(dt))
+        return false;
+
     seeThroughQuantifier(&dt);
 
     if (dt->kind == type_List) {
@@ -371,6 +374,9 @@ bool typeIsListOf (const type* dt, type** elements) {
 }
 
 bool typeIsTupleOf (const type* dt, vector(const type*)* types) {
+    if (!precond(dt))
+        return false;
+
     seeThroughQuantifier(&dt);
 
     if (dt->kind == type_Tuple) {

@@ -19,13 +19,16 @@ typedef struct value {
     union {
         /*Int*/
         int64_t integer;
+
         /*Float*/
         double number;
+
         /*Str*/
         struct {
             const char* str;
             size_t strlen;
         };
+
         /*File*/
         struct {
             const char* filename;
@@ -34,21 +37,26 @@ typedef struct value {
               computed yet and therefore null.*/
             const char* absolute;
         };
+
         /*Fn*/
         value* (*fnptr)(const value*);
+
         /*SimpleClosure*/
         struct {
             value* (*simpleClosure)(const void* env, const value*);
             const void* simpleEnv;
         };
+
         /*ASTClosure*/
         struct {
             const vector(sym*)* argSymbols;
             const vector(value*)* argValues;
             ast* body;
         };
+
         /*Vector*/
         vector(value*) vec; //todo array(value*)
+
         /*Pair Triple*/
         struct {
             value *first, *second, *third;

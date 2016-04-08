@@ -208,9 +208,6 @@ const char* opKindGetStr (opKind kind) {
 
 const char* astKindGetStr (astKind kind) {
     switch (kind) {
-    case astBOP: return "BOP";
-    case astFnApp: return "FnApp";
-    case astSymbol: return "Symbol";
     case astUnitLit: return "UnitLit";
     case astIntLit: return "IntLit";
     case astFloatLit: return "FloatLit";
@@ -221,6 +218,9 @@ const char* astKindGetStr (astKind kind) {
     case astListLit: return "ListLit";
     case astTupleLit: return "TupleLit";
     case astFnLit: return "FnLit";
+    case astBOP: return "BOP";
+    case astFnApp: return "FnApp";
+    case astSymbol: return "Symbol";
     case astLet: return "Let";
     case astTypeHint: return "TypeHint";
     case astInvalid: return "Invalid";

@@ -40,3 +40,15 @@
    ...
    fun:GC_gcollect
 }
+{
+   boehm07
+   Memcheck:Cond
+   ...
+   fun:GC_malloc
+}
+{
+   readline
+   Memcheck:Leak
+   ...
+   fun:readline
+}
