@@ -283,6 +283,28 @@ static value* runPipe (envCtx* env, const ast* node, const value* arg, const val
         return pipeCall(node, fn, arg);
 }
 
+static value* runArithmetic (envCtx* env, const ast* node, const value* left, const value* right) {
+    (void) env;
+
+    int l = valueGetInt(left),
+        r = valueGetInt(right);
+
+    int result;
+
+    switch (node->op) {
+    case opAdd: result = l + r; break;
+    case opSubtract: result = l - r; break;
+    case opMultiply: result = l * r; break;
+    case opDivide: result = l / r; break;
+    case opModulo: result = l % r; break;
+    default:
+        errprintf("Unhandled binary operator kind, %s\n", opKindGetStr(node->op));
+        return valueCreateInvalid();
+    }
+
+    return valueCreateInt(result);
+}
+
 static value* runConcat (envCtx* env, const ast* node, const value* left, const value* right) {
     (void) env, (void) node;
 
@@ -305,6 +327,13 @@ static value* runBOP (envCtx* env, const ast* node) {
     case opPipe:
     case opPipeZip:
         return runPipe(env, node, left, right);
+
+    case opAdd:
+    case opSubtract:
+    case opMultiply:
+    case opDivide:
+    case opModulo:
+        return runArithmetic(env, node, left, right);
 
     case opConcat: return runConcat(env, node, left, right);
 

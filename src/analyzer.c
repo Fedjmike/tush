@@ -250,41 +250,54 @@ static type* analyzePipe (analyzerCtx* ctx, ast* node, type* arg, type* fn) {
         return callResult;
 }
 
-static void errorConcat (analyzerCtx* ctx, type* left, type* right) {
-    if (typeIsInvalid(left) || typeIsInvalid(right))
-        return;
-
-    bool leftNotList = !typeIsList(left),
-         rightNotList = !typeIsList(right);
-
-    if (leftNotList || rightNotList) {
-        if (leftNotList && rightNotList) {
-            error(ctx)(  typeIsEqual(left, right)
-                       ? "concat operator (++): operands, %s, are not lists\n"
-                       : "concat operator (++): operands, %s and %s, are not lists\n",
-                       typeGetStr(left), typeGetStr(right));
-
-        } else
-            error(ctx)("concat operator (++): %s operand, %s, is not a list\n",
-                       leftNotList ? "left" : "right",
-                       typeGetStr(leftNotList ? left : right));
-
-    } else
-        error(ctx)("concat operator (++): operand mismatch: %s and %s\n",
-                   typeGetStr(left), typeGetStr(right));
+static const char* nameTypeKind (typeKind kind, bool plural) {
+    switch (kind) {
+    case type_Int: return plural ? "Ints" : "an Int";
+    case type_List: return plural ? "Lists" : "a List";
+    default: return "<unhandled>";
+    }
 }
 
-static type* analyzeConcat (analyzerCtx* ctx, ast* node, type* left, type* right) {
-    (void) node;
-
+static type* operandsUnifyToTypeKind (analyzerCtx* ctx, const ast* node, type* left, type* right, typeKind expected) {
     type* result;
     bool unifies = typeCanUnify(ctx->ts, left, right, &result);
 
-    if (unifies && typeIsList(result))
+    if (unifies && typeIsKind(expected, result))
         return result;
 
     else {
-        errorConcat(ctx, left, right);
+        bool leftNotExpected = !typeIsKind(expected, left),
+             rightNotExpected = !typeIsKind(expected, right);
+
+        if (typeIsInvalid(left) || typeIsInvalid(right))
+            ;
+
+        else if (leftNotExpected || rightNotExpected) {
+            if (leftNotExpected && rightNotExpected) {
+                if (typeIsEqual(left, right))
+                    error(ctx)("operator (%s): operands, %s, are not %s\n",
+                               opKindGetStr(node->op),
+                               typeGetStr(left),
+                               nameTypeKind(expected, true));
+
+                else
+                    error(ctx)("operator (%s): operands, %s and %s, are not %s\n",
+                               opKindGetStr(node->op),
+                               typeGetStr(left), typeGetStr(right),
+                               nameTypeKind(expected, true));
+
+            } else
+                error(ctx)("operator (%s): %s operand, %s, is not %s\n",
+                           opKindGetStr(node->op),
+                           leftNotExpected ? "left" : "right",
+                           typeGetStr(leftNotExpected ? left : right),
+                           nameTypeKind(expected, false));
+
+        } else
+            error(ctx)("operator (%s): operand mismatch: %s and %s\n",
+                       opKindGetStr(node->op),
+                       typeGetStr(left), typeGetStr(right));
+
         return typeInvalid(ctx->ts);
     }
 }
@@ -298,7 +311,15 @@ static type* analyzeBOP (analyzerCtx* ctx, ast* node) {
     case opPipeZip:
         return analyzePipe(ctx, node, left, right);
 
-    case opConcat: return analyzeConcat(ctx, node, left, right);
+    case opAdd:
+    case opSubtract:
+    case opMultiply:
+    case opDivide:
+    case opModulo:
+        return operandsUnifyToTypeKind(ctx, node, left, right, type_Int);
+
+    case opConcat:
+        return operandsUnifyToTypeKind(ctx, node, left, right, type_List);
 
     default:
         errprintf("Unhandled binary operator kind, %s\n", opKindGetStr(node->op));
